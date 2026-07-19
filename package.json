@@ -1,15 +1,19 @@
 {
   "name": "workspace",
   "version": "0.0.0",
-  "license": "MIT",
-  "scripts": {
-    "dev": "npm run dev --workspace=@workspace/calculator-platform",
-    "build": "npm run build --workspaces --if-present",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "npm run typecheck:libs && npm run typecheck --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present"
-  },
   "private": true,
+  "license": "MIT",
+  "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @workspace/calculator-platform dev",
+    "build": "pnpm -r build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r typecheck",
+    "lint": "pnpm -r lint"
+  },
   "workspaces": [
     "artifacts/*",
     "lib/*",
