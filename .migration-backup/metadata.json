@@ -1,0 +1,6 @@
+{
+  "name": "Professional Calculator Platform",
+  "description": "An industrial-grade, 100% Mobile-First and SEO-optimized calculator suite featuring Mortgage, BMI, Percentage, Loan, Age, Tip, Calorie, and GPA calculators with instant client-side math and an advanced admin dashboard with Google Trends and OpenRouter AI integrations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,227 @@
+# Migrate This Project from Vite to Next.js 15 (Do NOT Rebuild)
+
+You are a senior software architect and Next.js expert.
+
+Your task is to **migrate the existing project** from **Vite + React + TypeScript** to **Next.js 15 App Router**.
+
+This is a migration, NOT a rewrite.
+
+## Primary Goal
+
+Keep **everything** working exactly as it is while replacing only the framework.
+
+Do not redesign anything.
+
+Do not simplify anything.
+
+Do not remove features.
+
+Do not change business logic.
+
+---
+
+# Preserve 100%
+
+Preserve:
+
+* UI
+* UX
+* Responsive design
+* Layout
+* Colors
+* Typography
+* Tailwind CSS
+* Animations
+* Icons
+* Components
+* Calculator formulas
+* Utilities
+* Hooks
+* State management
+* Validation
+* Accessibility
+* Existing functionality
+
+The application should look identical after migration.
+
+---
+
+# Convert to Next.js 15
+
+Use:
+
+* Next.js 15
+* App Router
+* TypeScript
+* Tailwind CSS
+* ESLint
+* Server Components where appropriate
+* Client Components only when necessary
+
+Remove all Vite-specific code.
+
+---
+
+# Routing
+
+Replace React Router completely with the Next.js App Router.
+
+Create a proper app/ directory.
+
+Preserve every existing URL whenever possible.
+
+---
+
+# SEO
+
+Implement production-grade SEO.
+
+Every page must support:
+
+* title
+* meta description
+* canonical URL
+* Open Graph
+* Twitter Cards
+* robots
+* sitemap
+* structured data (JSON-LD)
+* Breadcrumb schema
+* FAQ schema (when applicable)
+
+Generate sitemap.xml automatically.
+
+Generate robots.txt automatically.
+
+Implement clean URLs.
+
+---
+
+# AI SEO
+
+Implement advanced AI-friendly SEO.
+
+Optimize the application for:
+
+* Google
+* Bing
+* ChatGPT
+* Gemini
+* Claude
+* Perplexity
+* AI search engines
+
+Use semantic HTML.
+
+Use proper heading hierarchy.
+
+Optimize Core Web Vitals.
+
+Optimize Largest Contentful Paint.
+
+Optimize Interaction to Next Paint.
+
+Optimize CLS.
+
+---
+
+# Performance
+
+Optimize for:
+
+* lazy loading
+* dynamic imports
+* image optimization
+* font optimization
+* caching
+* code splitting
+* tree shaking
+* static generation where possible
+* server rendering where appropriate
+
+Target Lighthouse:
+
+* Performance 95+
+* Accessibility 100
+* Best Practices 100
+* SEO 100
+
+---
+
+# TypeScript
+
+Fix every TypeScript error.
+
+Remove every TS2835 error.
+
+Use clean imports.
+
+No build warnings.
+
+No lint warnings.
+
+---
+
+# Vercel
+
+Prepare the project for production deployment on Vercel.
+
+The project must build successfully using:
+
+npm install
+
+npm run build
+
+No configuration errors.
+
+---
+
+# Code Quality
+
+Keep the architecture clean.
+
+Avoid duplicated code.
+
+Follow SOLID principles.
+
+Use reusable components.
+
+Use scalable folder organization.
+
+---
+
+# Security
+
+Do not expose secrets.
+
+Validate user input.
+
+Use secure defaults.
+
+---
+
+# Final Verification
+
+Do not stop until all of the following are true:
+
+* Project successfully migrated to Next.js 15
+* UI identical to the original
+* UX identical to the original
+* All calculators work
+* All pages work
+* All links work
+* All imports fixed
+* Zero TypeScript errors
+* Zero build errors
+* Zero Vite dependencies
+* Production-ready on Vercel
+* SEO fully optimized
+* AI SEO fully optimized
+
+Finally provide:
+
+1. Summary of every modified file.
+2. List of removed Vite files.
+3. List of new Next.js files.
+4. Any manual steps still required.
+5. Confirmation that the project is production-ready.

@@ -1,0 +1,25 @@
+kind = "web"
+previewPath = "/"
+title = "Professional Calculator Platform"
+version = "1.0.0"
+id = "artifacts/calculator-platform"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23007
+
+[services.development]
+run = "pnpm --filter @workspace/calculator-platform run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/calculator-platform", "run", "build" ]
+serve = "standalone"
+standaloneDir = "artifacts/calculator-platform/.next/standalone"
+staticDir = "artifacts/calculator-platform/.next/static"
+publicDir = "artifacts/calculator-platform/public"
+
+[services.env]
+PORT = "23007"
+BASE_PATH = "/"

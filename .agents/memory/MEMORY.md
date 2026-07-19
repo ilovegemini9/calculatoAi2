@@ -1,0 +1,2 @@
+- [Calculator codegen architecture](codegen-architecture.md) — 3-pass parallel Gemini approach; article must NOT be inside JSON to avoid corruption
+- [OpenRouter model selection](openrouter-model-selection.md) — per-task free model picks (code vs article) chosen by live testing, not spec sheets; avoid "going away" models
