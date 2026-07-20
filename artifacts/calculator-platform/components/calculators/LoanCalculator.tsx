@@ -19,20 +19,51 @@ export function LoanCalculator() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <InputsPanel>
-          <Field label="Loan Amount ($)">
-            <input type="number" value={loanAmount} min={0} step={100}
-              onChange={e => setLoanAmount(+e.target.value || 0)} className={inputClass} />
+          <Field label="Loan Amount ($)" htmlFor="loan-amount">
+            <input
+              id="loan-amount"
+              type="number"
+              value={loanAmount}
+              min={0}
+              step={100}
+              aria-label="Loan amount in dollars"
+              onChange={e => setLoanAmount(+e.target.value || 0)}
+              className={inputClass}
+            />
           </Field>
-          <Field label="Annual Interest Rate (%)">
-            <input type="number" value={interestRate} min={0} max={100} step={0.01}
-              onChange={e => setInterestRate(+e.target.value || 0)} className={inputClass} />
+          <Field label="Annual Interest Rate (%)" htmlFor="loan-rate">
+            <input
+              id="loan-rate"
+              type="number"
+              value={interestRate}
+              min={0}
+              max={100}
+              step={0.01}
+              aria-label="Annual interest rate as a percentage"
+              onChange={e => setInterestRate(+e.target.value || 0)}
+              className={inputClass}
+            />
           </Field>
           <div className="flex gap-3">
-            <Field label="Term">
-              <input type="number" value={term} min={1} onChange={e => setTerm(+e.target.value || 1)} className={inputClass} />
+            <Field label="Term" htmlFor="loan-term">
+              <input
+                id="loan-term"
+                type="number"
+                value={term}
+                min={1}
+                aria-label="Loan term duration"
+                onChange={e => setTerm(+e.target.value || 1)}
+                className={inputClass}
+              />
             </Field>
-            <Field label="Unit">
-              <select value={termUnit} onChange={e => setTermUnit(e.target.value as 'years' | 'months')} className={selectClass}>
+            <Field label="Unit" htmlFor="loan-term-unit">
+              <select
+                id="loan-term-unit"
+                value={termUnit}
+                aria-label="Loan term unit"
+                onChange={e => setTermUnit(e.target.value as 'years' | 'months')}
+                className={selectClass}
+              >
                 <option value="years">Years</option>
                 <option value="months">Months</option>
               </select>
@@ -54,11 +85,11 @@ export function LoanCalculator() {
           <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Amortization Schedule (key payments)</h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-xs" aria-label="Amortization schedule">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
                 {['#', 'Payment', 'Principal', 'Interest', 'Balance'].map(h => (
-                  <th key={h} className="text-left px-4 py-2.5 font-bold text-slate-500 uppercase tracking-wide">{h}</th>
+                  <th key={h} scope="col" className="text-left px-4 py-2.5 font-bold text-slate-500 uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
             </thead>

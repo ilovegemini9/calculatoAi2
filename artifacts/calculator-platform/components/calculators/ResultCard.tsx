@@ -89,21 +89,24 @@ export function InputsPanel({ children, title }: InputsPanelProps) {
 
 interface FieldProps {
   label: string;
+  htmlFor?: string;
   hint?: string;
+  hintId?: string;
   children: React.ReactNode;
 }
 
-export function Field({ label, hint, children }: FieldProps) {
+export function Field({ label, htmlFor, hint, hintId, children }: FieldProps) {
   return (
     <div>
       <label
+        htmlFor={htmlFor}
         className="block text-[11px] font-black uppercase tracking-wider mb-1.5"
         style={{ color: 'var(--text-secondary)' }}
       >
         {label}
       </label>
       {hint && (
-        <p className="text-[11px] mb-1.5" style={{ color: 'var(--text-muted)' }}>
+        <p id={hintId} className="text-[11px] mb-1.5" style={{ color: 'var(--text-muted)' }}>
           {hint}
         </p>
       )}

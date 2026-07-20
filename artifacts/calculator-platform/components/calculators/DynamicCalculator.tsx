@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { formatNumber } from '@/lib/utils';
 import type { CalculatorInput, CalculatorOutput } from '@/lib/types';
 
@@ -11,9 +11,11 @@ interface Props {
 }
 
 export function DynamicCalculator({ inputs, outputs, calculateBody }: Props) {
+  const uid = useId();
   const [values, setValues] = useState<Record<string, string>>({});
   const [results, setResults] = useState<Record<string, unknown>>({});
   const [error, setError] = useState('');
+  const errorId = `${uid}-error`;
 
   // Set default values on mount
   useEffect(() => {
@@ -58,7 +60,7 @@ export function DynamicCalculator({ inputs, outputs, calculateBody }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
       {/* Input panel */}
-      <div 
+      <div
         className="md:col-span-7 rounded-2xl border p-6 space-y-6"
         style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
@@ -69,15 +71,26 @@ export function DynamicCalculator({ inputs, outputs, calculateBody }: Props) {
         <div className="space-y-4">
           {inputs.map((inp) => {
             const currentVal = values[inp.name] || '';
-            
+            const inputId = `${uid}-${inp.name}`;
+            const helpId = inp.helpText ? `${uid}-${inp.name}-help` : undefined;
+            const rangeId = `${uid}-${inp.name}-range`;
+
             return (
               <div key={inp.name} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
-                  <label className="font-bold" style={{ color: 'var(--text-secondary)' }}>
+                  <label
+                    htmlFor={inp.type === 'number' ? rangeId : inputId}
+                    className="font-bold"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
                     {inp.label}
                   </label>
                   {inp.type === 'number' && (
-                    <span className="font-semibold font-mono" style={{ color: 'var(--text-primary)' }}>
+                    <span
+                      className="font-semibold font-mono"
+                      style={{ color: 'var(--text-primary)' }}
+                      aria-live="polite"
+                    >
                       {currentVal} {inp.suffix}
                     </span>
                   )}
@@ -86,37 +99,46 @@ export function DynamicCalculator({ inputs, outputs, calculateBody }: Props) {
                 {inp.type === 'number' ? (
                   <div className="space-y-2">
                     <input
+                      id={rangeId}
                       type="range"
                       min={inp.min ?? 0}
                       max={inp.max ?? 100}
                       step={inp.step ?? 1}
                       value={Number(currentVal || 0)}
+                      aria-label={`${inp.label} slider`}
+                      aria-describedby={helpId}
                       onChange={(e) => handleInputChange(inp.name, e.target.value)}
-                      className="w-full h-1.5 bg-[var(--border)] rounded-lg appearance-none cursor-pointer accent-blue-600"
+                      className="w-full h-5 bg-[var(--border)] rounded-lg appearance-none cursor-pointer accent-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     />
                     <input
+                      id={inputId}
                       type="number"
                       min={inp.min}
                       max={inp.max}
                       step={inp.step}
                       value={currentVal}
+                      aria-label={`${inp.label} value`}
+                      aria-describedby={helpId}
                       onChange={(e) => handleInputChange(inp.name, e.target.value)}
-                      className="w-full p-2.5 border rounded-lg text-sm outline-none font-medium"
+                      className="w-full p-2.5 min-h-[44px] border rounded-lg text-sm outline-none font-medium focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] focus-visible:border-[var(--border-focus)]"
                       style={{ backgroundColor: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                     />
                   </div>
                 ) : (
                   <input
+                    id={inputId}
                     type="text"
                     value={currentVal}
+                    aria-label={inp.label}
+                    aria-describedby={helpId}
                     onChange={(e) => handleInputChange(inp.name, e.target.value)}
-                    className="w-full p-3 border rounded-xl text-sm outline-none"
+                    className="w-full p-3 min-h-[44px] border rounded-xl text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-focus)] focus-visible:border-[var(--border-focus)]"
                     style={{ backgroundColor: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                   />
                 )}
 
                 {inp.helpText && (
-                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                  <p id={helpId} className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
                     {inp.helpText}
                   </p>
                 )}
@@ -128,7 +150,7 @@ export function DynamicCalculator({ inputs, outputs, calculateBody }: Props) {
 
       {/* Output results card */}
       <div className="md:col-span-5 space-y-6">
-        <div 
+        <div
           className="rounded-2xl border p-6 text-center space-y-6"
           style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}
         >
@@ -137,27 +159,38 @@ export function DynamicCalculator({ inputs, outputs, calculateBody }: Props) {
           </h2>
 
           {error ? (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold rounded-xl">
+            <div
+              id={errorId}
+              role="alert"
+              aria-live="assertive"
+              className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold rounded-xl"
+            >
               ⚠️ {error}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4" aria-live="polite" aria-label="Calculation results">
               {outputs.map((out) => {
                 const rawVal = results[out.name];
                 const displayVal = typeof rawVal === 'number' ? formatNumber(rawVal, 2) : String(rawVal ?? '0');
 
                 return (
-                  <div 
-                    key={out.name} 
+                  <div
+                    key={out.name}
                     className={`p-4 rounded-xl border ${
                       out.highlight ? 'bg-blue-500/5 border-blue-500/20' : ''
                     }`}
                     style={{ borderColor: 'var(--border)' }}
                   >
-                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                    <span
+                      className="text-[10px] font-black uppercase tracking-widest"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       {out.label}
                     </span>
-                    <p className={`text-2xl font-black mt-1 ${out.highlight ? 'text-blue-500' : ''}`} style={{ color: 'var(--text-primary)' }}>
+                    <p
+                      className={`text-2xl font-black mt-1 ${out.highlight ? 'text-blue-500' : ''}`}
+                      style={{ color: 'var(--text-primary)' }}
+                    >
                       {displayVal} <span className="text-sm font-bold">{out.suffix}</span>
                     </p>
                   </div>

@@ -17,24 +17,50 @@ export function BMICalculator() {
   const [height, setHeight] = useState(170);
 
   const result = calculateBMI({ system, weight, height });
+  const weightLabel = `Weight (${system === 'metric' ? 'kg' : 'lbs'})`;
+  const heightLabel = `Height (${system === 'metric' ? 'cm' : 'inches'})`;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <InputsPanel>
-          <Field label="Unit System">
-            <select value={system} onChange={e => setSystem(e.target.value as 'metric' | 'imperial')} className={selectClass}>
+          <Field label="Unit System" htmlFor="bmi-system">
+            <select
+              id="bmi-system"
+              value={system}
+              aria-label="Unit system for BMI calculation"
+              onChange={e => setSystem(e.target.value as 'metric' | 'imperial')}
+              className={selectClass}
+            >
               <option value="metric">Metric (kg / cm)</option>
               <option value="imperial">Imperial (lbs / in)</option>
             </select>
           </Field>
-          <Field label={`Weight (${system === 'metric' ? 'kg' : 'lbs'})`}>
-            <input type="number" value={weight} min={1} max={999} step={0.1}
-              onChange={e => setWeight(parseFloat(e.target.value) || 0)} className={inputClass} />
+          <Field label={weightLabel} htmlFor="bmi-weight">
+            <input
+              id="bmi-weight"
+              type="number"
+              value={weight}
+              min={1}
+              max={999}
+              step={0.1}
+              aria-label={weightLabel}
+              onChange={e => setWeight(parseFloat(e.target.value) || 0)}
+              className={inputClass}
+            />
           </Field>
-          <Field label={`Height (${system === 'metric' ? 'cm' : 'inches'})`}>
-            <input type="number" value={height} min={1} max={999} step={0.1}
-              onChange={e => setHeight(parseFloat(e.target.value) || 0)} className={inputClass} />
+          <Field label={heightLabel} htmlFor="bmi-height">
+            <input
+              id="bmi-height"
+              type="number"
+              value={height}
+              min={1}
+              max={999}
+              step={0.1}
+              aria-label={heightLabel}
+              onChange={e => setHeight(parseFloat(e.target.value) || 0)}
+              className={inputClass}
+            />
           </Field>
         </InputsPanel>
 

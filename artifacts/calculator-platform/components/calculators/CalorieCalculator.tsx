@@ -18,34 +18,48 @@ export function CalorieCalculator() {
     setForm(prev => ({ ...prev, [k]: v }));
 
   const result = calculateCalorie(form);
+  const weightLabel = `Weight (${form.system === 'metric' ? 'kg' : 'lbs'})`;
+  const heightLabel = `Height (${form.system === 'metric' ? 'cm' : 'inches'})`;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <InputsPanel>
-          <Field label="Unit System">
-            <select value={form.system} onChange={e => set('system', e.target.value as CalorieInput['system'])} className={selectClass}>
+          <Field label="Unit System" htmlFor="cal-system">
+            <select id="cal-system" value={form.system}
+              aria-label="Unit system for calorie calculation"
+              onChange={e => set('system', e.target.value as CalorieInput['system'])} className={selectClass}>
               <option value="metric">Metric (kg / cm)</option>
               <option value="imperial">Imperial (lbs / in)</option>
             </select>
           </Field>
-          <Field label="Gender">
-            <select value={form.gender} onChange={e => set('gender', e.target.value as CalorieInput['gender'])} className={selectClass}>
+          <Field label="Gender" htmlFor="cal-gender">
+            <select id="cal-gender" value={form.gender}
+              aria-label="Biological sex for BMR calculation"
+              onChange={e => set('gender', e.target.value as CalorieInput['gender'])} className={selectClass}>
               <option value="male">Male</option>
               <option value="female">Female</option>
             </select>
           </Field>
-          <Field label="Age (years)">
-            <input type="number" value={form.age} min={1} max={120} onChange={e => set('age', +e.target.value || 0)} className={inputClass} />
+          <Field label="Age (years)" htmlFor="cal-age">
+            <input id="cal-age" type="number" value={form.age} min={1} max={120}
+              aria-label="Your age in years"
+              onChange={e => set('age', +e.target.value || 0)} className={inputClass} />
           </Field>
-          <Field label={`Weight (${form.system === 'metric' ? 'kg' : 'lbs'})`}>
-            <input type="number" value={form.weight} min={1} max={999} step={0.1} onChange={e => set('weight', +e.target.value || 0)} className={inputClass} />
+          <Field label={weightLabel} htmlFor="cal-weight">
+            <input id="cal-weight" type="number" value={form.weight} min={1} max={999} step={0.1}
+              aria-label={weightLabel}
+              onChange={e => set('weight', +e.target.value || 0)} className={inputClass} />
           </Field>
-          <Field label={`Height (${form.system === 'metric' ? 'cm' : 'inches'})`}>
-            <input type="number" value={form.height} min={1} max={999} step={0.1} onChange={e => set('height', +e.target.value || 0)} className={inputClass} />
+          <Field label={heightLabel} htmlFor="cal-height">
+            <input id="cal-height" type="number" value={form.height} min={1} max={999} step={0.1}
+              aria-label={heightLabel}
+              onChange={e => set('height', +e.target.value || 0)} className={inputClass} />
           </Field>
-          <Field label="Activity Level">
-            <select value={form.activity} onChange={e => set('activity', e.target.value as CalorieInput['activity'])} className={selectClass}>
+          <Field label="Activity Level" htmlFor="cal-activity">
+            <select id="cal-activity" value={form.activity}
+              aria-label="Your weekly activity level"
+              onChange={e => set('activity', e.target.value as CalorieInput['activity'])} className={selectClass}>
               <option value="sedentary">Sedentary (little/no exercise)</option>
               <option value="light">Light (1–3 days/week)</option>
               <option value="moderate">Moderate (3–5 days/week)</option>
@@ -67,7 +81,7 @@ export function CalorieCalculator() {
         <div className="p-5 border-b border-slate-100">
           <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Calorie Goals</h3>
         </div>
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100" role="list" aria-label="Calorie goals by target">
           {[
             { label: 'Extreme Weight Loss (−1 kg/wk)', value: result.extremeLoss, color: 'text-red-600' },
             { label: 'Weight Loss (−0.5 kg/wk)', value: result.weightLoss, color: 'text-orange-600' },
@@ -76,7 +90,7 @@ export function CalorieCalculator() {
             { label: 'Mild Weight Gain (+0.25 kg/wk)', value: result.mildGain, color: 'text-blue-600' },
             { label: 'Weight Gain (+0.5 kg/wk)', value: result.weightGain, color: 'text-purple-600' },
           ].map((row) => (
-            <div key={row.label} className="flex justify-between items-center px-5 py-3">
+            <div key={row.label} role="listitem" className="flex justify-between items-center px-5 py-3">
               <span className="text-sm text-slate-700">{row.label}</span>
               <span className={`font-black text-sm ${row.color}`}>{row.value.toLocaleString()} kcal</span>
             </div>

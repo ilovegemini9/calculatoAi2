@@ -17,13 +17,28 @@ export function AgeCalculator() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <InputsPanel>
-        <Field label="Date of Birth">
-          <input type="date" value={birthDate} max={today}
-            onChange={e => setBirthDate(e.target.value)} className={inputClass} />
+        <Field label="Date of Birth" htmlFor="age-birth-date">
+          <input
+            id="age-birth-date"
+            type="date"
+            value={birthDate}
+            max={today}
+            aria-label="Your date of birth"
+            onChange={e => setBirthDate(e.target.value)}
+            className={inputClass}
+          />
         </Field>
-        <Field label="Age at Date">
-          <input type="date" value={targetDate} min={birthDate} max="2100-12-31"
-            onChange={e => setTargetDate(e.target.value)} className={inputClass} />
+        <Field label="Age at Date" htmlFor="age-target-date">
+          <input
+            id="age-target-date"
+            type="date"
+            value={targetDate}
+            min={birthDate}
+            max="2100-12-31"
+            aria-label="Date to calculate age at"
+            onChange={e => setTargetDate(e.target.value)}
+            className={inputClass}
+          />
         </Field>
       </InputsPanel>
 

@@ -20,7 +20,7 @@ export function GPACalculator() {
 
   const result = calculateGPA({ courses: courses.filter(c => c.credits > 0) });
 
-  const cellClass = 'px-2 py-1 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-100 outline-none w-full';
+  const cellClass = 'px-2 py-1 min-h-[44px] text-sm bg-slate-50 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 outline-none w-full';
 
   return (
     <div className="space-y-6">
@@ -35,49 +35,80 @@ export function GPACalculator() {
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <h3 className="text-xs font-black uppercase tracking-widest text-slate-500">Courses</h3>
-          <button onClick={addCourse}
-            className="text-xs font-bold px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          <button
+            onClick={addCourse}
+            aria-label="Add a new course"
+            className="text-xs font-bold min-h-[44px] px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
             + Add Course
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm" aria-label="GPA course list">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Course Name</th>
-                <th className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Grade</th>
-                <th className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Credits</th>
-                <th className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Type</th>
-                <th className="px-4 py-2" />
+                <th scope="col" className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Course Name</th>
+                <th scope="col" className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Grade</th>
+                <th scope="col" className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Credits</th>
+                <th scope="col" className="text-left px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide">Type</th>
+                <th scope="col" className="px-4 py-2 sr-only">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {courses.map((course, i) => (
                 <tr key={i} className="hover:bg-slate-50/50 transition">
                   <td className="px-4 py-2.5">
-                    <input value={course.name} onChange={e => updateCourse(i, 'name', e.target.value)}
-                      placeholder="e.g. Math 101" className={cellClass} />
+                    <input
+                      value={course.name}
+                      onChange={e => updateCourse(i, 'name', e.target.value)}
+                      placeholder="e.g. Math 101"
+                      aria-label={`Course ${i + 1} name`}
+                      className={cellClass}
+                    />
                   </td>
                   <td className="px-4 py-2.5">
-                    <select value={course.grade} onChange={e => updateCourse(i, 'grade', e.target.value)} className={cellClass}>
+                    <select
+                      value={course.grade}
+                      onChange={e => updateCourse(i, 'grade', e.target.value)}
+                      aria-label={`Course ${i + 1} grade`}
+                      className={cellClass}
+                    >
                       {GRADES.map(g => <option key={g}>{g}</option>)}
                     </select>
                   </td>
                   <td className="px-4 py-2.5">
-                    <input type="number" value={course.credits} min={0.5} max={6} step={0.5}
+                    <input
+                      type="number"
+                      value={course.credits}
+                      min={0.5}
+                      max={6}
+                      step={0.5}
+                      aria-label={`Course ${i + 1} credit hours`}
                       onChange={e => updateCourse(i, 'credits', parseFloat(e.target.value) || 0)}
-                      className={cn(cellClass, 'w-20')} />
+                      className={cn(cellClass, 'w-20')}
+                    />
                   </td>
                   <td className="px-4 py-2.5">
-                    <select value={course.courseType} onChange={e => updateCourse(i, 'courseType', e.target.value)} className={cellClass}>
+                    <select
+                      value={course.courseType}
+                      onChange={e => updateCourse(i, 'courseType', e.target.value)}
+                      aria-label={`Course ${i + 1} type`}
+                      className={cellClass}
+                    >
                       <option value="regular">Regular</option>
                       <option value="honors">Honors (+0.5)</option>
                       <option value="ap_ib">AP / IB (+1.0)</option>
                     </select>
                   </td>
                   <td className="px-4 py-2.5 text-center">
-                    <button onClick={() => removeCourse(i)} className="text-red-400 hover:text-red-600 transition text-lg leading-none">×</button>
+                    <button
+                      onClick={() => removeCourse(i)}
+                      aria-label={`Remove course ${i + 1}${course.name ? ` (${course.name})` : ''}`}
+                      className="min-w-[44px] min-h-[44px] text-red-400 hover:text-red-600 transition text-lg leading-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none rounded"
+                    >
+                      ×
+                    </button>
                   </td>
                 </tr>
               ))}

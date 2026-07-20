@@ -136,6 +136,7 @@ body {
 .input-base {
   width: 100%;
   padding: 0.75rem;
+  min-height: 44px;
   background-color: var(--bg-input);
   border: 1.5px solid var(--border);
   border-radius: 0.75rem;
@@ -148,6 +149,33 @@ body {
 .input-base:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus) 15%, transparent);
+}
+.input-base:focus-visible {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus) 25%, transparent);
+  outline: 2px solid var(--border-focus);
+  outline-offset: 1px;
+}
+.input-base[aria-invalid="true"] {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgb(239 68 68 / 15%);
+}
+
+/* ─── Skeleton loading ─── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--bg-card-hover) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ─── Scrollbar ─── */
