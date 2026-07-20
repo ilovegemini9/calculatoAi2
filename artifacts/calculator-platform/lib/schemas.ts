@@ -39,14 +39,19 @@ export function websiteSchema() {
   };
 }
 
+/**
+ * WebApplication + SoftwareApplication dual type — recommended by Google for
+ * AI Overviews (SGE) so the tool surfaces in both app and utility searches.
+ */
 export function calculatorSchema(calc: CalculatorMeta) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
+    '@type': ['WebApplication', 'SoftwareApplication'],
     name: calc.name,
     url: `${siteConfig.url}/calculator/${calc.slug}`,
     description: calc.description,
     applicationCategory: 'UtilityApplication',
+    applicationSubCategory: CATEGORY_LABELS[calc.category] ?? calc.category,
     operatingSystem: 'All',
     browserRequirements: 'Requires JavaScript',
     inLanguage: 'en-US',
@@ -55,12 +60,14 @@ export function calculatorSchema(calc: CalculatorMeta) {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
     },
     provider: {
       '@type': 'Organization',
       name: siteConfig.name,
       url: siteConfig.url,
     },
+    keywords: calc.keywords.join(', '),
   };
 }
 
@@ -78,6 +85,7 @@ export function breadcrumbSchema(items: { name: string; url?: string }[]) {
 }
 
 export function faqSchema(items: { question: string; answer: string }[]) {
+  if (!items || items.length === 0) return null;
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -92,12 +100,26 @@ export function faqSchema(items: { question: string; answer: string }[]) {
   };
 }
 
+/**
+ * HowTo schema with Google-recommended fields:
+ * - Named steps (not just text)
+ * - estimatedCost (free tool)
+ * - totalTime as ISO 8601 duration (PT{n}M heuristic: ~2 min per step)
+ */
 export function howToSchema(calc: CalculatorMeta, steps: string[]) {
+  if (!steps || steps.length === 0) return null;
+  const estimatedMinutes = Math.max(2, steps.length * 2);
   return {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name: `How to use the ${calc.name}`,
     description: `Step-by-step guide to using the free online ${calc.name}.`,
+    totalTime: `PT${estimatedMinutes}M`,
+    estimatedCost: {
+      '@type': 'MonetaryAmount',
+      currency: 'USD',
+      value: '0',
+    },
     tool: {
       '@type': 'HowToTool',
       name: calc.name,
@@ -105,7 +127,33 @@ export function howToSchema(calc: CalculatorMeta, steps: string[]) {
     step: steps.map((text, i) => ({
       '@type': 'HowToStep',
       position: i + 1,
+      name: text.length > 60 ? text.slice(0, 57) + '…' : text,
       text,
+      url: `${siteConfig.url}/calculator/${calc.slug}#step-${i + 1}`,
+    })),
+  };
+}
+
+/**
+ * ItemList schema for the Related Calculators section — helps Google understand
+ * the site structure and distributes PageRank via explicit item declarations.
+ */
+export function itemListSchema(
+  items: { name: string; slug: string; description: string }[],
+  listName = 'Related Calculators',
+) {
+  if (!items || items.length === 0) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: listName,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      description: item.description,
+      url: `${siteConfig.url}/calculator/${item.slug}`,
     })),
   };
 }
@@ -150,9 +198,11 @@ export function articleSchema({
   };
 }
 
-/** Serialize multiple schemas as individual <script> tags */
-export function jsonLd(...schemas: object[]) {
-  return schemas.map((s) => JSON.stringify(s));
+/** Serialize multiple schemas as individual <script> tags (null schemas are filtered out) */
+export function jsonLd(...schemas: (object | null | undefined)[]) {
+  return schemas
+    .filter((s): s is object => s != null)
+    .map((s) => JSON.stringify(s));
 }
 
 export function calcCategoryLabel(calc: CalculatorMeta) {
