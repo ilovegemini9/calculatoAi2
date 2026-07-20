@@ -27,5 +27,8 @@
   "devDependencies": {
     "prettier": "^3.9.4",
     "typescript": "~5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@google/genai", "esbuild", "protobufjs", "sharp", "unrs-resolver"]
   }
 }
