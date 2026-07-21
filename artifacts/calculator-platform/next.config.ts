@@ -1,9 +1,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Standalone output for optimized deployment
-  output: 'standalone',
-
   // Experimental features
   experimental: {
     // React 19 server actions
