@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Allow Replit's proxied dev domain for cross-origin HMR/RSC requests
+  allowedDevOrigins: ['*.replit.dev', '*.spock.replit.dev', '*.repl.co'],
+
   // Experimental features
   experimental: {
     // React 19 server actions
