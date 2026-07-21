@@ -320,7 +320,7 @@ export default function SEOFinderPage() {
     }
   };
 
-  const handleBuildCalculator = (_opp: KeywordOpportunity) => {
+  const handleBuildCalculator = () => {
     toast.success('Opening AI Calculator Factory…');
   };
 
@@ -439,7 +439,7 @@ export default function SEOFinderPage() {
             📡 Real Google Search Queries — Live Autocomplete Data
           </h2>
           <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-            These are actual queries people type into Google for "{result.niche}". The AI analyzed these to identify the best opportunities below.
+            These are actual queries people type into Google for &quot;{result.niche}&quot;. The AI analyzed these to identify the best opportunities below.
           </p>
           <div className="flex flex-wrap gap-2">
             {result.rawSuggestions.map((s, i) => (

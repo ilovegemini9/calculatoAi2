@@ -130,12 +130,12 @@ export function AdminShell({ children }: Props) {
               Online
             </span>
           </div>
-          <a
+          <Link
             href="/api/admin/logout"
             className="flex items-center justify-center gap-2 px-3 py-2.5 text-[10px] font-black uppercase tracking-wider text-red-500 hover:bg-red-500/10 rounded-xl transition text-center w-full"
           >
             🚪 Logout session
-          </a>
+          </Link>
         </div>
       </aside>
 
@@ -355,12 +355,12 @@ export function AdminShell({ children }: Props) {
                     </Link>
                   </div>
                   <div className="py-1">
-                    <a
+                    <Link
                       href="/api/admin/logout"
                       className="block text-xs px-3 py-2 text-red-500 hover:bg-red-500/10 rounded-lg"
                     >
                       🚪 Logout Session
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}

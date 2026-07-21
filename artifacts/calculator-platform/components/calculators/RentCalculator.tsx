@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { calculateRent } from '@/lib/calculators/rent/formula';
 import { ResultCard, ResultsPanel, InputsPanel, Field, inputClass } from './ResultCard';
-import { formatCurrency, formatNumber } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 
 export function RentCalculator() {
   const [monthlyRent, setMonthlyRent] = useState(2000);

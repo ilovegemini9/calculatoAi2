@@ -71,7 +71,6 @@ export function calculateRefinance(input: RefinanceInput): RefinanceResult {
   const breakEvenYears = breakEvenMonths !== null ? Math.round((breakEvenMonths / 12) * 10) / 10 : null;
 
   // Remaining interest on current loan
-  const currentMonthlyRate = input.currentInterestRate / 100 / 12;
   const remainingInterestCurrent = r(
     input.currentMonthlyPayment * input.currentRemainingTermMonths - input.currentLoanBalance
   );

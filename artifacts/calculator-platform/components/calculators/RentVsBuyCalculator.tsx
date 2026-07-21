@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { calculateRentVsBuy } from '@/lib/calculators/rent-vs-buy/formula';
-import { ResultCard, ResultsPanel, InputsPanel, Field, inputClass } from './ResultCard';
-import { formatCurrency, formatNumber } from '@/lib/utils';
+import { ResultCard, ResultsPanel, Field, inputClass } from './ResultCard';
+import { formatCurrency } from '@/lib/utils';
 
 export function RentVsBuyCalculator() {
   // Buying

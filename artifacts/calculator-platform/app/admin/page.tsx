@@ -11,7 +11,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
-import { CALCULATORS } from '@/config/calculators';
+import Link from 'next/link';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -69,9 +69,9 @@ function EmptyState({ icon, title, description, href, cta }: {
       <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{title}</p>
       <p className="text-xs max-w-sm" style={{ color: 'var(--text-muted)' }}>{description}</p>
       {href && cta && (
-        <a href={href} className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition">
+        <Link href={href} className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition">
           {cta}
-        </a>
+        </Link>
       )}
     </div>
   );
@@ -334,9 +334,9 @@ export default function AdminDashboardPage() {
                   ? 'Enable AI features in Platform Settings to activate the Calculator Factory engine.'
                   : 'Add an OpenRouter API key or set GEMINI_API_KEY to connect the AI generation engine.'}
               </p>
-              <a href="/admin/settings" className="mt-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition shadow-lg shadow-blue-600/20">
+              <Link href="/admin/settings" className="mt-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition shadow-lg shadow-blue-600/20">
                 Configure in Settings →
-              </a>
+              </Link>
             </div>
           ) : (
             <>
@@ -677,9 +677,9 @@ export default function AdminDashboardPage() {
               <p className="text-xs max-w-md" style={{ color: 'var(--text-muted)' }}>
                 No AdSense publisher script is configured. Earnings, RPM, CTR, and impression data require a live AdSense connection.
               </p>
-              <a href="/admin/settings" className="mt-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition shadow-lg shadow-blue-600/20">
+              <Link href="/admin/settings" className="mt-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition shadow-lg shadow-blue-600/20">
                 Configure AdSense in Settings →
-              </a>
+              </Link>
             </div>
           )}
         </div>
@@ -706,7 +706,7 @@ export default function AdminDashboardPage() {
             <h2 className="text-sm font-black uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>Site Verification</h2>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
               Configure Google and Bing verification tokens in{' '}
-              <a href="/admin/settings" className="text-blue-500 hover:underline font-bold">Settings</a>.
+              <Link href="/admin/settings" className="text-blue-500 hover:underline font-bold">Settings</Link>.
               They are injected automatically into the HTML head once saved.
             </p>
             <div className="rounded-xl border p-4 flex items-center gap-3" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}>

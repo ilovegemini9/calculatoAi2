@@ -70,7 +70,7 @@ export default function BlogWorkspacePage() {
       } else {
         toast.error('Failed to delete article.');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred.');
     }
   };
@@ -102,7 +102,7 @@ export default function BlogWorkspacePage() {
       } else {
         toast.error('Failed to save article.');
       }
-    } catch (err) {
+    } catch {
       toast.error('An error occurred.');
     }
   };

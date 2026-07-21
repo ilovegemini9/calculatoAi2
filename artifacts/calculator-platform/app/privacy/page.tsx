@@ -69,7 +69,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Contact</h2>
           <p>
-            Questions about this policy? <a href="/contact" className="text-blue-600 hover:underline">Contact us</a>.
+            Questions about this policy? <Link href="/contact" className="text-blue-600 hover:underline">Contact us</Link>.
           </p>
         </section>
       </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from 'sonner';
 
 interface CalculatorInput {
@@ -173,7 +174,7 @@ export default function AICalculatorFactory() {
               <span className="font-bold text-red-500">
                 {!aiStats.aiEnabled ? 'AI features disabled' : 'No AI provider connected'}
               </span>
-              <a href="/admin/settings" className="text-blue-500 hover:underline font-bold">Configure in Settings →</a>
+              <Link href="/admin/settings" className="text-blue-500 hover:underline font-bold">Configure in Settings →</Link>
             </div>
           )}
 

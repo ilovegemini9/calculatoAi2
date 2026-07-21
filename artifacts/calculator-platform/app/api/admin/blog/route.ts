@@ -91,7 +91,7 @@ export async function DELETE(req: Request) {
     saveDb(db);
 
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }

@@ -59,7 +59,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Contact</h2>
-          <p><a href="/contact" className="text-blue-600 hover:underline">Contact us</a> with any questions about these terms.</p>
+          <p><Link href="/contact" className="text-blue-600 hover:underline">Contact us</Link> with any questions about these terms.</p>
         </section>
       </div>
     </div>

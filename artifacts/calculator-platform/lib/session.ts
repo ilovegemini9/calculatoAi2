@@ -37,7 +37,7 @@ export async function verifySession(): Promise<boolean> {
     // Verify signature matches
     const isMatched = bcrypt.compareSync(username + SESSION_SECRET, signature);
     return isMatched;
-  } catch (err) {
+  } catch {
     return false;
   }
 }

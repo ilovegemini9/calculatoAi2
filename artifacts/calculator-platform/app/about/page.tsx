@@ -92,7 +92,7 @@ export default function AboutPage() {
             <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>Contact</h2>
             <p>
               Have a suggestion, found a bug, or want to request a new calculator?{' '}
-              <a href="/contact" className="text-blue-600 hover:underline">Get in touch</a> — we read
+              <Link href="/contact" className="text-blue-600 hover:underline">Get in touch</Link> — we read
               every message.
             </p>
           </div>
