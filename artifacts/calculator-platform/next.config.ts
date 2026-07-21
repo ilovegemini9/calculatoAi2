@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Isolate dev build from production build — prevents chunk corruption when
+  // `next build` and `next dev` share the same .next directory on Replit.
+  // next dev  → NODE_ENV=development → /tmp/.next-calculator (ephemeral, safe)
+  // next build → NODE_ENV=production  → .next (normal, committed for Vercel)
+  distDir: process.env.NODE_ENV === 'development' ? '/tmp/.next-calculator' : '.next',
+
   // Allow Replit's proxied dev domain for cross-origin HMR/RSC requests
   allowedDevOrigins: ['*.replit.dev', '*.spock.replit.dev', '*.repl.co'],
 
@@ -61,6 +67,15 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+
+  // Disable webpack filesystem cache in dev — prevents corrupt .next/cache on Replit's FS
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  webpack(config: any, { dev }: { dev: boolean }) {
+    if (dev) {
+      config.cache = false;
+    }
+    return config;
   },
 
   // TypeScript and ESLint
