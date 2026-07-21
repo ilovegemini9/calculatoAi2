@@ -24,6 +24,8 @@ const DEFAULT_DB: AppSchema = {
   redirects: [],
   analytics: [],
   settings: DEFAULT_SETTINGS,
+  logs: [],
+  backups: [],
 };
 
 // Ensure data directory exists
@@ -68,6 +70,8 @@ export function getDb(): AppSchema {
     db.redirects = db.redirects || [];
     db.analytics = db.analytics || [];
     db.settings = { ...DEFAULT_SETTINGS, ...db.settings };
+    db.logs = db.logs || [];
+    db.backups = db.backups || [];
     
     // Ensure admin user exists if table is empty
     if (db.adminUsers.length === 0) {

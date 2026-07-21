@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { verifySession } from '@/lib/session';
+import { CALCULATORS } from '@/config/calculators';
 
 export async function GET() {
   const isAuth = await verifySession();
@@ -10,21 +11,56 @@ export async function GET() {
 
   const db = getDb();
 
-  // Generate realistic seed trend analytics for the dashboard charts if none exist
-  const trends = [
-    { date: 'Jul 13', views: 1240, calculations: 940 },
-    { date: 'Jul 14', views: 1560, calculations: 1100 },
-    { date: 'Jul 15', views: 1890, calculations: 1320 },
-    { date: 'Jul 16', views: 2100, calculations: 1450 },
-    { date: 'Jul 17', views: 2450, calculations: 1780 },
-    { date: 'Jul 18', views: 2890, calculations: 2100 },
-    { date: 'Jul 19', views: 3400, calculations: 2450 },
-  ];
+  // Calculator stats — static + dynamic
+  const staticCount = CALCULATORS.length;
+  const dynamicCalcs = db.calculators;
+  const calcStats = {
+    total: staticCount + dynamicCalcs.length,
+    staticCount,
+    published: staticCount + dynamicCalcs.filter((c) => c.status === 'active').length,
+    draft: dynamicCalcs.filter((c) => c.status === 'inactive').length,
+    disabled: 0, // no disabled status in current schema
+  };
+
+  // Article stats — from db
+  const articles = db.articles;
+  const articleStats = {
+    total: articles.length,
+    published: articles.filter((a) => a.status === 'published').length,
+    draft: articles.filter((a) => a.status === 'draft').length,
+    pendingReview: articles.filter((a) => a.status === 'pending_review').length,
+    scheduled: 0, // not yet supported
+  };
+
+  // Trends — aggregate db.analytics by date (last 14 days)
+  const analyticsByDate: Record<string, { views: number; calculations: number }> = {};
+  for (const entry of db.analytics) {
+    if (!analyticsByDate[entry.date]) {
+      analyticsByDate[entry.date] = { views: 0, calculations: 0 };
+    }
+    analyticsByDate[entry.date].views += entry.views;
+  }
+
+  const trends = Object.entries(analyticsByDate)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-14)
+    .map(([date, data]) => ({
+      date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      views: data.views,
+      calculations: data.calculations,
+    }));
 
   return NextResponse.json({
-    totalDynamic: db.calculators.length,
-    totalArticles: db.articles.length,
+    totalDynamic: dynamicCalcs.length,
+    totalArticles: articles.length,
     totalRedirects: db.redirects.length,
+    calcStats,
+    articleStats,
     trends,
+    settings: {
+      adsenseEnabled: db.settings.adsenseEnabled,
+      adsenseCode: db.settings.adsenseCode,
+      analyticsCode: db.settings.analyticsCode,
+    },
   });
 }

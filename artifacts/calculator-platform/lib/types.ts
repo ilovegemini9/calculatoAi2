@@ -104,6 +104,22 @@ export interface SystemSettings {
   };
 }
 
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  level: 'INFO' | 'WARN' | 'ERROR';
+  message: string;
+  route: string;
+}
+
+export interface BackupEntry {
+  id: string;
+  date: string;
+  size: string;
+  status: 'Completed' | 'Pending';
+  type: string;
+}
+
 export interface AppSchema {
   adminUsers: AdminUser[];
   calculators: Calculator[];
@@ -112,4 +128,6 @@ export interface AppSchema {
   redirects: Redirect[];
   analytics: Analytic[];
   settings: SystemSettings;
+  logs: LogEntry[];
+  backups: BackupEntry[];
 }
