@@ -50,3 +50,6 @@ Thumbs.db
 
 # Runtime data (contains secrets / server state — never commit)
 artifacts/api-server/.data/
+
+# Frontend DB (contains API keys / runtime state — never commit)
+artifacts/calculator-platform/data/
