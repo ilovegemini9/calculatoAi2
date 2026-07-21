@@ -293,21 +293,25 @@ export default function SEOFinderPage() {
   const handleWriteArticle = async (opp: KeywordOpportunity) => {
     setDispatching(opp.keyword);
     try {
-      const res = await fetch('/api/admin/blog', {
+      const res = await fetch('/api/admin/seo-finder/generate-article', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          calculatorId: `seo_${Date.now()}`,
-          calculatorName: opp.keyword,
-          keywords: [opp.primaryKeyword, ...opp.secondaryKeywords],
-          title: opp.titles[0],
+          keyword: opp.keyword,
+          primaryKeyword: opp.primaryKeyword,
+          secondaryKeywords: opp.secondaryKeywords,
+          titles: opp.titles,
+          intentAnalysis: opp.intentAnalysis,
+          outline: opp.outline,
+          metaTitle: opp.metaTitle,
+          metaDescription: opp.metaDescription,
         }),
       });
-      if (res.ok) {
-        toast.success(`Article queued: "${opp.titles[0]}"`);
+      const d = await res.json();
+      if (res.ok && d.success) {
+        toast.success(`Article generated & saved: "${d.article.title}" — review it in Blog Workspace.`);
       } else {
-        const d = await res.json();
-        toast.error(d.error || 'Failed to queue article');
+        toast.error(d.error || 'Failed to generate article');
       }
     } catch {
       toast.error('Failed to dispatch article generation');

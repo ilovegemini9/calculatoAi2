@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface CalculatorInput {
@@ -29,7 +30,8 @@ const PROGRESS_STEPS = [
 ];
 
 export default function AICalculatorFactory() {
-  const [prompt, setPrompt]           = useState('');
+  const searchParams = useSearchParams();
+  const [prompt, setPrompt]           = useState(() => searchParams.get('prompt') ?? '');
   const [generating, setGenerating]   = useState(false);
   const [progressStep, setProgressStep] = useState(0);
   const [spec, setSpec]               = useState<Spec | null>(null);
