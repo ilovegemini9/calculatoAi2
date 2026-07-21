@@ -54,6 +54,9 @@ export const metadata: Metadata = {
     canonical: siteConfig.url,
     types: { 'application/rss+xml': `${siteConfig.url}/rss.xml` },
   },
+  verification: {
+    google: 'vPS9qaHxCdQLYRJ66EyPns_WK9sKN-rlOZXFNM2IHCk',
+  },
   icons: {
     icon: '/icon.svg',
     apple: '/apple-icon.svg',
