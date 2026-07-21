@@ -129,6 +129,56 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['tip calculator', 'gratuity calculator', 'bill split calculator', 'restaurant tip'],
     icon: '🍽️',
   },
+  {
+    slug: 'rental-property',
+    name: 'Rental Property Calculator',
+    shortName: 'Rental Property',
+    category: 'financial',
+    description:
+      'Analyze a rental property investment. Calculate monthly cash flow, cash-on-cash return, cap rate, and gross rent multiplier using real expenses.',
+    keywords: ['rental property calculator', 'cash on cash return', 'cap rate calculator', 'real estate investment', 'rental income calculator', 'noi calculator'],
+    icon: '🏘️',
+  },
+  {
+    slug: 'real-estate',
+    name: 'Real Estate Calculator',
+    shortName: 'Real Estate ROI',
+    category: 'financial',
+    description:
+      'Calculate real estate ROI, home appreciation, equity growth, and total profit on a property sale. Includes optional rental income analysis.',
+    keywords: ['real estate calculator', 'real estate roi', 'home appreciation calculator', 'property investment calculator', 'real estate profit'],
+    icon: '📈',
+  },
+  {
+    slug: 'fha-loan',
+    name: 'FHA Loan Calculator',
+    shortName: 'FHA Loan',
+    category: 'financial',
+    description:
+      'Calculate FHA loan payments including upfront and annual Mortgage Insurance Premium (MIP). See the true monthly cost for low-down-payment buyers.',
+    keywords: ['fha loan calculator', 'fha mortgage calculator', 'fha mip calculator', 'fha payment', 'fha mortgage insurance', '3.5 percent down payment'],
+    icon: '🏛️',
+  },
+  {
+    slug: 'va-mortgage',
+    name: 'VA Mortgage Calculator',
+    shortName: 'VA Mortgage',
+    category: 'financial',
+    description:
+      'Calculate VA loan payments and funding fee for veterans and active-duty service members. No PMI required — see how much you save vs a conventional loan.',
+    keywords: ['va mortgage calculator', 'va loan calculator', 'va funding fee', 'veteran home loan', 'va home loan payment', 'military mortgage'],
+    icon: '🎖️',
+  },
+  {
+    slug: 'home-equity-loan',
+    name: 'Home Equity Loan Calculator',
+    shortName: 'Home Equity Loan',
+    category: 'financial',
+    description:
+      'Calculate how much you can borrow against your home equity. See monthly payments, CLTV ratio, and total cost for a fixed-rate second mortgage.',
+    keywords: ['home equity loan calculator', 'heloc calculator', 'second mortgage calculator', 'home equity calculator', 'cltv calculator', 'equity loan payment'],
+    icon: '🏦',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

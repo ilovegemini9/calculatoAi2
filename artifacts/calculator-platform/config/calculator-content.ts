@@ -947,6 +947,439 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
     },
   },
 
+  // ── Rental Property ───────────────────────────────────────────────────────
+  'rental-property': {
+    howToSteps: [
+      'Enter the purchase price, down payment, interest rate, and loan term.',
+      'Enter the expected monthly rent and set the vacancy rate (5–10% is typical).',
+      'Add annual property tax rate, insurance, maintenance (1% of value is standard), and property management fee.',
+      'Enter closing costs (2–3% is typical). All key metrics update instantly.',
+    ],
+    faqs: [
+      { question: 'What is cash-on-cash return?', answer: 'Cash-on-cash return (CoC) measures the annual pre-tax cash flow divided by the total cash invested (down payment + closing costs). A CoC of 6–10% is generally considered good for a single-family rental.' },
+      { question: 'What is cap rate?', answer: 'Cap rate (capitalization rate) = Net Operating Income ÷ Purchase Price. It measures a property\'s return independent of financing. A cap rate of 5–10% is typical in most US markets. Use it to compare properties without the noise of different financing structures.' },
+      { question: 'What is gross rent multiplier (GRM)?', answer: 'GRM = Purchase Price ÷ Annual Gross Rent. A lower GRM indicates better value. Most residential markets fall between 8–15×. Divide 1 by the GRM to get a rough yield before expenses.' },
+      { question: 'What vacancy rate should I use?', answer: 'A 5% vacancy rate is a common default for long-term rentals in stable markets. Use 8–10% for higher-turnover areas or short-term rentals. Never assume 100% occupancy — even great properties have gap periods.' },
+      { question: 'Should I include property management fees even if I self-manage?', answer: 'Yes. Including an 8–10% management fee even if you self-manage captures the true economic cost — your time has value, and you may need management later. It also makes your underwriting more conservative and defensible.' },
+    ],
+    formula: {
+      expression: 'NOI = Effective Gross Income − Operating Expenses\nEffective Gross Income = Gross Rent × (1 − Vacancy%)\nCash Flow = NOI − Annual Mortgage Payment\nCash-on-Cash Return = Annual Cash Flow ÷ Total Cash Invested\nCap Rate = NOI ÷ Purchase Price\nGRM = Purchase Price ÷ Annual Gross Rent',
+      variables: [
+        { symbol: 'NOI', definition: 'Net Operating Income — income after all operating expenses but before mortgage debt service' },
+        { symbol: 'CoC', definition: 'Cash-on-Cash Return — annual cash flow ÷ total cash invested (down payment + closing costs)' },
+        { symbol: 'Cap Rate', definition: 'NOI ÷ Purchase Price — unlevered return, independent of financing' },
+        { symbol: 'GRM', definition: 'Gross Rent Multiplier — purchase price ÷ annual gross rent; lower is better' },
+        { symbol: 'Vacancy%', definition: 'Expected percentage of time the property sits unoccupied or rent is uncollected' },
+      ],
+      notes: 'Cap rate does not include mortgage payments — it reflects the unlevered yield on the asset. Cash-on-cash return reflects levered yield (uses debt). A positive cash flow does not guarantee a profitable investment; appreciation, equity paydown, and tax benefits must also be considered.',
+    },
+    examples: [
+      {
+        title: 'Single-family rental — Midwest market',
+        scenario: '$250,000 purchase, $50,000 down (20%), 7% rate, 30-yr term, $1,800/mo rent, 5% vacancy, 1.2% tax, $1,200 insurance, 1% maintenance, 8% management, 3% closing.',
+        steps: [
+          'Loan: $200,000. Monthly P&I ≈ $1,331. Annual mortgage = $15,972.',
+          'Gross rent: $1,800 × 12 = $21,600. Vacancy loss (5%): $1,080. EGI: $20,520.',
+          'Operating expenses: Tax $3,000 + Insurance $1,200 + Maintenance $2,500 + Management $1,642 = $8,342.',
+          'NOI = $20,520 − $8,342 = $12,178. Cap rate = $12,178 ÷ $250,000 = 4.87%.',
+          'Cash flow = $12,178 − $15,972 = −$3,794/yr. Monthly: −$316.',
+          'Total cash invested = $50,000 + $7,500 closing = $57,500. CoC = −6.6%.',
+        ],
+        result: 'Negative cash flow of −$316/mo. Cap rate: 4.87%. This deal requires appreciation to be profitable.',
+      },
+      {
+        title: 'Cash-flowing duplex — Sun Belt market',
+        scenario: '$350,000 duplex, $70,000 down, 7% rate, $2,800/mo combined rent, 5% vacancy, 1.3% tax, $1,600 insurance, 1% maint, 0% management (self-managed), 3% closing.',
+        steps: [
+          'Loan: $280,000. Monthly P&I ≈ $1,863. Annual mortgage = $22,356.',
+          'EGI = $2,800 × 12 × 0.95 = $31,920.',
+          'Operating expenses: Tax $4,550 + Insurance $1,600 + Maintenance $3,500 = $9,650.',
+          'NOI = $31,920 − $9,650 = $22,270. Cap rate = 6.36%.',
+          'Cash flow = $22,270 − $22,356 = −$86/yr ≈ break-even.',
+          'CoC ≈ −0.1% (essentially zero). Equity paydown + appreciation = total return.',
+        ],
+        result: 'Break-even cash flow. Cap rate: 6.36%. Strong equity-build play in appreciating market.',
+      },
+    ],
+    useCases: [
+      'Screening rental properties before making an offer',
+      'Comparing multiple investment properties side-by-side on cap rate and CoC',
+      'Determining the maximum purchase price for a target CoC return',
+      'Building a landlord cash-flow model to present to private lenders',
+      'Evaluating the impact of raising rents on investment returns',
+      'Stress-testing assumptions: what happens if vacancy rises to 10%?',
+    ],
+    commonPitfalls: [
+      'Using gross rent without deducting vacancy — even 5% vacancy materially changes CoC.',
+      'Omitting property management fees when self-managing — your time has a cost.',
+      'Using purchase price as property value for tax calculations — always use current assessed/market value.',
+      'Ignoring capital expenditure reserves (CapEx): roof, HVAC, appliances can cost $5,000–$20,000 unexpectedly.',
+      'Assuming appreciation compensates for negative cash flow — appreciation is speculative; cash flow is contractual.',
+      'Forgetting that NOI and cap rate are pre-financing metrics — using them post-mortgage is incorrect.',
+    ],
+    glossary: [
+      { term: 'Net Operating Income (NOI)', definition: 'Annual rental income minus all operating expenses (taxes, insurance, maintenance, management), before mortgage payments.' },
+      { term: 'Cap Rate', definition: 'NOI ÷ purchase price. The unlevered yield of a property, used to compare investments independently of how they are financed.' },
+      { term: 'Cash-on-Cash Return', definition: 'Annual pre-tax cash flow ÷ total cash invested. Measures the levered return on the actual money you put in.' },
+      { term: 'Gross Rent Multiplier (GRM)', definition: 'Purchase price ÷ annual gross rent. A quick screening ratio — lower values indicate more income per dollar of purchase price.' },
+      { term: 'Debt Service Coverage Ratio (DSCR)', definition: 'NOI ÷ Annual Mortgage Payment. Lenders require DSCR ≥ 1.25 for most investment property loans. Below 1.0 means the property cannot service its own debt.' },
+      { term: 'Capital Expenditure (CapEx)', definition: 'Large, irregular expenses for major repairs or replacements (roof, HVAC, plumbing). Budget 0.5–1.5% of property value annually as a CapEx reserve.' },
+    ],
+    sources: [
+      { title: 'Rental Housing Finance Survey', publisher: 'U.S. Census Bureau', url: 'https://www.census.gov/programs-surveys/rhfs.html', year: 2023 },
+      { title: 'Investment Property Underwriting Guide', publisher: 'Fannie Mae', url: 'https://selling-guide.fanniemae.com/', year: 2024 },
+      { title: 'Real Estate Investing Fundamentals', publisher: 'National Association of Realtors', url: 'https://www.nar.realtor/research-and-statistics', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree Real Estate Finance Team',
+      credentials: 'Real Estate Investment & Property Management Review',
+      description: 'Formulas verified against NAR investment property guidelines and Fannie Mae DSCR underwriting standards.',
+    },
+  },
+
+  // ── Real Estate Calculator ────────────────────────────────────────────────
+  'real-estate': {
+    howToSteps: [
+      'Enter the purchase price, down payment, and expected annual appreciation rate.',
+      'Set the interest rate, loan term, and how many years you plan to hold the property.',
+      'Enter closing costs (buying) and selling costs (agent commission + transfer taxes, typically 6–8%).',
+      'Optionally add monthly rent and annual operating expenses to analyze total returns including rental income.',
+    ],
+    faqs: [
+      { question: 'What is a realistic home appreciation rate?', answer: 'The US national average home appreciation is approximately 3–4% per year over the long run, roughly tracking inflation. Hot markets (Miami, Austin, Phoenix) have seen 6–10%+ in recent years, while flat markets may average 1–2%. The calculator defaults to 3%.' },
+      { question: 'What are typical selling costs?', answer: 'Selling costs typically include real estate agent commissions (5–6% of sale price), transfer taxes (0.1–2% depending on state), and closing fees. Total selling costs of 6–8% are standard. These costs significantly affect net profit and must be recouped through appreciation before you break even.' },
+      { question: 'How is annualized ROI (CAGR) different from total ROI?', answer: 'Total ROI is your overall percentage gain on cash invested. Annualized ROI (CAGR — Compound Annual Growth Rate) shows the equivalent annual return. Holding a property longer smooths out the entry costs and increases CAGR, even with the same total appreciation.' },
+      { question: 'Does this calculator include tax benefits?', answer: 'No. Mortgage interest deductions, depreciation (for rentals), and capital gains exclusions ($250K/$500K for primary residences) are not included because they depend heavily on individual tax situations. Consult a CPA for tax-adjusted analysis.' },
+    ],
+    formula: {
+      expression: 'Home Value at Sale = Purchase Price × (1 + Appreciation%)^Years\nNet Sale Proceeds = Home Value − Selling Costs − Remaining Loan Balance\nNet Profit = Net Proceeds − Down Payment − Closing Costs − Principal Paid\nROI = Net Profit ÷ Total Cash Invested × 100\nAnnualized ROI (CAGR) = (1 + ROI/100)^(1/Years) − 1',
+      variables: [
+        { symbol: 'CAGR', definition: 'Compound Annual Growth Rate — the annualized equivalent of total ROI' },
+        { symbol: 'Appreciation%', definition: 'Expected annual percentage increase in home value' },
+        { symbol: 'Selling Costs', definition: 'Agent commissions + transfer taxes + closing fees at sale (typically 6–8% of sale price)' },
+        { symbol: 'Total Cash Invested', definition: 'Down payment plus buying closing costs' },
+        { symbol: 'Net Profit', definition: 'Net sale proceeds minus total out-of-pocket costs (excluding principal paydown received back as equity)' },
+      ],
+      notes: 'This model assumes constant appreciation compounded annually. Real estate appreciation is cyclical and market-dependent. The model does not include inflation adjustment, tax implications, or the time value of money beyond CAGR. For rental analysis, operating expenses are held constant — in practice, they track inflation.',
+    },
+    examples: [
+      {
+        title: 'Primary residence — 7-year hold',
+        scenario: '$400,000 home, $80,000 down (20%), 6.85% rate, 30-year term, 3% annual appreciation, 7 years held, 3% closing costs, 6% selling costs.',
+        steps: [
+          'Total cash invested: $80,000 + $12,000 = $92,000.',
+          'Home value after 7 years: $400,000 × (1.03)^7 ≈ $491,600.',
+          'Remaining loan balance after 7 years: ≈ $290,000.',
+          'Selling costs: $491,600 × 0.06 = $29,500.',
+          'Net sale proceeds: $491,600 − $29,500 − $290,000 = $172,100.',
+          'Principal paid over 7 years ≈ $30,000 (recovered as equity above).',
+          'Net profit ≈ $172,100 − $92,000 = $80,100.',
+        ],
+        result: 'Net profit: ~$80,100 | ROI: ~87% | Annualized ROI (CAGR): ~9.3%/yr',
+      },
+    ],
+    useCases: [
+      'Projecting total wealth creation from a home purchase over 5–20 years',
+      'Comparing buying and selling quickly (2 years) vs holding long-term',
+      'Evaluating a rental property for total return including income and appreciation',
+      'Modeling the impact of different appreciation scenarios (1%, 3%, 5%)',
+      'Calculating whether a relocation sale will be profitable after costs',
+      'Estimating equity available for a future home upgrade purchase',
+    ],
+    commonPitfalls: [
+      'Ignoring selling costs — 6% of sale price on a $500,000 home is $30,000, which must come from appreciation.',
+      'Forgetting that buying closing costs (2–3%) are also sunk costs that reduce ROI.',
+      'Using inflated appreciation assumptions — 3% is a realistic long-run average; using 7–8% produces dramatically overstated results.',
+      'Comparing ROI to stock market returns without adjusting for leverage — real estate returns are amplified by the mortgage (you control a $400K asset with $80K down).',
+      'Omitting the opportunity cost of the down payment — that $80K invested in index funds could also compound at 7%/yr.',
+    ],
+    glossary: [
+      { term: 'Appreciation', definition: 'The increase in a property\'s value over time, driven by inflation, local supply/demand, and improvements.' },
+      { term: 'CAGR (Compound Annual Growth Rate)', definition: 'The rate at which an investment would have grown if it had grown at a steady annual rate. Normalizes returns across different holding periods.' },
+      { term: 'Equity', definition: 'The portion of the property you own outright: current market value minus outstanding loan balance.' },
+      { term: 'Selling Costs', definition: 'Transaction costs paid at sale: real estate commissions (5–6%), transfer taxes, and closing fees. Typically 6–8% of the sale price.' },
+      { term: 'Leverage', definition: 'Using borrowed money (mortgage) to control a larger asset than cash alone would allow. Real estate leverage amplifies both gains and losses.' },
+      { term: 'Capital Gains', definition: 'The profit from selling an asset for more than its purchase price. Primary residence sales may qualify for a $250K/$500K exclusion (IRS Section 121).' },
+    ],
+    sources: [
+      { title: 'Existing Home Sales and Median Price Data', publisher: 'National Association of Realtors', url: 'https://www.nar.realtor/research-and-statistics/housing-statistics/existing-home-sales', year: 2024 },
+      { title: 'House Price Index', publisher: 'Federal Housing Finance Agency (FHFA)', url: 'https://www.fhfa.gov/data/hpi', year: 2024 },
+      { title: 'Home Sale Exclusion — IRS Publication 523', publisher: 'Internal Revenue Service', url: 'https://www.irs.gov/publications/p523', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Real Estate Finance Team',
+      credentials: 'Real Estate Economics & Investment Analysis Review',
+      description: 'Appreciation assumptions benchmarked against FHFA House Price Index historical data and NAR median sale price trends.',
+    },
+  },
+
+  // ── FHA Loan ──────────────────────────────────────────────────────────────
+  'fha-loan': {
+    howToSteps: [
+      'Enter the home price — the calculator will set the minimum 3.5% down payment automatically.',
+      'Adjust the down payment if putting more than 3.5% down.',
+      'Choose whether to finance the upfront MIP (1.75%) into the loan — most borrowers do to preserve cash.',
+      'Select the loan term (30 or 15 years), add property tax and insurance, and see your full monthly payment.',
+    ],
+    faqs: [
+      { question: 'What is FHA MIP?', answer: 'FHA MIP (Mortgage Insurance Premium) comes in two parts: an upfront MIP of 1.75% of the base loan amount (paid at closing or rolled into the loan), and an annual MIP charged monthly. For 30-year loans with LTV above 90%, the annual rate is 0.55% — a significant addition to your monthly payment.' },
+      { question: 'How long do I pay FHA mortgage insurance?', answer: 'If your LTV at origination is above 90% (less than 10% down), you pay annual MIP for the full loan term — it cannot be cancelled. If your LTV is 90% or less (10%+ down), MIP lasts 11 years. This is a key difference from conventional PMI, which cancels at 80% LTV.' },
+      { question: 'What credit score do I need for an FHA loan?', answer: 'FHA allows credit scores as low as 580 for a 3.5% down payment, and 500–579 for a 10% down payment. Scores below 500 are not eligible for FHA financing.' },
+      { question: 'Should I choose FHA or conventional?', answer: 'FHA is typically better when your credit score is below 680 or you can only put 3.5–5% down. Conventional PMI can be less expensive than FHA MIP for borrowers with scores above 700. Run both scenarios: conventional PMI cancels at 80% LTV, while FHA MIP on a 3.5%-down loan never cancels.' },
+      { question: 'Are there FHA loan limits?', answer: 'Yes. FHA sets county-level loan limits annually. For 2024, the national floor is $498,257 for single-family homes; high-cost areas (e.g., California, New York) can be up to $1,149,825. The calculator assumes you are within the applicable limit.' },
+    ],
+    formula: {
+      expression: 'Base Loan = Home Price − Down Payment\nUFMIP = Base Loan × 0.0175\nTotal Loan = Base Loan + UFMIP (if financed)\nMonthly MIP = Total Loan × (Annual MIP Rate ÷ 12)\n30-yr, LTV>90%: Annual MIP = 0.55% | LTV≤90%: 0.50%\n15-yr, LTV>90%: Annual MIP = 0.40% | LTV≤90%: 0.15%\nMIP Duration: LTV>90% → full term | LTV≤90% → 11 years',
+      variables: [
+        { symbol: 'UFMIP', definition: 'Upfront Mortgage Insurance Premium — 1.75% of base loan amount, always required' },
+        { symbol: 'Annual MIP Rate', definition: 'Ongoing annual MIP rate charged monthly; varies by loan term and LTV at origination' },
+        { symbol: 'LTV', definition: 'Loan-to-Value Ratio — base loan amount ÷ home price at origination' },
+        { symbol: 'Total Loan', definition: 'Base loan amount plus financed UFMIP (if elected)' },
+        { symbol: 'MIP Duration', definition: 'Number of months annual MIP is charged: full term if LTV>90%; 11 years if LTV≤90%' },
+      ],
+      notes: 'FHA MIP rates shown are effective 2023–2024 per HUD Mortgagee Letter 2023-05. HUD adjusts MIP rates periodically; always confirm current rates at hud.gov. The UFMIP is non-refundable after 3 years (partial refund available within 3 years for FHA streamline refinances).',
+    },
+    examples: [
+      {
+        title: 'First-time buyer — 3.5% down, 30-year loan',
+        scenario: '$350,000 home, $12,250 down (3.5%), 6.75% rate, 30-year term, UFMIP financed, 1.2% tax, $1,200 insurance.',
+        steps: [
+          'Base loan: $350,000 − $12,250 = $337,750.',
+          'UFMIP: $337,750 × 1.75% = $5,911.',
+          'Total loan (UFMIP financed): $337,750 + $5,911 = $343,661.',
+          'Monthly P&I on $343,661 at 6.75% / 30 yr ≈ $2,229.',
+          'Annual MIP rate (LTV 96.5%, 30-yr): 0.55%.',
+          'Monthly MIP: $343,661 × 0.0055 ÷ 12 ≈ $157.',
+          'Property tax: $350,000 × 1.2% ÷ 12 = $350. Insurance: $100.',
+          'Total monthly: $2,229 + $157 + $350 + $100 = $2,836.',
+        ],
+        result: 'Monthly payment: $2,836 | Monthly MIP: $157 (paid for life of loan) | Total MIP: ~$56,500',
+      },
+      {
+        title: 'Buyer with 10% down — MIP cancels after 11 years',
+        scenario: '$350,000 home, $35,000 down (10%), 6.75% rate, 30-year term.',
+        steps: [
+          'Base loan: $315,000. LTV = 90%. Annual MIP rate: 0.50%.',
+          'Monthly MIP: $315,000 × 0.0050 ÷ 12 ≈ $131.',
+          'MIP duration: 11 years (132 payments), not full 30 years.',
+          'Total MIP saved vs 3.5% down scenario: ≈ $23,000 less MIP.',
+        ],
+        result: 'Monthly MIP: $131 for 11 years only. Total MIP savings from 10% down: ~$23,000 vs 3.5% down.',
+      },
+    ],
+    useCases: [
+      'First-time homebuyers with limited down payment savings (3.5% minimum)',
+      'Buyers with credit scores 580–679 who cannot qualify for competitive conventional rates',
+      'Comparing FHA vs conventional: at what LTV and credit score does conventional become cheaper?',
+      'Planning a strategy to refinance out of FHA MIP once equity reaches 20%',
+      'Estimating the true cost of MIP over the life of a 30-year FHA loan',
+      'Evaluating higher down payment to reduce MIP to 0.50% and limit its duration to 11 years',
+    ],
+    commonPitfalls: [
+      'Assuming FHA MIP cancels at 80% LTV like conventional PMI — it does not for loans with less than 10% down.',
+      'Financing the UFMIP without realizing it adds to the loan balance and accrues interest over 30 years.',
+      'Not comparing FHA to conventional with PMI at the same credit score — above 700, conventional is often cheaper.',
+      'Ignoring FHA county loan limits — homes priced above the limit do not qualify for FHA financing.',
+      'Overlooking the FHA property condition requirements — appraisers enforce stricter standards than conventional loans.',
+    ],
+    glossary: [
+      { term: 'FHA (Federal Housing Administration)', definition: 'A U.S. government agency within HUD that insures mortgages made by approved lenders, enabling low-down-payment financing for qualified buyers.' },
+      { term: 'MIP (Mortgage Insurance Premium)', definition: 'FHA\'s version of mortgage insurance, consisting of an upfront premium (1.75%) and an annual premium charged monthly. Protects the lender against default.' },
+      { term: 'UFMIP (Upfront MIP)', definition: 'The one-time 1.75% mortgage insurance premium paid at closing or rolled into the FHA loan balance.' },
+      { term: 'LTV (Loan-to-Value)', definition: 'Base loan amount ÷ home purchase price or appraised value. Determines MIP rate and duration for FHA loans.' },
+      { term: 'FHA Loan Limit', definition: 'The maximum FHA loan amount in a given county, set annually by HUD based on median home prices. Varies from $498,257 (floor) to $1,149,825 (ceiling) in 2024.' },
+      { term: 'FHA Streamline Refinance', definition: 'A simplified refinance program for existing FHA borrowers, requiring limited documentation and no appraisal, to reduce the interest rate or switch loan terms.' },
+    ],
+    sources: [
+      { title: 'FHA Single Family Housing Policy Handbook (HUD 4000.1)', publisher: 'U.S. Department of Housing and Urban Development', url: 'https://www.hud.gov/program_offices/housing/sfh/handbook_references', year: 2024 },
+      { title: 'Mortgagee Letter 2023-05 — Annual MIP Rate Reduction', publisher: 'HUD', url: 'https://www.hud.gov/sites/dfiles/OCHCO/documents/2023-05mlformatted.pdf', year: 2023 },
+      { title: 'FHA Loan Limits for 2024', publisher: 'FHA / HUD', url: 'https://www.hud.gov/program_offices/housing/sfh/lender/origination/mortgage_limits', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Mortgage & Lending Team',
+      credentials: 'HUD/FHA Guidelines & Mortgage Compliance Review',
+      description: 'MIP rates and rules verified against HUD Mortgagee Letter 2023-05 and FHA Single Family Housing Policy Handbook 4000.1.',
+    },
+  },
+
+  // ── VA Mortgage ───────────────────────────────────────────────────────────
+  'va-mortgage': {
+    howToSteps: [
+      'Enter the home price and your down payment (0% is allowed for most eligible VA borrowers).',
+      'Select whether this is your first use or subsequent use of VA loan benefits — the funding fee differs.',
+      'If you have a service-connected disability rating, select "Exempt" to waive the funding fee entirely.',
+      'Choose whether to finance the funding fee into the loan or pay it at closing, then add property tax and insurance.',
+    ],
+    faqs: [
+      { question: 'Who is eligible for a VA loan?', answer: 'VA loans are available to: active-duty service members (after 90 days during wartime or 181 days during peacetime), veterans who meet minimum service requirements, National Guard and Reserve members (after 6 years or 90 days active duty), and surviving spouses of veterans who died in service or from a service-connected disability.' },
+      { question: 'What is the VA funding fee?', answer: 'The VA funding fee is a one-time charge that funds the VA loan program and eliminates the need for PMI. For a first-use purchase with no down payment, the fee is 2.15% of the loan amount. It scales down with larger down payments. Veterans with a 10%+ service-connected disability rating are completely exempt.' },
+      { question: 'Can I use a VA loan more than once?', answer: 'Yes. VA loan benefits are reusable as long as the previous VA loan is paid off (or in some cases, the entitlement is restored). Subsequent-use funding fees are higher (3.30% for 0% down) to reflect the program\'s risk management.' },
+      { question: 'Does a VA loan require a down payment?', answer: 'No. VA loans have no minimum down payment requirement for qualified borrowers with full entitlement. However, putting at least 5% or 10% down reduces the funding fee to 1.50% or 1.25% respectively, potentially saving thousands upfront.' },
+      { question: 'Are there VA loan limits?', answer: 'Since 2020, there are no VA loan limits for borrowers with full entitlement. Borrowers with remaining entitlement from an active VA loan may face county-level limits based on the conforming loan limit ($766,550 in most areas for 2024).' },
+    ],
+    formula: {
+      expression: 'Base Loan = Home Price − Down Payment\nFunding Fee = Base Loan × Funding Fee Rate%\nTotal Loan = Base Loan + Funding Fee (if financed)\nMonthly P&I = Total Loan × [r(1+r)^n] ÷ [(1+r)^n − 1]\nFunding Fee Rates:\n  First Use, 0% down: 2.15% | 5–10% down: 1.50% | 10%+ down: 1.25%\n  Subsequent Use, 0% down: 3.30% | 5–10% down: 1.50% | 10%+ down: 1.25%\n  Exempt (disability): 0%',
+      variables: [
+        { symbol: 'Funding Fee', definition: 'One-time VA fee in lieu of PMI; replaces conventional mortgage insurance at a lower total cost for most borrowers' },
+        { symbol: 'First Use', definition: 'First time using VA loan benefit, or after full entitlement restoration' },
+        { symbol: 'Subsequent Use', definition: 'Any use of VA loan benefit after the first, while prior VA loan is still active' },
+        { symbol: 'Exempt', definition: 'Veterans with 10%+ service-connected disability rating pay $0 funding fee' },
+        { symbol: 'Total Loan', definition: 'Base loan plus financed funding fee; this is the amount that accrues interest' },
+      ],
+      notes: 'Funding fee rates are per VA Circular 26-23-24 (2024). Rates apply to purchase loans and cash-out refinances. IRRRL (Interest Rate Reduction Refinance Loan) has a flat 0.50% funding fee. VA loans have no PMI, no prepayment penalty, and allow seller concessions up to 4% of the loan amount.',
+    },
+    examples: [
+      {
+        title: 'First-time VA buyer — 0% down, $400,000 home',
+        scenario: '$400,000 home, $0 down, first use, 6.5% rate, 30-year term, funding fee financed, 1.2% tax, $1,200 insurance.',
+        steps: [
+          'Base loan: $400,000.',
+          'Funding fee: $400,000 × 2.15% = $8,600.',
+          'Total loan (fee financed): $408,600.',
+          'Monthly P&I: $408,600 at 6.5% / 30 yr ≈ $2,584.',
+          'Monthly tax: $400/mo. Monthly insurance: $100.',
+          'Total monthly: $2,584 + $400 + $100 = $3,084.',
+          'Conventional comparison (PMI ~0.85%/yr for 0% down): $283/mo PMI for ~7 yrs = $23,772 extra.',
+          'VA funding fee ($8,600) vs. conventional PMI ($23,772): VA saves ≈ $15,172.',
+        ],
+        result: 'Monthly payment: $3,084 (no PMI ever) | VA funding fee: $8,600 | Estimated PMI savings vs conventional: ~$15,000',
+      },
+      {
+        title: 'Disabled veteran — funding fee exempt',
+        scenario: '$400,000 home, $0 down, 10% disability rating (exempt), 6.5% rate, 30-year term.',
+        steps: [
+          'Funding fee: $0 (exempt).',
+          'Loan amount: $400,000.',
+          'Monthly P&I: $400,000 at 6.5% / 30 yr ≈ $2,528.',
+          'Total monthly (with tax/insurance): ~$3,028.',
+          'Savings vs non-exempt VA buyer: $8,600 funding fee eliminated.',
+        ],
+        result: 'Monthly payment: ~$3,028 | Funding fee savings: $8,600 | No PMI, no funding fee = maximum VA benefit.',
+      },
+    ],
+    useCases: [
+      'Active-duty service members purchasing a home with limited savings (0% down)',
+      'Veterans comparing VA vs. FHA vs. conventional loan total costs',
+      'Subsequent VA loan users planning a second purchase while retaining prior home',
+      'Veterans with disability ratings verifying their funding fee exemption status',
+      'Military families calculating whether a larger down payment reduces fees enough to justify it',
+      'Financial advisors helping veteran clients model first-home purchase scenarios',
+    ],
+    commonPitfalls: [
+      'Forgetting that subsequent use of VA loan with 0% down triggers a 3.30% funding fee — significantly higher than first use.',
+      'Not checking disability rating exemption — any rating of 10% or higher eliminates the funding fee entirely.',
+      'Financing the funding fee without realizing it accrues 30 years of interest, raising its true cost.',
+      'Assuming VA loans have no limits — borrowers with reduced entitlement still face county-level limits.',
+      'Overlooking VA appraisal requirements — VA appraisers enforce minimum property condition standards (MPRs) that can delay or derail purchases of fixer-uppers.',
+    ],
+    glossary: [
+      { term: 'VA Funding Fee', definition: 'A one-time fee paid to the Department of Veterans Affairs, replacing PMI. Varies by down payment, loan use, and disability status.' },
+      { term: 'VA Entitlement', definition: 'The dollar amount the VA guarantees on a veteran\'s loan. Full entitlement (no county limits) is available when previous VA loans are paid off or when first using the benefit.' },
+      { term: 'COE (Certificate of Eligibility)', definition: 'The document issued by the VA confirming a borrower\'s eligibility for a VA loan, based on service history and requirements.' },
+      { term: 'MPR (Minimum Property Requirements)', definition: 'VA standards that a property must meet to qualify for VA financing, covering safety, habitability, and structural soundness.' },
+      { term: 'IRRRL (Interest Rate Reduction Refinance Loan)', definition: 'A VA streamline refinance product allowing eligible borrowers to lower their rate with minimal documentation. Funding fee: 0.50%.' },
+      { term: 'Service-Connected Disability', definition: 'A health condition or injury directly caused or aggravated by military service. A 10%+ rating exempts the veteran from the VA funding fee.' },
+    ],
+    sources: [
+      { title: 'VA Loan Guaranty Program', publisher: 'U.S. Department of Veterans Affairs', url: 'https://www.benefits.va.gov/homeloans/', year: 2024 },
+      { title: 'VA Funding Fee Tables (Circular 26-23-24)', publisher: 'U.S. Department of Veterans Affairs', url: 'https://www.benefits.va.gov/homeloans/purchaseco_loan_fee.asp', year: 2024 },
+      { title: 'VA Loan Limits', publisher: 'U.S. Department of Veterans Affairs', url: 'https://www.benefits.va.gov/homeloans/loan_limits.asp', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Mortgage & Veterans Benefits Team',
+      credentials: 'VA Loan Guidelines & Military Financial Planning Review',
+      description: 'Funding fee rates verified against VA Circular 26-23-24. Eligibility rules cross-referenced with VA Lenders Handbook Chapter 2.',
+    },
+  },
+
+  // ── Home Equity Loan ──────────────────────────────────────────────────────
+  'home-equity-loan': {
+    howToSteps: [
+      'Enter your current home value (use a recent appraisal or Zillow/Redfin estimate).',
+      'Enter your current outstanding first mortgage balance.',
+      'Enter the loan amount you want to borrow and set the interest rate and term.',
+      'The calculator shows your maximum available equity, CLTV ratio, monthly payment, and total cost.',
+    ],
+    faqs: [
+      { question: 'How much can I borrow with a home equity loan?', answer: 'Most lenders allow a Combined Loan-to-Value (CLTV) ratio of up to 85%, meaning your first mortgage plus the equity loan cannot exceed 85% of your home\'s value. On a $450,000 home with a $280,000 mortgage: max combined debt = $382,500; max equity loan = $102,500.' },
+      { question: 'What is the difference between a home equity loan and a HELOC?', answer: 'A home equity loan is a fixed-rate, fixed-term loan — a lump sum you repay in equal monthly payments over 5–30 years. A HELOC (Home Equity Line of Credit) is a revolving credit line with a variable rate. Home equity loans are better for one-time large expenses (renovation, debt consolidation); HELOCs are better for ongoing or unpredictable costs.' },
+      { question: 'Is home equity loan interest tax-deductible?', answer: 'Since the 2018 Tax Cuts and Jobs Act, home equity loan interest is only deductible if the funds are used to "buy, build, or substantially improve" the home that secures the loan. Interest used for debt consolidation, vacations, or other purposes is generally not deductible. Consult a CPA.' },
+      { question: 'What credit score do I need for a home equity loan?', answer: 'Most lenders require a minimum credit score of 620–680, with the best rates reserved for scores above 720. Lenders also look at DTI (typically ≤43%), income verification, and LTV ratio.' },
+    ],
+    formula: {
+      expression: 'Current Equity = Home Value − First Mortgage Balance\nMax CLTV = Home Value × CLTV%\nMax Equity Loan = Max CLTV − First Mortgage Balance\nCLTV After Loan = (First Mortgage + Equity Loan) ÷ Home Value\nMonthly Payment = Loan × [r(1+r)^n] ÷ [(1+r)^n − 1]\nTotal Interest = (Monthly Payment × n) − Loan Amount',
+      variables: [
+        { symbol: 'CLTV', definition: 'Combined Loan-to-Value — (first mortgage + equity loan) ÷ home value. Most lenders cap at 85%.' },
+        { symbol: 'Equity', definition: 'Home market value minus the outstanding first mortgage balance' },
+        { symbol: 'Max Equity Loan', definition: 'Maximum borrowable amount: (Home Value × CLTV Limit%) − First Mortgage Balance' },
+        { symbol: 'r', definition: 'Monthly interest rate = Annual Rate ÷ 12 ÷ 100' },
+        { symbol: 'n', definition: 'Total number of monthly payments = Loan Term × 12' },
+      ],
+      notes: 'Home equity loan rates are typically 0.5–2% higher than first mortgage rates because they are second-lien debt (lender is second in line in a foreclosure). Some lenders cap CLTV at 80% in declining markets. The calculator defaults to 85% but this is adjustable.',
+    },
+    examples: [
+      {
+        title: 'Kitchen renovation — $50,000 loan',
+        scenario: '$450,000 home value, $280,000 first mortgage balance, $50,000 loan requested, 8.5% rate, 10-year term.',
+        steps: [
+          'Current equity: $450,000 − $280,000 = $170,000 (37.8% equity).',
+          'Max CLTV (85%): $450,000 × 0.85 = $382,500.',
+          'Max loan available: $382,500 − $280,000 = $102,500.',
+          '$50,000 < $102,500 — within limit.',
+          'CLTV after loan: ($280,000 + $50,000) ÷ $450,000 = 73.3%.',
+          'Monthly payment: $50,000 at 8.5% / 10 yr = $620/mo.',
+          'Total interest: $620 × 120 − $50,000 = $24,400.',
+        ],
+        result: 'Monthly payment: $620 | Total interest: $24,400 | CLTV: 73.3% (safely under 85%)',
+      },
+      {
+        title: 'Debt consolidation — maximum borrowing',
+        scenario: '$500,000 home, $350,000 first mortgage, want maximum loan at 8.0%, 15-year term.',
+        steps: [
+          'Max CLTV (85%): $500,000 × 0.85 = $425,000.',
+          'Max loan: $425,000 − $350,000 = $75,000.',
+          'CLTV after loan: $425,000 ÷ $500,000 = 85% (at limit).',
+          'Monthly payment: $75,000 at 8.0% / 15 yr ≈ $717/mo.',
+          'Total interest: $717 × 180 − $75,000 = $54,060.',
+        ],
+        result: 'Monthly payment: $717 | Max loan: $75,000 | Total interest: $54,060 | CLTV: 85.0%',
+      },
+    ],
+    useCases: [
+      'Funding a major home renovation (kitchen, bathroom, addition)',
+      'Consolidating high-interest credit card debt into a lower fixed-rate loan',
+      'Paying for education expenses without touching retirement accounts',
+      'Funding a large medical expense or emergency',
+      'Financing a rental property down payment using equity from a primary residence',
+      'Comparing the cost of a home equity loan vs cash-out refinance for accessing equity',
+    ],
+    commonPitfalls: [
+      'Treating home equity as "free money" — defaulting on a home equity loan puts your house at risk of foreclosure.',
+      'Borrowing to the 85% CLTV limit leaves no buffer if home values decline.',
+      'Using a home equity loan for depreciating assets (cars, vacations) rather than value-adding investments.',
+      'Not comparing to a cash-out refinance — if rates have dropped since your first mortgage, a refi might be cheaper than a second lien.',
+      'Ignoring closing costs — home equity loans typically carry $500–$3,000 in origination fees, appraisal, and title costs.',
+    ],
+    glossary: [
+      { term: 'CLTV (Combined Loan-to-Value)', definition: 'The ratio of all loans secured by a property (first mortgage + equity loan) to the home\'s current value. Lenders typically cap at 85%.' },
+      { term: 'Second Lien', definition: 'A loan secured by a property that is subordinate to the first mortgage. In foreclosure, the first mortgage is paid before the second lien.' },
+      { term: 'HELOC (Home Equity Line of Credit)', definition: 'A revolving line of credit secured by home equity, typically variable-rate. Different from a home equity loan, which is a fixed-rate lump sum.' },
+      { term: 'Cash-Out Refinance', definition: 'Replacing the existing first mortgage with a larger one and taking the difference as cash. Alternative to a home equity loan; may offer lower rates but restarts the amortization clock.' },
+      { term: 'Equity', definition: 'The market value of the owner\'s stake in the property: current value minus all secured debts.' },
+      { term: 'Loan-to-Value (LTV)', definition: 'For a home equity loan in isolation: equity loan ÷ home value. Distinct from CLTV which stacks all loans.' },
+    ],
+    sources: [
+      { title: 'Home Equity Loan and HELOC Basics', publisher: 'Consumer Financial Protection Bureau', url: 'https://www.consumerfinance.gov/ask-cfpb/what-is-a-home-equity-loan/', year: 2024 },
+      { title: 'Tax Cuts and Jobs Act — Home Equity Interest Deductibility', publisher: 'Internal Revenue Service', url: 'https://www.irs.gov/newsroom/interest-on-home-equity-loans-often-still-deductible-under-new-law', year: 2023 },
+      { title: 'Home Equity Products — Supervisory Highlights', publisher: 'Consumer Financial Protection Bureau', url: 'https://www.consumerfinance.gov/data-research/research-reports/', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree Mortgage & Lending Team',
+      credentials: 'Home Equity Lending & Consumer Finance Review',
+      description: 'CLTV limits and product mechanics verified against CFPB consumer disclosures and major lender underwriting guidelines.',
+    },
+  },
+
   // ── Tip ──────────────────────────────────────────────────────────────────
   tip: {
     howToSteps: [

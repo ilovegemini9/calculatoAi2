@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 interface ResultCardProps {
   label: string;
-  value: string;
+  value: string | React.ReactNode;
   highlight?: boolean;
   sub?: string;
   className?: string;
