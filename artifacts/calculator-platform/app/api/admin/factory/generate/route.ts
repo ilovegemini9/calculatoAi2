@@ -114,7 +114,7 @@ Security constraint for calculateBody:
           'HTTP-Referer': req.headers.get('referer') || 'https://calculator-platform.local',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'poolside/laguna-xs-2.1',
           messages: [
             { role: 'system', content: systemInstruction },
             { role: 'user', content: `Generate the specs for: ${prompt}` }

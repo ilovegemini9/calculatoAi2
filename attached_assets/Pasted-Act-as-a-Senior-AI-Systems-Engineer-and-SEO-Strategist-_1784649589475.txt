@@ -1,0 +1,47 @@
+Act as a Senior AI Systems Engineer and SEO Strategist.
+
+Implement an Intelligent Model Selector & Content Factory system inside the Admin Dashboard using the provided OpenRouter Models API.
+
+========================================================
+1. DYNAMIC MODEL SELECTION LOGIC
+========================================================
+Automatically route OpenRouter API calls based on task type:
+
+A. FOR CALCULATOR BUILDING & CODE GENERATION:
+   - Primary Model: `poolside/laguna-xs-2.1`
+   - Secondary Fallback: `google/gemma-4-31b`
+   - Purpose: Generating JavaScript/TypeScript calculation logic, UI components, and edge-case validations.
+
+B. FOR ARTICLE WRITING & CONTENT GENERATION:
+   - Primary Model: `google/gemma-4-31b`
+   - Secondary Fallback: `google/gemma-4-26b-a4b`
+   - Purpose: Generating highly readable, SEO-optimized articles, FAQs, and glossaries.
+
+========================================================
+2. SEO KEYWORD & TITLE SUGGESTION ENGINE
+========================================================
+Build an automated SEO Topic & Keyword Discovery feature that identifies winning opportunities before creating articles or calculators.
+
+The Engine Must Analyze & Generate:
+1. Google Search Intent & Trends Integration:
+   - Target Keywords: High Search Volume + Low Keyword Difficulty (Low Competition).
+   - Fetch real-time search queries and Google Autocomplete long-tail suggestions (e.g., "how to calculate...", "free ... calculator online").
+
+2. Catchy & High-CTR Title Generation:
+   - Generate 5 click-worthy, AdSense-safe blog and calculator titles for each target keyword.
+   - Example: "Free [Calculator Name] Tool – Instant & Accurate Results (2026 Updated)".
+
+3. Complete SEO Content Brief:
+   - Target Primary Keyword + 5 Secondary/LSI Keywords.
+   - Search Intent Analysis (Informational vs. Transactional).
+   - Structured H2/H3 Heading Outline.
+   - Recommended Meta Title (under 60 chars) and Meta Description (under 155 chars).
+
+========================================================
+3. EXECUTION FLOW & ADMIN INTERFACE
+========================================================
+- Add a "SEO Content & Keyword Finder" tab in the Admin Dashboard.
+- Allow the admin to enter a seed niche (e.g., "Finance", "Health", "Real Estate").
+- The system uses Google Autocomplete & Search Trend logic to propose low-competition calculator/article ideas.
+- Upon clicking "Generate", automatically dispatch the prompt to `google/gemma-4-31b` for Content/SEO or `poolside/laguna-xs-2.1` for Code Building.
+- Save all generated metadata directly to the database without hardcoded or mock placeholding values.

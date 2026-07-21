@@ -112,22 +112,27 @@ function getGeminiClient(): GoogleGenAI | null {
 //      "famous" ones — the popular free models (llama-3.3-70b, qwen3-coder,
 //      gemma-4-31b) are heavily congested and returned 429 on most attempts.
 
-// Structured JSON / code tasks (calculator logic, SEO metadata, SEO briefs):
-// all three returned correct, valid JSON in testing with no formula errors.
+// Structured JSON / code tasks (calculator logic, SEO metadata, SEO briefs).
+// Primary: poolside/laguna-xs-2.1 (code generation specialist).
+// Secondary: google/gemma-4-31b per spec; kept as :free instruct variant.
+// Tertiary: proven reliable fallbacks from prior live testing.
 const CODE_GEN_MODELS = [
-  'nvidia/nemotron-3-super-120b-a12b:free',
+  'poolside/laguna-xs-2.1',                 // Primary: calculator building & code generation
+  'google/gemma-4-31b-it:free',             // Secondary fallback
+  'nvidia/nemotron-3-super-120b-a12b:free', // Reliable tertiary fallback
   'poolside/laguna-m.1:free',
   'cohere/north-mini-code:free',
 ];
 
-// Long-form article / prose tasks: nemotron-3-ultra produced the cleanest,
-// most human-sounding copy in testing (no clichés, no garbled tokens).
-// gpt-oss-20b was tried and rejected — it produced garbled/non-English
-// artifacts mid-sentence in testing.
+// Long-form article / prose tasks.
+// Primary: google/gemma-4-31b per spec (strong prose quality).
+// Secondary: google/gemma-4-26b-a4b per spec.
+// Tertiary: nemotron-3-ultra — proven reliable in prior testing.
 const ARTICLE_GEN_MODELS = [
-  'nvidia/nemotron-3-ultra-550b-a55b:free',
+  'google/gemma-4-31b-it:free',             // Primary: article writing & SEO content
+  'google/gemma-4-26b-a4b:free',            // Secondary fallback
+  'nvidia/nemotron-3-ultra-550b-a55b:free', // Reliable tertiary fallback
   'nvidia/nemotron-3-nano-30b-a3b:free',
-  'google/gemma-4-31b-it:free',
 ];
 
 // Legacy generic fallback, kept only for call sites not yet split by task type.
