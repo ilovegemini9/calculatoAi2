@@ -26,8 +26,7 @@ export function AdminShell({ children }: Props) {
   const navItems = [
     { href: '/admin', label: 'Dashboard Overview', icon: '📊' },
     { href: '/admin/factory', label: 'AI Calculator Factory', icon: '⚡' },
-    { href: '/admin/blog', label: 'Editorial Blog Workspace', icon: '✍️' },
-    { href: '/admin/seo-finder', label: 'SEO Content & Keyword Finder', icon: '🎯' },
+    { href: '/admin/seo-finder', label: 'Editorial Workspace', icon: '✍️' },
     { href: '/admin/seo', label: 'SEO Audit Hub', icon: '🔍' },
     { href: '/admin/media', label: 'Media Optimization', icon: '🖼️' },
     { href: '/admin/users', label: 'Security & Access Control', icon: '👥' },
