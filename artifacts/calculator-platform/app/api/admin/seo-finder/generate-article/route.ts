@@ -104,14 +104,6 @@ function buildFaqSchema(keyword: string, faqs: { q: string; a: string }[]): stri
 // ── Extract FAQ pairs from HTML content ───────────────────────────────────────
 function extractFaqPairs(html: string): { q: string; a: string }[] {
   const faqSection = html.match(/<section[^>]*class="[^"]*faq[^"]*"[^>]*>([\s\S]*?)<\/section>/i)?.[1] ?? html;
-  const questions: string[] = [];
-  const answers: string[] = [];
-
-  const qRegex = /<h[23][^>]*>(.*?)<\/h[23]>/gi;
-  const pRegex = /<p[^>]*>(.*?)<\/p>/gi;
-
-  let m;
-  let inFaqSection = false;
 
   // Simple heuristic: pairs of h3+p after a "FAQ" heading
   const lines = html.replace(/<h2[^>]*>.*?FAQ.*?<\/h2>/i, '<!-- FAQ_START -->').split(/<!--\s*FAQ_START\s*-->/i);
