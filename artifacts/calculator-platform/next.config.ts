@@ -33,10 +33,16 @@ const nextConfig: NextConfig = {
         destination: '/:slug-calculator',
         permanent: true,
       },
-      // Strip .html from any /:slug-calculator.html or other pages
+      // Strip .html from single-segment paths: /mortgage-calculator.html → /mortgage-calculator
       {
         source: '/:slug.html',
         destination: '/:slug',
+        permanent: true,
+      },
+      // Strip .html from nested paths: /blog/post-title.html → /blog/post-title
+      {
+        source: '/:first/:rest*.html',
+        destination: '/:first/:rest*',
         permanent: true,
       },
     ];
