@@ -173,7 +173,7 @@ export default function SEOAuditPage() {
             <input
               type="text"
               required
-              placeholder="/calculator/old-path"
+              placeholder="/mortgage-calculator"
               value={newRedirect.oldUrl}
               onChange={(e) => setNewRedirect({ ...newRedirect, oldUrl: e.target.value })}
               className="w-full p-2.5 border rounded-xl outline-none text-xs"
@@ -188,7 +188,7 @@ export default function SEOAuditPage() {
             <input
               type="text"
               required
-              placeholder="/calculator/new-path"
+              placeholder="/mortgage-payment-calculator"
               value={newRedirect.newUrl}
               onChange={(e) => setNewRedirect({ ...newRedirect, newUrl: e.target.value })}
               className="w-full p-2.5 border rounded-xl outline-none text-xs"

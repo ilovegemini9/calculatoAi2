@@ -18,22 +18,22 @@ const nextConfig: NextConfig = {
     remotePatterns: [],
   },
 
-  // 301 redirects: strip .html extension from any inbound URL
+  // 301 redirects
   async redirects() {
     return [
-      // /calculator/mortgage.html → /calculator/mortgage
+      // /calculator/:slug → /:slug-calculator  (legacy nested path)
       {
-        source: '/calculator/:slug.html',
-        destination: '/calculator/:slug',
+        source: '/calculator/:slug',
+        destination: '/:slug-calculator',
         permanent: true,
       },
-      // /calculators/mortgage.html → /calculator/mortgage (legacy plural form)
+      // /calculators/:slug → /:slug-calculator  (legacy plural path)
       {
-        source: '/calculators/:slug.html',
-        destination: '/calculator/:slug',
+        source: '/calculators/:slug',
+        destination: '/:slug-calculator',
         permanent: true,
       },
-      // Catch-all: /about.html, /privacy.html, /terms.html, etc.
+      // Strip .html from any /:slug-calculator.html or other pages
       {
         source: '/:slug.html',
         destination: '/:slug',

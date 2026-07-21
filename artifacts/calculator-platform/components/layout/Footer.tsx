@@ -39,7 +39,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               {CALCULATORS.slice(0, 4).map((c) => (
                 <li key={c.slug}>
-                  <Link href={`/calculator/${c.slug}`} className="transition-colors flex items-center gap-1.5 hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>
+                  <Link href={`/${c.slug}-calculator`} className="transition-colors flex items-center gap-1.5 hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>
                     <span className="text-xs">{c.icon}</span>
                     {c.name}
                   </Link>
@@ -53,7 +53,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               {CALCULATORS.slice(4).map((c) => (
                 <li key={c.slug}>
-                  <Link href={`/calculator/${c.slug}`} className="transition-colors flex items-center gap-1.5 hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>
+                  <Link href={`/${c.slug}-calculator`} className="transition-colors flex items-center gap-1.5 hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>
                     <span className="text-xs">{c.icon}</span>
                     {c.name}
                   </Link>

@@ -6,7 +6,7 @@ export const dynamic = 'force-static';
 export function GET() {
   const calculatorList = CALCULATORS.map(
     (c) =>
-      `- [${c.name}](${siteConfig.url}/calculator/${c.slug}): ${c.description}`
+      `- [${c.name}](${siteConfig.url}/${c.slug}-calculator): ${c.description}`
   ).join('\n');
 
   const text = `# ${siteConfig.name}

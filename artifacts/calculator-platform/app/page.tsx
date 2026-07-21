@@ -99,7 +99,7 @@ export default function HomePage() {
             {allCalculators.slice(0, 4).map((c) => (
               <Link
                 key={c.slug}
-                href={`/calculator/${c.slug}`}
+                href={`/${c.slug}-calculator`}
                 className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium px-3.5 py-2 rounded-xl transition-all duration-200 hover:scale-105"
               >
                 <span className="text-base">{c.icon}</span>
@@ -140,7 +140,7 @@ export default function HomePage() {
                 {calcs.map((calc) => (
                   <Link
                     key={calc.slug}
-                    href={`/calculator/${calc.slug}`}
+                    href={`/${calc.slug}-calculator`}
                     className="group relative block rounded-2xl border card-lift transition-all duration-200 overflow-hidden"
                     style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}
                     aria-label={calc.name}

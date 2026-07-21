@@ -60,7 +60,7 @@ export default function SitemapPage() {
                   <span className="text-lg leading-tight">{calc.icon}</span>
                   <div>
                     <Link
-                      href={`/calculator/${calc.slug}`}
+                      href={`/${calc.slug}-calculator`}
                       className="font-semibold text-blue-500 hover:underline"
                     >
                       {calc.name}

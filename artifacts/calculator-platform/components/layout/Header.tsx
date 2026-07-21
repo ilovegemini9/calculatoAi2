@@ -131,7 +131,7 @@ export function Header() {
                 {CALCULATORS.map((c) => (
                   <Link
                     key={c.slug}
-                    href={`/calculator/${c.slug}`}
+                    href={`/${c.slug}-calculator`}
                     className="px-3 py-2 rounded-lg text-sm transition flex items-center gap-2 hover:bg-[var(--bg-card-hover)]"
                     style={{ color: 'var(--text-secondary)' }}
                   >

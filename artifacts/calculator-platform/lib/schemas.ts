@@ -32,7 +32,7 @@ export function websiteSchema() {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteConfig.url}/calculator/{slug}`,
+        urlTemplate: `${siteConfig.url}/{slug}-calculator`,
       },
       'query-input': 'required name=slug',
     },
@@ -48,7 +48,7 @@ export function calculatorSchema(calc: CalculatorMeta) {
     '@context': 'https://schema.org',
     '@type': ['WebApplication', 'SoftwareApplication'],
     name: calc.name,
-    url: `${siteConfig.url}/calculator/${calc.slug}`,
+    url: `${siteConfig.url}/${calc.slug}-calculator`,
     description: calc.description,
     applicationCategory: 'UtilityApplication',
     applicationSubCategory: CATEGORY_LABELS[calc.category] ?? calc.category,
@@ -129,7 +129,7 @@ export function howToSchema(calc: CalculatorMeta, steps: string[]) {
       position: i + 1,
       name: text.length > 60 ? text.slice(0, 57) + '…' : text,
       text,
-      url: `${siteConfig.url}/calculator/${calc.slug}#step-${i + 1}`,
+      url: `${siteConfig.url}/${calc.slug}-calculator#step-${i + 1}`,
     })),
   };
 }
@@ -153,7 +153,7 @@ export function itemListSchema(
       position: i + 1,
       name: item.name,
       description: item.description,
-      url: `${siteConfig.url}/calculator/${item.slug}`,
+      url: `${siteConfig.url}/${item.slug}-calculator`,
     })),
   };
 }

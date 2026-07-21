@@ -70,7 +70,7 @@ export default function AboutPage() {
               {CALCULATORS.map((c) => (
                 <li key={c.slug} className="flex items-center gap-2">
                   <span>{c.icon}</span>
-                  <Link href={`/calculator/${c.slug}`} className="text-blue-600 hover:underline font-medium">
+                  <Link href={`/${c.slug}-calculator`} className="text-blue-600 hover:underline font-medium">
                     {c.name}
                   </Link>
                 </li>

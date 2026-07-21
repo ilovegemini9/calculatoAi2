@@ -174,7 +174,7 @@ export default function AICalculatorFactory() {
       });
 
       if (res.ok) {
-        toast.success('Dynamic calculator is live on /calculator/' + spec.slug);
+        toast.success('Dynamic calculator is live on /' + spec.slug + '-calculator');
         setSpec(null);
         fetchPublished();
       } else {

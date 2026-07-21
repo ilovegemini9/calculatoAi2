@@ -62,7 +62,7 @@ export function RelatedCalculators({ related }: RelatedCalculatorsProps) {
             return (
               <Link
                 key={r.slug}
-                href={`/calculator/${r.slug}`}
+                href={`/${r.slug}-calculator`}
                 className="group flex items-center gap-3 p-4 rounded-xl border card-lift transition-all duration-200"
                 style={{ backgroundColor: 'var(--bg-page)', borderColor: 'var(--border)' }}
               >

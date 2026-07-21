@@ -11,8 +11,8 @@ export function GET() {
     (calc) => `
   <item>
     <title><![CDATA[${calc.name} — Free Online Calculator]]></title>
-    <link>${siteConfig.url}/calculator/${calc.slug}</link>
-    <guid isPermaLink="true">${siteConfig.url}/calculator/${calc.slug}</guid>
+    <link>${siteConfig.url}/${calc.slug}-calculator</link>
+    <guid isPermaLink="true">${siteConfig.url}/${calc.slug}-calculator</guid>
     <description><![CDATA[${calc.description}]]></description>
     <pubDate>${now}</pubDate>
     <category><![CDATA[${calc.category}]]></category>

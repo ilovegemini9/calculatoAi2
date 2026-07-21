@@ -9,7 +9,10 @@ export async function generateStaticParams() {
   return CALCULATORS.map((c) => ({ slug: c.slug }));
 }
 
-export default async function CalculatorsOldPage({ params }: Props) {
+/**
+ * Permanent 301 redirect: /calculators/:slug → /:slug-calculator
+ */
+export default async function CalculatorsLegacyRedirect({ params }: Props) {
   const { slug } = await params;
-  redirect(`/calculator/${slug}`);
+  redirect(`/${slug}-calculator`);
 }
