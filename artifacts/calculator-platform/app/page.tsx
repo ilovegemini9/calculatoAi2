@@ -6,7 +6,7 @@ import { organizationSchema, websiteSchema } from '@/lib/schemas';
 import { getDb } from '@/lib/db';
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — Free Online Calculators`,
+  title: `${siteConfig.name} — Free Online Calculators for Finance, Math, Health & More`,
   description: siteConfig.description,
   keywords: siteConfig.keywords,
   alternates: {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: siteConfig.url,
-    title: `${siteConfig.name} — Free Online Calculators`,
+    title: `${siteConfig.name} — Free Online Calculators for Finance, Math, Health & More`,
     description: siteConfig.description,
     images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
   },

@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'CalculatorFree',
   description:
-    'Free online calculators for finance, health, math, and more. Fast, accurate, and private — all calculations run in your browser.',
+    'Free online calculators for finance, math, health, and everyday life. Instant, accurate, and easy to use with no signup required. All tools run in-browser.',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://calculatorfree.vercel.app',
   ogImage: '/og-image.png',
   links: {

@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} — Free Online Calculators`,
+    default: `${siteConfig.name} — Free Online Calculators for Finance, Math, Health & More`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteConfig.url,
-    title: `${siteConfig.name} — Free Online Calculators`,
+    title: `${siteConfig.name} — Free Online Calculators for Finance, Math, Health & More`,
     description: siteConfig.description,
     siteName: siteConfig.name,
     images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${siteConfig.name} — Free Online Calculators`,
+    title: `${siteConfig.name} — Free Online Calculators for Finance, Math, Health & More`,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
   },
