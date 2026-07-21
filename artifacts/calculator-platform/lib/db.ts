@@ -3,7 +3,12 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 import type { AppSchema, SystemSettings } from './types';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'db.json');
+// On read-only hosts (e.g. Vercel serverless), fall back to /tmp which is always writable.
+// Note: /tmp is ephemeral on serverless — data resets between cold starts.
+// Use ADMIN_PASSWORD env var for persistent admin access on Vercel.
+const DB_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'data', 'db.json')
+  : path.join(process.cwd(), 'data', 'db.json');
 
 const DEFAULT_SETTINGS: SystemSettings = {
   openrouterApiKey: '',

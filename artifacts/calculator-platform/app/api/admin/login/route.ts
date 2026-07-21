@@ -14,11 +14,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const db = getDb();
     let matches = false;
     let finalUsername = '';
 
     // Check ADMIN_PASSWORD env var override (for deployment environments)
+    // This path avoids any filesystem access — safe on read-only hosts like Vercel
     const envPassword = process.env.ADMIN_PASSWORD;
     const envUsername = process.env.ADMIN_USERNAME || 'admin';
     if (
@@ -30,8 +30,9 @@ export async function POST(req: Request) {
       finalUsername = envUsername;
     }
 
-    // Check DB users (bcrypt-hashed)
+    // Check DB users (bcrypt-hashed) — only reached when env var auth didn't match
     if (!matches) {
+      const db = getDb();
       const admin = db.adminUsers.find(
         (u) => u.username.toLowerCase() === username.toLowerCase(),
       );
