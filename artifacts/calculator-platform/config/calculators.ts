@@ -179,6 +179,56 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['home equity loan calculator', 'heloc calculator', 'second mortgage calculator', 'home equity calculator', 'cltv calculator', 'equity loan payment'],
     icon: '🏦',
   },
+  {
+    slug: 'heloc',
+    name: 'HELOC Calculator',
+    shortName: 'HELOC',
+    category: 'financial',
+    description:
+      'Calculate your Home Equity Line of Credit limit, draw-period interest-only payments, and repayment-period P&I payments. See CLTV, max credit line, and total interest across both phases.',
+    keywords: ['heloc calculator', 'home equity line of credit', 'heloc payment', 'draw period', 'heloc interest', 'equity line calculator'],
+    icon: '🏗️',
+  },
+  {
+    slug: 'down-payment',
+    name: 'Down Payment Calculator',
+    shortName: 'Down Payment',
+    category: 'financial',
+    description:
+      'Calculate how much you need for a down payment and closing costs. See PMI costs, loan-type minimums (FHA, VA, conventional), and a savings timeline to reach your goal.',
+    keywords: ['down payment calculator', 'how much down payment', 'closing costs calculator', 'pmi calculator', 'down payment savings', 'fha down payment'],
+    icon: '💵',
+  },
+  {
+    slug: 'refinance',
+    name: 'Refinance Calculator',
+    shortName: 'Refinance',
+    category: 'financial',
+    description:
+      'Find out if refinancing your mortgage makes sense. Compare monthly savings, break-even point, and lifetime interest savings against closing costs.',
+    keywords: ['refinance calculator', 'mortgage refinance calculator', 'break even refinance', 'should i refinance', 'refi calculator', 'refinancing savings'],
+    icon: '🔄',
+  },
+  {
+    slug: 'mortgage-payoff',
+    name: 'Mortgage Payoff Calculator',
+    shortName: 'Payoff',
+    category: 'financial',
+    description:
+      'See how extra monthly payments or a lump sum can accelerate your mortgage payoff. Calculate interest saved and years cut from your loan term.',
+    keywords: ['mortgage payoff calculator', 'extra mortgage payment calculator', 'pay off mortgage early', 'mortgage early payoff', 'lump sum mortgage payment', 'mortgage interest savings'],
+    icon: '🏁',
+  },
+  {
+    slug: 'mortgage-uk',
+    name: 'Mortgage Calculator UK',
+    shortName: 'UK Mortgage',
+    category: 'financial',
+    description:
+      'UK mortgage calculator with Stamp Duty Land Tax (SDLT), LTV, repayment vs interest-only, and arrangement fees. First-time buyer and buy-to-let rates included.',
+    keywords: ['mortgage calculator uk', 'uk mortgage calculator', 'stamp duty calculator', 'sdlt calculator', 'uk home loan', 'first time buyer calculator uk', 'buy to let mortgage calculator'],
+    icon: '🇬🇧',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

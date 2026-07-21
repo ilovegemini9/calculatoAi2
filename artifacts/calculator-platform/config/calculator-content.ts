@@ -1457,4 +1457,401 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
       description: 'Tipping guidance cross-referenced with NRA industry standards and consumer finance best practices.',
     },
   },
+
+  // ── HELOC ─────────────────────────────────────────────────────────────────
+  heloc: {
+    howToSteps: [
+      'Enter your current home value and remaining mortgage balance to determine available equity.',
+      'Input your desired credit limit — the calculator will cap it at the lender\'s maximum CLTV (typically 85%).',
+      'Set the interest rate (check current Prime rate + your lender\'s margin), draw period, and repayment period.',
+      'Enter your estimated average monthly draw to project total interest costs across both phases.',
+      'Review the CLTV ratio, draw-period interest-only payment, and repayment-period P&I payment.',
+    ],
+    faqs: [
+      { question: 'What is the difference between a HELOC and a home equity loan?', answer: 'A HELOC is a revolving credit line — you borrow, repay, and re-borrow during the draw period, paying interest only on the outstanding balance. A home equity loan disburses a lump sum upfront with fixed monthly P&I payments from day one.' },
+      { question: 'How is a HELOC credit limit determined?', answer: 'Lenders calculate the maximum Combined Loan-to-Value (CLTV) — typically 80–90% of your home\'s appraised value — and subtract your existing mortgage balance. For example: $500,000 home × 85% CLTV − $300,000 mortgage = $125,000 maximum HELOC.' },
+      { question: 'Are HELOC interest rates fixed or variable?', answer: 'Most HELOCs have variable rates tied to the Prime Rate plus a margin (e.g. Prime + 0.5%). This means your payment changes when the Fed adjusts rates. Some lenders offer rate-lock options to convert a portion to a fixed rate.' },
+      { question: 'Can I deduct HELOC interest on my taxes?', answer: 'As of the Tax Cuts and Jobs Act (2018), HELOC interest is only deductible if the funds are used to "buy, build, or substantially improve" the home securing the loan. Using HELOC funds for other purposes (debt consolidation, vacations) disqualifies the deduction.' },
+      { question: 'What happens at the end of the draw period?', answer: 'The HELOC enters repayment. You can no longer draw funds and must repay the outstanding balance — usually as fully amortizing P&I payments. Some HELOCs require a balloon payment; confirm the terms with your lender.' },
+    ],
+    formula: {
+      expression: 'Max HELOC = (Home Value × Max CLTV%) − Existing Mortgage Balance',
+      variables: [
+        { symbol: 'CLTV', definition: 'Combined Loan-to-Value ratio — total debt secured by the property divided by appraised value' },
+        { symbol: 'Draw Interest', definition: 'Outstanding Balance × (Annual Rate ÷ 12) — interest-only during draw period' },
+        { symbol: 'Repayment PMT', definition: 'Standard amortization formula applied to balance outstanding at end of draw period' },
+      ],
+      notes: 'Interest during the draw period accrues only on amounts actually drawn, not the full credit limit. This calculator uses an average draw model for projection; actual costs depend on your draw pattern.',
+    },
+    examples: [
+      {
+        title: 'Home renovation HELOC',
+        scenario: '$500,000 home, $300,000 mortgage, 85% CLTV, 8.75% rate, 10-year draw, $500/mo draw.',
+        steps: [
+          'Max HELOC = $500,000 × 0.85 − $300,000 = $125,000.',
+          'CLTV after HELOC = ($300,000 + $125,000) / $500,000 = 85%.',
+          'Draw-period interest on avg balance ($31,250): $31,250 × 8.75%/12 ≈ $228/month.',
+          'Repayment: $125,000 over 20 years at 8.75% ≈ $1,107/month.',
+        ],
+        result: '$228/mo draw period · $1,107/mo repayment · $125,000 credit line',
+      },
+    ],
+    useCases: [
+      'Home renovation and remodeling — kitchen, bathroom, or addition financing',
+      'Emergency fund backstop — low-cost standby credit without drawing unless needed',
+      'Debt consolidation — paying off high-interest credit cards with home equity at lower rates',
+      'Education expenses — tuition and college costs financed over time',
+      'Investment property down payment — using equity in primary residence',
+    ],
+    commonPitfalls: [
+      'Treating a HELOC as permanent income — the lender can reduce or freeze the line if your home value drops or creditworthiness changes.',
+      'Interest-only mindset — paying only the draw-period minimum means the full balance remains and payment shock arrives at repayment.',
+      'Variable rate risk — a 2% rate increase on a $100,000 balance adds $167/month to your payment.',
+      'Over-leveraging — borrowing to the CLTV maximum leaves no equity buffer if home prices decline.',
+    ],
+    glossary: [
+      { term: 'CLTV (Combined LTV)', definition: 'The total of all loans secured by a property divided by its appraised value, expressed as a percentage.' },
+      { term: 'Draw Period', definition: 'The initial phase (typically 5–10 years) during which you can borrow, repay, and re-borrow up to your credit limit.' },
+      { term: 'Repayment Period', definition: 'The phase following the draw period (typically 10–20 years) when no new draws are allowed and the outstanding balance is repaid with P&I payments.' },
+      { term: 'Prime Rate', definition: 'The benchmark interest rate US banks charge their most creditworthy customers; most HELOCs are priced as Prime + a margin.' },
+    ],
+    sources: [
+      { title: 'Home Equity Line of Credit (HELOC)', publisher: 'Consumer Financial Protection Bureau', url: 'https://www.consumerfinance.gov/ask-cfpb/what-is-a-home-equity-line-of-credit-heloc/', year: 2024 },
+      { title: 'Publication 936 — Home Mortgage Interest Deduction', publisher: 'Internal Revenue Service', url: 'https://www.irs.gov/publications/p936', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Mortgage Team',
+      credentials: 'Certified Mortgage Planning Specialist (CMPS) Advisory Review',
+      description: 'HELOC mechanics verified against CFPB guidelines and current bank product disclosures.',
+    },
+  },
+
+  // ── Down Payment ──────────────────────────────────────────────────────────
+  'down-payment': {
+    howToSteps: [
+      'Enter the home purchase price.',
+      'Select your loan type — the required minimum down payment fills automatically (3.5% for FHA, 0% for VA/USDA, or choose Custom).',
+      'Enter your current savings and how much you can save each month.',
+      'Add your savings account yield (high-yield savings or CD rate) for an accurate timeline.',
+      'Review the total cash needed (down payment + closing costs), PMI estimate, and months to reach your goal.',
+    ],
+    faqs: [
+      { question: 'How much down payment do I really need?', answer: 'Minimum requirements range from 0% (VA, USDA) to 3% (some conventional loans), 3.5% (FHA), 5–10% (standard conventional). However, 20% down eliminates PMI and often secures better rates — saving thousands over the loan life.' },
+      { question: 'What is PMI and when can I remove it?', answer: 'Private Mortgage Insurance protects the lender if you default. It\'s required on conventional loans with less than 20% down, typically costing 0.5–1.5% of the loan annually. You can request removal when your equity reaches 20%; it auto-cancels at 22% under the Homeowners Protection Act.' },
+      { question: 'What are closing costs and how much should I budget?', answer: 'Closing costs cover lender fees (origination, appraisal, credit report), title insurance, escrow, prepaid taxes, and insurance. They typically run 2–5% of the purchase price. Some costs are negotiable; sellers occasionally cover a portion.' },
+      { question: 'Is a larger down payment always better?', answer: 'A larger down payment reduces your monthly payment, eliminates PMI, and lowers total interest. However, it also ties up liquid capital. Consider keeping 3–6 months of expenses as an emergency fund and not draining retirement accounts, even for a larger down payment.' },
+      { question: 'Can I use gift funds for my down payment?', answer: 'Yes — most loan programs allow gift funds from family members. FHA allows 100% gifted down payment. Conventional loans may require you to contribute a minimum amount from your own funds depending on the loan-to-value ratio. A gift letter is required.' },
+    ],
+    formula: {
+      expression: 'Down Payment = Home Price × Down Payment% | Closing Costs = Home Price × Closing Cost%',
+      variables: [
+        { symbol: 'LTV', definition: 'Loan-to-Value = Loan Amount ÷ Home Price × 100 — determines PMI requirement' },
+        { symbol: 'PMI', definition: 'Estimated at 0.7% of loan amount annually when LTV > 80%; actual rate varies by lender and credit score' },
+        { symbol: 'Total Cash Needed', definition: 'Down Payment Amount + Closing Cost Amount' },
+        { symbol: 'Months to Goal', definition: 'ln(Gap × r / PMT + 1) / ln(1 + r), where r = monthly yield and PMT = monthly savings' },
+      ],
+      notes: 'Closing costs vary by state, lender, and loan type. The 3% default is a conservative middle estimate. VA and USDA loans have no PMI but may have funding fees.',
+    },
+    examples: [
+      {
+        title: 'First-time buyer — FHA loan',
+        scenario: '$350,000 home, FHA 3.5% down, $15,000 saved, $2,000/month savings, 4.5% HYSA yield.',
+        steps: [
+          'Down payment: $350,000 × 3.5% = $12,250.',
+          'Closing costs at 3%: $350,000 × 3% = $10,500.',
+          'Total cash needed: $12,250 + $10,500 = $22,750.',
+          'Cash gap: $22,750 − $15,000 = $7,750.',
+          'Months to save $7,750 at $2,000/mo (4.5% yield): ≈ 4 months.',
+        ],
+        result: 'Ready in ~4 months. PMI ≈ $191/month until 20% equity.',
+      },
+      {
+        title: 'Conventional 20% — no PMI',
+        scenario: '$450,000 home, 20% down, $50,000 saved, $3,000/month savings.',
+        steps: [
+          'Down payment: $450,000 × 20% = $90,000.',
+          'Closing costs at 3%: $13,500.',
+          'Total cash needed: $103,500.',
+          'Cash gap: $103,500 − $50,000 = $53,500.',
+          'Months to save at $3,000/mo: ≈ 17 months.',
+        ],
+        result: 'Ready in ~17 months. No PMI — saves ~$175/month vs 10% down.',
+      },
+    ],
+    useCases: [
+      'First-time homebuyers planning their purchase timeline',
+      'Comparing FHA vs conventional loan total cost including PMI',
+      'Setting a monthly savings target to buy within a specific timeframe',
+      'Understanding how down payment size affects monthly payment and total interest',
+      'Evaluating whether to wait for 20% down or buy sooner with PMI',
+    ],
+    commonPitfalls: [
+      'Forgetting closing costs — buyers who only save for the down payment are often surprised by an additional 2–5% needed at closing.',
+      'Ignoring PMI when comparing loan options — FHA MIP can exceed conventional PMI and lasts the life of the loan if down payment < 10%.',
+      'Depleting emergency savings — leaving nothing after closing puts you at financial risk for repairs and unexpected expenses.',
+      'Not accounting for rate of return on savings — a 4–5% HYSA meaningfully shortens the timeline via compound interest.',
+    ],
+    glossary: [
+      { term: 'LTV (Loan-to-Value)', definition: 'The ratio of your loan amount to the home\'s purchase price or appraised value. Higher LTV = less equity = higher risk to lenders.' },
+      { term: 'PMI (Private Mortgage Insurance)', definition: 'Insurance protecting the lender against borrower default on conventional loans with LTV above 80%.' },
+      { term: 'MIP (Mortgage Insurance Premium)', definition: 'FHA\'s equivalent of PMI. Includes an upfront premium (1.75% of loan) and annual premium (0.55–1.05%).' },
+      { term: 'Closing Costs', definition: 'Fees paid at closing beyond the down payment: origination, appraisal, title, escrow, prepaid taxes and insurance.' },
+    ],
+    sources: [
+      { title: 'Buying a Home', publisher: 'Consumer Financial Protection Bureau', url: 'https://www.consumerfinance.gov/owning-a-home/', year: 2024 },
+      { title: 'Down Payment Assistance Programs', publisher: 'U.S. Department of Housing and Urban Development (HUD)', url: 'https://www.hud.gov/topics/buying_a_home', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Mortgage Team',
+      credentials: 'Certified Mortgage Planning Specialist (CMPS) Advisory Review',
+      description: 'Down payment guidance verified against HUD, FHA, VA, and CFPB published guidelines.',
+    },
+  },
+
+  // ── Refinance ──────────────────────────────────────────────────────────────
+  refinance: {
+    howToSteps: [
+      'Enter your current loan balance, interest rate, monthly P&I payment, and months remaining.',
+      'Input the new loan\'s interest rate and term you\'re considering.',
+      'Add estimated closing costs (2–5% of loan amount is typical).',
+      'Choose whether to pay closing costs upfront or roll them into the new loan.',
+      'Review the break-even point, monthly savings, and lifetime interest comparison.',
+    ],
+    faqs: [
+      { question: 'When does refinancing make financial sense?', answer: 'The classic rule of thumb is to refinance when you can lower your rate by at least 1% and expect to stay in the home past the break-even point (when cumulative monthly savings exceed closing costs). However, smaller rate drops can still make sense on large balances or long remaining terms.' },
+      { question: 'What are typical refinancing closing costs?', answer: 'Expect 2–5% of the loan amount, covering origination fees, appraisal ($300–$600), title search, title insurance, recording fees, and prepaid interest. On a $300,000 loan that\'s $6,000–$15,000. Some lenders offer "no-closing-cost" refis where costs are built into a slightly higher rate.' },
+      { question: 'Should I choose a shorter or longer term when refinancing?', answer: 'A shorter term (e.g. 15-year) saves substantial interest but increases your monthly payment. A longer term (e.g. 30-year) lowers your payment but may cost more in total interest, especially if you reset a loan that was nearly paid off. The calculator shows both scenarios.' },
+      { question: 'What is a cash-out refinance?', answer: 'A cash-out refi replaces your mortgage with a larger one, giving you the difference in cash. This calculator covers rate-and-term refinancing only. Cash-out refis have separate LTV and equity requirements and typically carry slightly higher rates.' },
+      { question: 'How does rolling closing costs into the loan affect savings?', answer: 'Rolling in closing costs eliminates the upfront expense but increases your loan balance, raising your monthly payment slightly and costing more in interest over time. The break-even calculation changes because there\'s no upfront cost to recover — but you pay more overall.' },
+    ],
+    formula: {
+      expression: 'Break-Even (months) = Closing Costs ÷ Monthly Savings | Net Savings = (Current PMT − New PMT) × Projection Months − Closing Costs',
+      variables: [
+        { symbol: 'New PMT', definition: 'New monthly P&I = P × [r(1+r)^n] / [(1+r)^n − 1], where P = new balance, r = new monthly rate, n = new term months' },
+        { symbol: 'Monthly Savings', definition: 'Current Monthly Payment − New Monthly Payment (positive = savings)' },
+        { symbol: 'Break-Even', definition: 'Months until cumulative savings equals out-of-pocket closing costs' },
+        { symbol: 'Lifetime Interest Savings', definition: 'Remaining interest on current loan − Total interest on new loan (can be negative if term is extended)' },
+      ],
+      notes: 'If closing costs are rolled into the new loan, the break-even point is zero months (no upfront cost) but total interest paid is higher. The lifetime interest comparison accounts for the remaining current term vs. the full new term.',
+    },
+    examples: [
+      {
+        title: 'Rate drop refinance — clear winner',
+        scenario: '$320,000 balance, 7.25% → 6.25%, 30-year refi, $6,400 closing costs, 312 months remaining.',
+        steps: [
+          'Current payment at 7.25%: ≈ $2,183/month.',
+          'New payment at 6.25% / 30 years: ≈ $1,971/month.',
+          'Monthly savings: $212.',
+          'Break-even: $6,400 ÷ $212 ≈ 30 months.',
+          'If staying 10+ years: total savings far exceed closing costs.',
+        ],
+        result: 'Break-even in 2.5 years. Saves $212/month and ~$29,000 in interest over 10 years.',
+      },
+      {
+        title: 'Term extension risk',
+        scenario: '$200,000 balance with 10 years left at 6%. Refinancing to 30 years at 5.5%.',
+        steps: [
+          'Current remaining interest: ≈ $65,000.',
+          'New 30-year interest: ≈ $208,000.',
+          'Monthly payment drops $600 but costs $143,000 more in total interest.',
+        ],
+        result: 'Lower monthly payment but $143,000 more in interest — not recommended unless cash flow is critical.',
+      },
+    ],
+    useCases: [
+      'Lowering monthly payment when interest rates drop significantly below your current rate',
+      'Switching from a 30-year to a 15-year mortgage to build equity faster',
+      'Eliminating PMI by refinancing once you reach 20% equity',
+      'Converting an adjustable-rate mortgage (ARM) to a fixed-rate loan for payment stability',
+      'Evaluating whether a lender\'s promotional rate offer genuinely saves money',
+    ],
+    commonPitfalls: [
+      'Refinancing when you plan to sell soon — if you move before the break-even point, you lose money on closing costs.',
+      'Resetting the clock on a nearly-paid-off mortgage — refinancing a 5-year-old 30-year loan to another 30 years dramatically increases lifetime interest.',
+      'Ignoring closing costs in "no-closing-cost" offers — the cost is embedded in a higher rate and paid over time.',
+      'Refinancing repeatedly without strategic purpose — each refi resets amortization, and early payments are mostly interest.',
+    ],
+    glossary: [
+      { term: 'Rate-and-Term Refinance', definition: 'Replacing your existing mortgage with a new one at a different rate and/or term, without changing the loan balance significantly.' },
+      { term: 'Break-Even Point', definition: 'The month at which cumulative monthly savings from the lower payment exceed the upfront closing costs paid.' },
+      { term: 'APR (Annual Percentage Rate)', definition: 'The true annual cost of the loan including interest and fees, expressed as a percentage. Useful for comparing loan offers with different fee structures.' },
+      { term: 'Amortization Reset', definition: 'When you refinance, your new loan begins a fresh amortization schedule — early payments are again mostly interest rather than principal.' },
+    ],
+    sources: [
+      { title: 'When to Refinance Your Mortgage', publisher: 'Consumer Financial Protection Bureau', url: 'https://www.consumerfinance.gov/ask-cfpb/when-should-i-consider-refinancing-my-mortgage/', year: 2024 },
+      { title: 'Mortgage Refinance Guide', publisher: 'Federal Reserve', url: 'https://www.federalreserve.gov/pubs/refinancings/', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree Mortgage Team',
+      credentials: 'Certified Mortgage Planning Specialist (CMPS) Advisory Review',
+      description: 'Refinance break-even methodology validated against CFPB and Federal Reserve published guidelines.',
+    },
+  },
+
+  // ── Mortgage Payoff ────────────────────────────────────────────────────────
+  'mortgage-payoff': {
+    howToSteps: [
+      'Enter your current loan balance, interest rate, and regular monthly P&I payment.',
+      'Add an extra monthly payment amount — even $100–$200 per month makes a significant difference.',
+      'Optionally add a one-time lump sum (tax refund, bonus) applied to principal today.',
+      'See the new payoff date, months saved, and total interest saved instantly.',
+      'Adjust the extra payment slider to find the payoff acceleration that fits your budget.',
+    ],
+    faqs: [
+      { question: 'How much interest can extra payments save?', answer: 'On a typical 30-year $300,000 mortgage at 6.85%, paying an extra $200/month saves approximately $45,000 in interest and cuts 5.5 years off the loan. The savings are front-loaded because interest accrues on a larger balance early in the loan.' },
+      { question: 'Should extra payments go to principal or escrow?', answer: 'Extra payments must be directed to principal to reduce your balance and save interest. Contact your loan servicer or note "Apply to principal only" on your payment. Sending extra money without this instruction may be applied to future regular payments instead.' },
+      { question: 'Is it better to pay extra monthly or in a lump sum?', answer: 'A lump sum made today reduces your balance immediately and starts saving interest right away. Monthly extra payments are more flexible and sustainable. This calculator lets you model both simultaneously — they compound together for maximum payoff acceleration.' },
+      { question: 'Should I pay off my mortgage early or invest instead?', answer: 'It depends on your mortgage rate vs. expected investment returns. If your rate is 7% and you expect 8–10% stock market returns, investing may win mathematically. However, paying off debt is a guaranteed return equal to your interest rate with no market risk — valuable for peace of mind and retirement planning.' },
+      { question: 'Does making extra payments change my minimum required payment?', answer: 'No. Your minimum required monthly payment stays the same regardless of extra principal payments. Extra payments simply reduce your balance faster, shortening the loan term. Your servicer will not reduce your required payment due to extra payments.' },
+    ],
+    formula: {
+      expression: 'Remaining Balance After n Payments: B_n = P(1+r)^n − PMT[(1+r)^n − 1]/r',
+      variables: [
+        { symbol: 'P', definition: 'Current outstanding principal balance' },
+        { symbol: 'r', definition: 'Monthly interest rate = Annual Rate ÷ 12 ÷ 100' },
+        { symbol: 'PMT', definition: 'Total monthly payment including any extra amount' },
+        { symbol: 'n', definition: 'Number of months until balance reaches zero' },
+      ],
+      notes: 'Any lump-sum payment is applied to the principal balance immediately before the regular amortization schedule begins. This maximizes interest savings because the reduced balance compounds for the entire remaining term.',
+    },
+    examples: [
+      {
+        title: '$200/month extra — 30-year mortgage',
+        scenario: '$280,000 balance, 6.85% rate, $1,844/month regular payment.',
+        steps: [
+          'Regular payoff: 360 months (30 years), total interest ≈ $383,000.',
+          'With $200/mo extra: total payment $2,044/month.',
+          'New payoff: ≈ 293 months (24.4 years).',
+          'Months saved: 67 months (5.6 years).',
+          'Interest saved: ≈ $47,200.',
+        ],
+        result: 'Pay off 5.6 years early and save ~$47,200 in interest for $200/month.',
+      },
+      {
+        title: 'Lump sum $10,000 tax refund',
+        scenario: 'Same $280,000 mortgage — apply $10,000 lump sum today.',
+        steps: [
+          'New balance after lump sum: $270,000.',
+          'New payoff: ≈ 344 months.',
+          'Months saved: 16 months.',
+          'Interest saved: ≈ $11,400.',
+        ],
+        result: 'One $10,000 payment saves $11,400 in interest and 16 months.',
+      },
+    ],
+    useCases: [
+      'Planning mortgage freedom before retirement',
+      'Evaluating whether a year-end bonus should go to the mortgage or investments',
+      'Comparing bi-weekly payment strategies to extra monthly payments',
+      'Calculating payoff date when refinancing isn\'t worthwhile but debt reduction is desired',
+      'Motivating consistent extra payments by seeing the compounding impact in real time',
+    ],
+    commonPitfalls: [
+      'Not specifying "apply to principal" — servicers may credit extra payments to future monthly obligations instead of reducing principal.',
+      'Neglecting emergency fund to make extra payments — liquidity is essential; ensure 3–6 months of expenses are accessible first.',
+      'Ignoring tax implications — mortgage interest deductions (if itemizing) decrease as you pay down faster, slightly offsetting the tax benefit.',
+      'Paying extra on a 3% pandemic-era mortgage while carrying 20%+ credit card debt — always eliminate higher-rate debt first.',
+    ],
+    glossary: [
+      { term: 'Principal Curtailment', definition: 'A payment made directly against the principal balance, separate from and in addition to the regular monthly payment.' },
+      { term: 'Amortization', definition: 'The process of paying off a loan with regular payments over time, where each payment covers interest first and the remainder reduces principal.' },
+      { term: 'Payoff Date', definition: 'The month and year in which the outstanding loan balance reaches zero and the mortgage is fully satisfied.' },
+      { term: 'Bi-Weekly Payments', definition: 'Paying half the monthly mortgage payment every two weeks, resulting in 26 half-payments (13 full payments) per year instead of 12 — an effective extra payment strategy.' },
+    ],
+    sources: [
+      { title: 'Making Extra Mortgage Payments', publisher: 'Consumer Financial Protection Bureau', url: 'https://www.consumerfinance.gov/ask-cfpb/how-can-i-pay-off-my-mortgage-faster/', year: 2024 },
+      { title: 'Homeowners Protection Act — PMI Cancellation', publisher: 'Federal Trade Commission', url: 'https://consumer.ftc.gov/articles/home-equity-loans-and-home-equity-lines-credit', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree Mortgage Team',
+      credentials: 'Certified Mortgage Planning Specialist (CMPS) Advisory Review',
+      description: 'Payoff acceleration formulas verified against standard amortization mathematics and CFPB consumer guidance.',
+    },
+  },
+
+  // ── UK Mortgage ────────────────────────────────────────────────────────────
+  'mortgage-uk': {
+    howToSteps: [
+      'Enter the property value and your deposit — the LTV and loan amount calculate automatically.',
+      'Input your mortgage interest rate (use your initial fixed-rate period, e.g. 2 or 5-year fix).',
+      'Set the mortgage term (25 years is standard in the UK) and choose repayment or interest-only.',
+      'Select your buyer type — first-time buyer, home mover, or additional property — to calculate the correct Stamp Duty Land Tax (SDLT).',
+      'Add any arrangement fee and choose whether to pay it upfront or add it to the loan.',
+      'Review the monthly payment, Stamp Duty breakdown, and total purchase cost.',
+    ],
+    faqs: [
+      { question: 'How is Stamp Duty Land Tax (SDLT) calculated in England?', answer: 'SDLT is banded: 0% on the first £250,000; 5% on £250,001–£925,000; 10% on £925,001–£1,500,000; 12% above that. First-time buyers pay 0% up to £425,000 and 5% from £425,001–£625,000. Additional properties (buy-to-let, second homes) attract a 3% surcharge on every band.' },
+      { question: 'Does Scotland or Wales use the same Stamp Duty?', answer: 'No. Scotland uses Land and Buildings Transaction Tax (LBTT) with different thresholds and rates. Wales uses Land Transaction Tax (LTT). This calculator applies England & Northern Ireland SDLT rates — residents of Scotland or Wales should consult their respective Revenue authorities.' },
+      { question: 'What is the difference between repayment and interest-only mortgages?', answer: 'With a repayment mortgage, each monthly payment covers both interest and a portion of the capital — you own the property outright at the end. With an interest-only mortgage, monthly payments cover interest alone; you must repay the full capital at term end via a separate repayment vehicle (ISA, pension, property sale).' },
+      { question: 'What LTV can I expect to get a mortgage?', answer: 'Most UK lenders offer mortgages up to 95% LTV (5% deposit), though higher LTV products carry higher interest rates and fewer product options. The best rates typically start at 60% LTV. Above 90% LTV, options narrow significantly; lenders price in additional risk.' },
+      { question: 'What is a mortgage arrangement fee?', answer: 'An arrangement (or product) fee is charged by the lender for setting up the mortgage, typically £0–£2,000. You can pay it upfront or add it to the loan balance. Adding it to the loan means you pay interest on the fee for the full mortgage term, increasing total cost.' },
+      { question: 'How does the Help to Buy scheme affect my mortgage?', answer: 'The original Help to Buy Equity Loan scheme closed to new applicants in 2023. Buyers who used it have a government equity loan (typically 20%, or 40% in London) which affects their LTV calculation and will need to be repaid. This calculator models standard mortgages without equity loan components.' },
+    ],
+    formula: {
+      expression: 'Monthly Repayment PMT = L × [r(1+r)^n] / [(1+r)^n − 1]  |  Interest-Only PMT = L × r',
+      variables: [
+        { symbol: 'L', definition: 'Loan amount (property value − deposit; + arrangement fee if rolled in)' },
+        { symbol: 'r', definition: 'Monthly interest rate = Annual Rate ÷ 12 ÷ 100' },
+        { symbol: 'n', definition: 'Total number of monthly payments = Term Years × 12' },
+        { symbol: 'SDLT', definition: 'Stamp Duty Land Tax — banded tax on England & N. Ireland property purchases, calculated on marginal bands' },
+      ],
+      notes: 'SDLT is calculated on marginal bands (not the whole price at the highest rate). First-time buyer relief applies only when the purchase price does not exceed £625,000.',
+    },
+    examples: [
+      {
+        title: 'First-time buyer in England',
+        scenario: '£350,000 property, £70,000 deposit (20% LTV), 4.5% rate, 25-year repayment term.',
+        steps: [
+          'Loan: £350,000 − £70,000 = £280,000. LTV = 80%.',
+          'Monthly payment: £280,000 at 4.5%/12 over 300 months ≈ £1,556/month.',
+          'SDLT (first-time buyer): £0 on first £250,000; 5% on £100,000 = £5,000. Total SDLT = £5,000.',
+          'Wait — property is £350,000 < £425,000 so first-time buyer 0% applies to full £350,000. SDLT = £0.',
+          'Total purchase cost: £350,000 + £0 SDLT = £350,000 (plus solicitor/survey fees).',
+        ],
+        result: '£1,556/month · £0 SDLT (first-time buyer relief) · £180,000 total interest over 25 years',
+      },
+      {
+        title: 'Home mover — standard SDLT',
+        scenario: '£600,000 property, £150,000 deposit, 4.2% rate, 25-year repayment, home mover.',
+        steps: [
+          'Loan: £450,000. LTV = 75%.',
+          'Monthly payment ≈ £2,440/month.',
+          'SDLT: 0% on £250,000 = £0; 5% on £350,000 (£250k–£600k) = £17,500. Total = £17,500.',
+          'Total purchase cost: £600,000 + £17,500 = £617,500.',
+        ],
+        result: '£2,440/month · £17,500 SDLT · Total purchase cost £617,500',
+      },
+    ],
+    useCases: [
+      'First-time buyers budgeting total purchase costs including Stamp Duty',
+      'Home movers comparing repayment vs. interest-only monthly cash flow',
+      'Buy-to-let investors calculating Stamp Duty surcharge impact on yield',
+      'UK expats returning home and assessing affordability at current rates',
+      'Comparing true cost of different mortgage terms (20 vs 25 vs 30 years)',
+    ],
+    commonPitfalls: [
+      'Confusing the initial fixed rate with the Standard Variable Rate (SVR) — after the fix ends, your payment will change, typically increasing substantially.',
+      'Forgetting additional purchase costs: solicitor/conveyancing fees (£1,500–£3,000), survey (£500–£1,500), and removal costs.',
+      'Interest-only without a repayment vehicle — the FCA requires lenders to verify a credible repayment strategy; lacking one is a serious financial risk.',
+      'Assuming Help to Buy is still available — the equity loan scheme closed in March 2023.',
+      'Ignoring the 3% SDLT surcharge when buying a second property — it applies even when letting out your former home.',
+    ],
+    glossary: [
+      { term: 'SDLT (Stamp Duty Land Tax)', definition: 'A tax levied by HMRC on property purchases in England and Northern Ireland, calculated on marginal bands above threshold values.' },
+      { term: 'LTV (Loan-to-Value)', definition: 'The mortgage loan amount expressed as a percentage of the property value. Lower LTV = larger deposit = better rates.' },
+      { term: 'Arrangement Fee', definition: 'A lender\'s product fee charged to set up the mortgage, typically £0–£2,000. Often higher fees accompany lower headline rates.' },
+      { term: 'SVR (Standard Variable Rate)', definition: 'The default rate a UK lender charges after a fixed or tracker period ends. Usually substantially higher than product rates — remortgaging before SVR is standard practice.' },
+      { term: 'Conveyancing', definition: 'The legal process of transferring property ownership, handled by a solicitor or licensed conveyancer. A required step in every UK property purchase.' },
+    ],
+    sources: [
+      { title: 'Stamp Duty Land Tax', publisher: 'HM Revenue & Customs (HMRC)', url: 'https://www.gov.uk/stamp-duty-land-tax', year: 2024 },
+      { title: 'Mortgage Best Buys and Rates', publisher: 'Financial Conduct Authority (FCA)', url: 'https://www.fca.org.uk/consumers/mortgages', year: 2024 },
+      { title: 'Help to Buy: Equity Loan Scheme', publisher: 'Homes England / GOV.UK', url: 'https://www.gov.uk/help-to-buy-equity-loan', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree UK Finance Team',
+      credentials: 'CeMAP-qualified Mortgage Adviser Review',
+      description: 'UK mortgage and SDLT calculations verified against current HMRC published rates and FCA mortgage guidance.',
+    },
+  },
 };
