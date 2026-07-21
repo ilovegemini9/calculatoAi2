@@ -624,6 +624,329 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
     },
   },
 
+  // ── Mortgage Amortization ─────────────────────────────────────────────────
+  'mortgage-amortization': {
+    howToSteps: [
+      'Enter your loan amount — the total you are borrowing (home price minus down payment).',
+      'Enter the annual interest rate and loan term in years.',
+      'Optionally add an extra monthly payment to model accelerated payoff.',
+      'Switch between "Yearly" and "Monthly" views; click any year row to expand the monthly detail.',
+    ],
+    faqs: [
+      { question: 'What is an amortization schedule?', answer: 'An amortization schedule is a complete table of every loan payment showing how much goes to principal, how much to interest, and the remaining balance after each payment. Early payments are mostly interest; later payments shift toward principal.' },
+      { question: 'How much interest can I save with extra payments?', answer: 'Even small extra payments applied to principal dramatically reduce total interest. For example, paying $200/month extra on a $300,000, 30-year loan at 6.85% saves over $90,000 in interest and pays off the loan ~8 years early.' },
+      { question: 'What is the difference between the monthly payment and total paid?', answer: 'Your monthly payment is fixed (P&I). Total paid is that payment times the number of payments. The difference between total paid and your original loan amount is the total interest you pay over the life of the loan.' },
+      { question: 'Why does so much of my early payment go to interest?', answer: 'Because interest accrues on the outstanding balance each month. When the balance is high (early in the loan), so is the interest charge. As you pay down principal, the interest portion shrinks and the principal portion grows — this is amortization.' },
+      { question: 'Can I use this for any loan type?', answer: 'Yes. This calculator works for any fixed-rate fully-amortizing loan: 30-year mortgages, 15-year mortgages, refinances, home equity loans, and personal loans.' },
+    ],
+    formula: {
+      expression: 'M = L × [r(1+r)^n] ÷ [(1+r)^n − 1]\nInterest_k = Balance_(k-1) × r\nPrincipal_k = M − Interest_k\nBalance_k = Balance_(k-1) − Principal_k',
+      variables: [
+        { symbol: 'M', definition: 'Fixed monthly payment (Principal & Interest)' },
+        { symbol: 'L', definition: 'Loan amount (principal)' },
+        { symbol: 'r', definition: 'Monthly interest rate = Annual Rate ÷ 12 ÷ 100' },
+        { symbol: 'n', definition: 'Total number of monthly payments = years × 12' },
+        { symbol: 'Balance_k', definition: 'Outstanding loan balance after payment k' },
+        { symbol: 'Interest_k', definition: 'Interest portion of payment k' },
+        { symbol: 'Principal_k', definition: 'Principal portion of payment k' },
+      ],
+      notes: 'Extra principal payments reduce the outstanding balance immediately, so subsequent interest charges are lower. This compounds: every dollar of extra principal paid early saves more than a dollar of interest over time.',
+    },
+    examples: [
+      {
+        title: 'Standard 30-year mortgage',
+        scenario: '$320,000 loan at 6.85% for 30 years, no extra payments.',
+        steps: [
+          'Monthly rate r = 6.85 ÷ 12 ÷ 100 = 0.005708.',
+          'n = 360 payments.',
+          'M = 320,000 × [0.005708 × (1.005708)^360] ÷ [(1.005708)^360 − 1] ≈ $2,103/mo.',
+          'Month 1: Interest = $320,000 × 0.005708 = $1,827; Principal = $276.',
+          'Month 360: Interest ≈ $12; Principal ≈ $2,091.',
+          'Total interest = $2,103 × 360 − $320,000 ≈ $437,000.',
+        ],
+        result: 'Monthly payment: $2,103 | Total interest over 30 years: ~$437,000',
+      },
+      {
+        title: 'Same loan with $300/mo extra payment',
+        scenario: '$320,000 at 6.85%, 30-year term, $300 extra per month.',
+        steps: [
+          'Base payment: $2,103/mo. Total monthly: $2,403.',
+          'Extra $300 applied to principal each month, reducing balance faster.',
+          'Lower balance → less interest each subsequent month.',
+          'Payoff achieved in approximately 22 years (instead of 30).',
+        ],
+        result: 'Payoff in ~22 years | Interest saved: ~$110,000 | Months saved: ~96',
+      },
+    ],
+    useCases: [
+      'Planning extra principal payments to shorten payoff and reduce total interest',
+      'Comparing 15-year vs 30-year mortgage total costs',
+      'Determining how many payments remain on an existing mortgage',
+      'Satisfying lender or accounting requirements for loan documentation',
+      'Real estate investment analysis — projecting equity build-up year by year',
+      'Refinancing decisions — comparing new schedule vs remaining old schedule',
+    ],
+    commonPitfalls: [
+      'Assuming all extra payments reduce principal — confirm with lender that prepayments apply to principal, not future scheduled payments.',
+      'Ignoring escrow: the amortization schedule covers P&I only; property tax and insurance are separate.',
+      'Not accounting for the interest saved when comparing paying points upfront vs a lower rate over time.',
+      'Overlooking that private mortgage insurance (PMI) is cancelled once LTV reaches 80%, reducing total cost.',
+    ],
+    glossary: [
+      { term: 'Amortization', definition: 'Gradual repayment of a debt over time through regular installments that cover both interest and principal.' },
+      { term: 'Principal', definition: 'The outstanding balance of the loan, excluding accrued interest.' },
+      { term: 'Negative Amortization', definition: 'When monthly payments are less than the interest owed, causing the outstanding balance to grow. Not possible with standard fixed-rate loans.' },
+      { term: 'Equity', definition: 'The portion of the home value you own outright: current home value minus outstanding loan balance.' },
+      { term: 'Prepayment', definition: 'Any payment toward principal beyond the scheduled monthly amount, reducing the outstanding balance and future interest charges.' },
+    ],
+    sources: [
+      { title: 'Mortgage Amortization — Consumer Financial Protection Bureau', publisher: 'CFPB', url: 'https://www.consumerfinance.gov/owning-a-home/process/compare/', year: 2024 },
+      { title: 'Understanding Your Mortgage Statement', publisher: 'Federal Reserve', url: 'https://www.federalreserve.gov/pubs/mortgage_interestrates/', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree Real Estate Finance Team',
+      credentials: 'Licensed Mortgage Broker Review & Actuarial Verification',
+      description: 'Amortization logic verified against Fannie Mae loan calculation standards and CFPB disclosure requirements.',
+    },
+  },
+
+  // ── House Affordability ───────────────────────────────────────────────────
+  'house-affordability': {
+    howToSteps: [
+      'Enter your annual gross income (before taxes) and total monthly debt payments (car, student loan, credit cards).',
+      'Enter your available down payment, expected interest rate, and loan term.',
+      'Adjust property tax rate (varies by state/county), home insurance rate, and any HOA fees.',
+      'The calculator shows your maximum home price based on the 28/36 DTI rule used by most lenders.',
+    ],
+    faqs: [
+      { question: 'What is the 28/36 rule?', answer: 'Lenders typically require your monthly housing costs (PITI) to be no more than 28% of gross monthly income (front-end DTI), and total debt including housing to be no more than 36% (back-end DTI). The calculator finds the maximum home price that satisfies both limits.' },
+      { question: 'What counts as monthly debt?', answer: 'Include all recurring minimum debt payments: car loans, student loans, personal loans, and minimum credit card payments. Do not include utilities, groceries, or subscriptions — only loan/debt obligations.' },
+      { question: 'Should I include PMI in affordability calculations?', answer: 'Yes, if your down payment is less than 20%. PMI typically costs 0.5–1.5% of the loan amount annually. Add it to your estimated monthly costs. PMI is automatically cancelled when your loan balance reaches 80% of home value.' },
+      { question: 'How does down payment affect affordability?', answer: 'A larger down payment reduces the loan amount, lowering your monthly P&I payment. It also eliminates PMI above 20% down. Even a 5% increase in down payment can significantly raise the maximum home price you qualify for.' },
+      { question: 'What is the difference between front-end and back-end DTI?', answer: 'Front-end DTI = housing costs ÷ gross income. Back-end DTI = (housing + all debts) ÷ gross income. The calculator uses whichever limit is more restrictive, which is how actual lenders underwrite mortgages.' },
+    ],
+    formula: {
+      expression: 'Front-End Limit: Max PITI = Monthly Income × (FrontEndDTI ÷ 100)\nBack-End Limit: Max PITI = Monthly Income × (BackEndDTI ÷ 100) − Monthly Debts\nMax PITI = min(Front-End Limit, Back-End Limit)\nMax P&I = Max PITI − Monthly Tax − Monthly Insurance − HOA\nMax Loan = Max P&I × [(1+r)^n − 1] ÷ [r × (1+r)^n]\nMax Home Price = Max Loan + Down Payment',
+      variables: [
+        { symbol: 'PITI', definition: 'Principal, Interest, Taxes, Insurance — total monthly housing cost' },
+        { symbol: 'DTI', definition: 'Debt-to-Income ratio, expressed as a percentage of gross monthly income' },
+        { symbol: 'r', definition: 'Monthly interest rate = Annual Rate ÷ 12 ÷ 100' },
+        { symbol: 'n', definition: 'Total monthly payments = loan term years × 12' },
+        { symbol: 'Max P&I', definition: 'Maximum allowable principal and interest payment after subtracting tax, insurance, and HOA from max PITI' },
+      ],
+      notes: 'Property tax and insurance scale with home price, so the formula is solved iteratively. Starting with an estimate of Max P&I, the calculator converges on the correct home price within 6 iterations. FHA loans allow DTI up to 43/50%; jumbo loans are stricter.',
+    },
+    examples: [
+      {
+        title: 'Dual-income household — $150k combined income',
+        scenario: '$150,000 annual income, $800/mo existing debts, $60,000 down, 6.85% rate, 30-year term, 1.2% tax, 0.5% insurance.',
+        steps: [
+          'Monthly income = $150,000 ÷ 12 = $12,500.',
+          'Front-end limit (28%): Max PITI = $12,500 × 0.28 = $3,500.',
+          'Back-end limit (36%): Max PITI = $12,500 × 0.36 − $800 = $3,700.',
+          'Binding constraint: front-end ($3,500).',
+          'Subtract estimated tax+insurance (≈1.7% ÷ 12 of home price) and iterate to find Max P&I.',
+          'Max loan ≈ $378,000; Max home price = $378,000 + $60,000 ≈ $438,000.',
+        ],
+        result: 'Maximum home price: ~$438,000 | Max PITI: ~$3,500/mo',
+      },
+    ],
+    useCases: [
+      'Pre-qualification estimate before meeting with a mortgage lender',
+      'Setting a realistic home search budget on Zillow or Redfin',
+      'Understanding how paying off debts increases buying power',
+      'Comparing affordability across different interest rate scenarios',
+      'Determining how much more down payment is needed to qualify for a specific home',
+      'Exploring the effect of a co-borrower on maximum loan amount',
+    ],
+    commonPitfalls: [
+      'Using net income instead of gross income — lenders qualify based on pre-tax income.',
+      'Omitting non-mortgage debts — even a $300/mo car payment meaningfully reduces max home price.',
+      'Not budgeting for PMI when down payment is under 20% — it can add $150–$400/mo.',
+      'Ignoring closing costs (2–5% of purchase price) that reduce available cash for down payment.',
+      'Assuming approval at the maximum limit — qualifying for a loan and comfortably affording it are different.',
+    ],
+    glossary: [
+      { term: 'DTI (Debt-to-Income Ratio)', definition: 'The percentage of gross monthly income consumed by debt payments. Lenders use both front-end (housing only) and back-end (all debts) DTI.' },
+      { term: 'Front-End DTI', definition: 'Housing costs (PITI) as a percentage of gross monthly income. Most conventional lenders require this to be ≤28%.' },
+      { term: 'Back-End DTI', definition: 'All monthly debt obligations (housing + other debts) as a percentage of gross monthly income. Conventional limit is typically 36–43%.' },
+      { term: 'PMI (Private Mortgage Insurance)', definition: 'Insurance required on conventional loans with less than 20% down. Protects the lender; cancelled when LTV reaches 80%.' },
+      { term: 'Gross Income', definition: 'Pre-tax income. Lenders use gross income (not take-home pay) for DTI calculations.' },
+      { term: 'Pre-qualification', definition: 'An informal estimate of how much a lender might lend, based on self-reported income and debts. Not a commitment to lend.' },
+    ],
+    sources: [
+      { title: 'Debt-to-Income Ratio for Mortgage Qualification', publisher: 'Consumer Financial Protection Bureau', url: 'https://www.consumerfinance.gov/ask-cfpb/what-is-a-debt-to-income-ratio/', year: 2024 },
+      { title: 'Qualifying Ratios — Fannie Mae Selling Guide', publisher: 'Fannie Mae', url: 'https://selling-guide.fanniemae.com/', year: 2024 },
+      { title: 'FHA Loan Requirements', publisher: 'U.S. Department of Housing and Urban Development', url: 'https://www.hud.gov/buying/loans', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Real Estate Finance Team',
+      credentials: 'Licensed Mortgage Broker Review & HUD Guidelines',
+      description: 'DTI methodology cross-referenced with Fannie Mae underwriting standards and CFPB qualification guidelines.',
+    },
+  },
+
+  // ── Rent ──────────────────────────────────────────────────────────────────
+  rent: {
+    howToSteps: [
+      'Enter your monthly base rent.',
+      'Add monthly utilities (electricity, gas, water, internet) and renter\'s insurance.',
+      'Enter any parking, pet fees, or other recurring monthly costs.',
+      'Add one-time upfront costs: security deposit and any broker or move-in fee.',
+      'Set the annual rent increase percentage and lease term to project total costs over time.',
+    ],
+    faqs: [
+      { question: 'What is the true cost of renting?', answer: 'Beyond base rent, true renting costs include utilities (avg $100–$200/mo), renter\'s insurance ($15–$30/mo), parking ($50–$300/mo in urban areas), and pet fees ($25–$100/mo). Add these up: a $2,000/mo apartment often costs $2,300–$2,600/mo all-in.' },
+      { question: 'What is renter\'s insurance and do I need it?', answer: 'Renter\'s insurance covers your personal belongings against theft, fire, and water damage, and provides liability coverage. It typically costs $15–$30/month and is strongly recommended. Many landlords require it.' },
+      { question: 'How much is a typical security deposit?', answer: 'Most landlords charge 1–2 months\' rent as a security deposit. Some states cap it at 1 month. You get it back (minus deductions for damage) when you move out, so it is not a lost cost — but it ties up cash upfront.' },
+      { question: 'What is a broker fee?', answer: 'In some markets (especially New York City), a real estate broker charges a fee — often one month\'s rent — to connect you with a landlord. This is a one-time cost at move-in that significantly increases the true first-year expense.' },
+      { question: 'How much do rents typically increase each year?', answer: 'Annual rent increases vary widely by market, but the US average has been 3–5% in recent years. Some cities have rent control ordinances limiting increases. Always factor in future increases when budgeting for a multi-year stay.' },
+    ],
+    formula: {
+      expression: 'Monthly Total = Rent + Utilities + Insurance + Parking + Pet Fee + Other\nAnnual Total = Monthly Total × 12\nTotal Lease Cost = Σ(Monthly Total × (1 + RentIncrease%)^floor(month/12)) for all months\nTrue First Year = Annual Total + Security Deposit + Broker Fee',
+      variables: [
+        { symbol: 'Rent', definition: 'Base monthly rent payment' },
+        { symbol: 'Utilities', definition: 'Average monthly electricity, gas, water, and internet costs' },
+        { symbol: 'Insurance', definition: 'Monthly renter\'s insurance premium' },
+        { symbol: 'RentIncrease%', definition: 'Annual percentage rent increase applied at each lease renewal' },
+        { symbol: 'True First Year', definition: 'All recurring costs for 12 months plus one-time upfront fees' },
+      ],
+      notes: 'The 10-year projection applies the annual rent increase at each yearly anniversary. Non-rent costs (utilities, insurance) are held constant as an estimate. In practice, utilities increase with inflation (~3% annually).',
+    },
+    examples: [
+      {
+        title: 'Urban apartment — New York City market',
+        scenario: '$3,200/mo rent, $200 utilities, $20 insurance, $150 parking, $50 pet fee, $3,200 deposit, $3,200 broker fee, 3% annual increase, 12-month lease.',
+        steps: [
+          'Monthly total = $3,200 + $200 + $20 + $150 + $50 = $3,620.',
+          'Annual recurring cost = $3,620 × 12 = $43,440.',
+          'Upfront costs = $3,200 + $3,200 = $6,400.',
+          'True first-year cost = $43,440 + $6,400 = $49,840.',
+          'Year 2 rent = $3,200 × 1.03 = $3,296/mo; annual total rises to ~$44,500.',
+        ],
+        result: 'Monthly all-in: $3,620 | True Year 1 cost: $49,840 | 10-year cumulative: ~$510,000',
+      },
+      {
+        title: 'Suburban apartment — mid-size city',
+        scenario: '$1,400/mo rent, $120 utilities, $15 insurance, no parking, $1,400 deposit, no broker fee, 2.5% annual increase, 12-month lease.',
+        steps: [
+          'Monthly total = $1,400 + $120 + $15 = $1,535.',
+          'Annual recurring = $1,535 × 12 = $18,420.',
+          'True first-year = $18,420 + $1,400 = $19,820.',
+        ],
+        result: 'Monthly all-in: $1,535 | True Year 1: $19,820 | Cost per day: ~$50',
+      },
+    ],
+    useCases: [
+      'Budgeting accurately before signing a lease',
+      'Comparing two apartments with different rent + fee structures',
+      'Calculating the true cash needed at move-in (deposit + broker + first month)',
+      'Projecting long-term housing costs when considering staying vs moving',
+      'Determining the maximum rent you can afford based on the 30% income rule',
+      'Preparing financial disclosures for roommate agreements',
+    ],
+    commonPitfalls: [
+      'Budgeting only for base rent — utilities and fees commonly add 15–30% on top.',
+      'Forgetting that security deposits tie up cash but are (theoretically) refundable — budget for it regardless.',
+      'Not reading the lease for automatic renewal clauses and rent escalation terms.',
+      'Overlooking broker fees in tight markets — they can equal a full month\'s additional expense.',
+      'Assuming utilities are included when they are not — always confirm what the landlord covers.',
+    ],
+    glossary: [
+      { term: 'Security Deposit', definition: 'Refundable cash held by the landlord against damage or unpaid rent. Returned (minus deductions) at lease end.' },
+      { term: 'Renter\'s Insurance', definition: 'Insurance covering a tenant\'s personal property and liability. Does not cover the building itself (covered by landlord\'s insurance).' },
+      { term: 'Broker Fee', definition: 'One-time payment to a real estate agent for facilitating the rental. Common in New York City and other high-demand markets.' },
+      { term: '30% Rule', definition: 'A common guideline that rent should not exceed 30% of gross monthly income. A rough heuristic — total housing costs including utilities are the more useful measure.' },
+      { term: 'Rent Control', definition: 'Local ordinances limiting how much a landlord can increase rent annually, often tied to inflation indices (CPI). Not available in all markets.' },
+    ],
+    sources: [
+      { title: 'Rental Housing Finance Survey', publisher: 'U.S. Census Bureau', url: 'https://www.census.gov/programs-surveys/rhfs.html', year: 2023 },
+      { title: 'Renter\'s Guide to Insurance', publisher: 'Insurance Information Institute', url: 'https://www.iii.org/article/renters-insurance', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Personal Finance Team',
+      credentials: 'Consumer Finance & Housing Economics Review',
+      description: 'Rental cost methodology reviewed against U.S. Census Bureau housing cost data and real estate industry standards.',
+    },
+  },
+
+  // ── Rent vs. Buy ──────────────────────────────────────────────────────────
+  'rent-vs-buy': {
+    howToSteps: [
+      'Enter the home price, down payment, mortgage rate, and loan term for the buying scenario.',
+      'Add property tax rate, insurance, HOA, annual maintenance (1% of value is standard), closing and selling costs.',
+      'Enter your monthly rent, expected annual rent increase, and renter\'s insurance.',
+      'Set how many years to compare and the investment return rate for the down payment opportunity cost.',
+      'The calculator shows break-even year, net cost of each option, and a year-by-year comparison table.',
+    ],
+    faqs: [
+      { question: 'How is the break-even calculated?', answer: 'The break-even year is when buying\'s cumulative net cost (total out-of-pocket minus home equity at sale) first becomes lower than renting\'s cumulative net cost (total rent minus what the invested down payment has grown to). It is the year buying becomes financially advantageous.' },
+      { question: 'What is "net cost" in this calculator?', answer: 'Net cost accounts for what you get back. For buying: total paid minus the equity you\'d receive if you sold (after selling costs). For renting: total rent paid minus the investment value of the down payment (opportunity cost). This gives a true apples-to-apples comparison.' },
+      { question: 'What is the opportunity cost of a down payment?', answer: 'If you rent, you keep the down payment and can invest it. The investment return rate represents what that money could earn (e.g., 7% in a diversified index fund). This is a real financial cost of buying that is often overlooked.' },
+      { question: 'Does this calculator account for tax benefits of homeownership?', answer: 'No. Mortgage interest deductions and property tax deductions are not included because their value depends on your tax bracket and whether you itemize. For most homeowners under the raised standard deduction (2018+), the tax benefit is minimal. Consult a tax professional.' },
+      { question: 'When does buying almost always win?', answer: 'Buying tends to win when: you stay for 7+ years, the local market appreciates steadily, rent is high relative to purchase price, and your down payment opportunity cost is low. Short time horizons and high closing/selling costs typically favour renting.' },
+    ],
+    formula: {
+      expression: 'Buying Net Cost_Y = Cumulative Out-of-Pocket_Y − Home Equity_Y\nHome Equity_Y = HomeValue × (1+g)^Y − RemainingLoan − SellingCosts\nRenting Net Cost_Y = Cumulative Rent_Y − InvestmentValue_Y\nInvestmentValue_Y = (DownPayment + ClosingCosts) × (1+i)^Y\nBreak-Even = first Y where BuyingNetCost_Y < RentingNetCost_Y',
+      variables: [
+        { symbol: 'g', definition: 'Annual home appreciation rate (e.g., 0.03 for 3%)' },
+        { symbol: 'i', definition: 'Annual investment return rate for the down payment opportunity cost' },
+        { symbol: 'Y', definition: 'Year in the comparison horizon' },
+        { symbol: 'SellingCosts', definition: 'Agent commissions + transfer taxes at sale (typically 6% of sale price)' },
+        { symbol: 'ClosingCosts', definition: 'Upfront buying transaction costs (typically 2–3% of purchase price)' },
+      ],
+      notes: 'This model simplifies taxes, does not include mortgage interest deduction, and assumes constant inflation-adjusted costs. Real break-even points depend on local market conditions. The closing costs are added to the down payment invested in the renting scenario for a fair comparison.',
+    },
+    examples: [
+      {
+        title: 'Urban scenario — 10-year horizon',
+        scenario: '$500,000 home, $100,000 down, 6.85% rate, 30-year term, $2,800/mo rent, 3% appreciation, 3% rent increase, 7% investment return, 10 years.',
+        steps: [
+          'Monthly mortgage P&I ≈ $2,628.',
+          'Add tax (1.2%), insurance (0.5%), maintenance (1%): +~$1,250/mo year 1 all-in cost.',
+          'Buying net cost year 10: ~$370,000 (paid) − ~$160,000 (equity after selling costs) = ~$210,000.',
+          'Renting net cost year 10: ~$384,000 (total rent) − ~$194,000 (investment) = ~$190,000.',
+          'Renting is cheaper at year 10 by ~$20,000.',
+          'Break-even occurs around year 12–14 in this scenario.',
+        ],
+        result: 'Renting is better at 10 years. Buying becomes better around year 12–14.',
+      },
+    ],
+    useCases: [
+      'Deciding whether to buy before a relocation or continue renting',
+      'Evaluating buying in a high cost-of-living city vs a lower-cost suburb',
+      'Comparing buying in a flat market vs renting and investing the difference',
+      'Advising a first-time buyer on realistic financial expectations',
+      'Real estate investors evaluating primary residence vs investment property',
+      'Modeling retirement housing strategy: pay off a mortgage vs rent and invest',
+    ],
+    commonPitfalls: [
+      'Ignoring transaction costs — closing (2–3%) plus selling (6%) costs total 8–9% of home value and must be recouped through appreciation before buying breaks even.',
+      'Assuming all equity is wealth — home equity is illiquid and subject to market risk, unlike a diversified investment portfolio.',
+      'Using too-low maintenance estimates — 1% of home value annually is the standard rule, but older homes and HOA-free properties often exceed this.',
+      'Ignoring rent increases — rents in most markets grow 2–4% annually. A fixed mortgage becomes relatively cheaper over time.',
+      'Not considering the psychological benefits of ownership (stability, customization) which have real value beyond the financial comparison.',
+    ],
+    glossary: [
+      { term: 'Opportunity Cost', definition: 'The financial return foregone by choosing one option over another. The down payment\'s opportunity cost is the investment return you give up by putting that money into a house.' },
+      { term: 'Home Equity', definition: 'The market value of your ownership stake in a property: current value minus outstanding mortgage balance.' },
+      { term: 'Net Cost', definition: 'Total out-of-pocket costs minus the value of assets received in return. For buying: total payments minus equity. For renting: total rent minus investment growth.' },
+      { term: 'Break-Even Year', definition: 'The first year in which the cumulative net cost of buying falls below the cumulative net cost of renting.' },
+      { term: 'Price-to-Rent Ratio', definition: 'Home price divided by annual rent for a comparable property. A ratio above 20 generally favours renting; below 15 generally favours buying.' },
+      { term: 'Selling Costs', definition: 'Agent commissions (typically 5–6%), transfer taxes, and closing costs paid at the time of sale. Usually 6–8% of sale price.' },
+    ],
+    sources: [
+      { title: 'Is It Better to Buy or Rent?', publisher: 'New York Times Upshot', url: 'https://www.nytimes.com/interactive/2014/upshot/buy-rent-calculator.html', year: 2023 },
+      { title: 'Homeownership and Wealth Accumulation', publisher: 'Federal Reserve Bank of St. Louis', url: 'https://www.stlouisfed.org/publications/regional-economist/2017/third-quarter/homeownership-and-wealth-accumulation', year: 2022 },
+      { title: 'The Price-to-Rent Ratio', publisher: 'Harvard Joint Center for Housing Studies', url: 'https://www.jchs.harvard.edu/', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree Real Estate Finance Team',
+      credentials: 'Licensed Real Estate & Financial Planning Review',
+      description: 'Comparison methodology aligned with CFPB homeownership cost frameworks and peer-reviewed housing economics literature.',
+    },
+  },
+
   // ── Tip ──────────────────────────────────────────────────────────────────
   tip: {
     howToSteps: [

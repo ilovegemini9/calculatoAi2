@@ -10,6 +10,56 @@ export interface CalculatorMeta {
 
 export const CALCULATORS: CalculatorMeta[] = [
   {
+    slug: 'mortgage',
+    name: 'Mortgage Calculator',
+    shortName: 'Mortgage',
+    category: 'financial',
+    description:
+      'Calculate your monthly mortgage payment including principal, interest, taxes, and insurance (PITI). See the full amortization schedule.',
+    keywords: ['mortgage calculator', 'home loan calculator', 'piti calculator', 'house payment', 'monthly mortgage payment'],
+    icon: '🏠',
+  },
+  {
+    slug: 'mortgage-amortization',
+    name: 'Mortgage Amortization Calculator',
+    shortName: 'Amortization',
+    category: 'financial',
+    description:
+      'View the complete amortization schedule for any mortgage. See exactly how each payment is split between principal and interest, year by year.',
+    keywords: ['mortgage amortization calculator', 'amortization schedule', 'loan amortization', 'mortgage payoff', 'extra payment calculator'],
+    icon: '📅',
+  },
+  {
+    slug: 'house-affordability',
+    name: 'House Affordability Calculator',
+    shortName: 'Affordability',
+    category: 'financial',
+    description:
+      'Find out how much house you can afford based on your income, debts, and down payment. Uses the 28/36 DTI rule used by mortgage lenders.',
+    keywords: ['house affordability calculator', 'how much house can i afford', 'home affordability', 'mortgage affordability', 'dti calculator'],
+    icon: '🏡',
+  },
+  {
+    slug: 'rent',
+    name: 'Rent Calculator',
+    shortName: 'Rent',
+    category: 'financial',
+    description:
+      'Calculate your true total cost of renting including utilities, insurance, parking, and fees. See 10-year projections with annual rent increases.',
+    keywords: ['rent calculator', 'cost of renting', 'monthly rent calculator', 'rental cost calculator', 'rent affordability'],
+    icon: '🏢',
+  },
+  {
+    slug: 'rent-vs-buy',
+    name: 'Rent vs. Buy Calculator',
+    shortName: 'Rent vs. Buy',
+    category: 'financial',
+    description:
+      'Compare the true financial cost of renting versus buying a home over time. Find your break-even year and net cost difference.',
+    keywords: ['rent vs buy calculator', 'renting vs buying', 'rent or buy', 'buy vs rent', 'break even buying house'],
+    icon: '⚖️',
+  },
+  {
     slug: 'age',
     name: 'Age Calculator',
     shortName: 'Age',
@@ -58,16 +108,6 @@ export const CALCULATORS: CalculatorMeta[] = [
       'Calculate monthly loan payments, total interest, and view a full amortization schedule for any loan amount.',
     keywords: ['loan calculator', 'loan payment calculator', 'amortization calculator', 'personal loan'],
     icon: '💰',
-  },
-  {
-    slug: 'mortgage',
-    name: 'Mortgage Calculator',
-    shortName: 'Mortgage',
-    category: 'financial',
-    description:
-      'Calculate your monthly mortgage payment including principal, interest, taxes, and insurance (PITI).',
-    keywords: ['mortgage calculator', 'home loan calculator', 'piti calculator', 'house payment'],
-    icon: '🏠',
   },
   {
     slug: 'percentage',
