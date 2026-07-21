@@ -197,6 +197,11 @@ function OpportunityCard({
           <div className="rounded-xl p-3 space-y-1 text-xs border" style={{ backgroundColor: 'var(--bg-input)', borderColor: 'var(--border)' }}>
             <p className="font-bold text-blue-500 truncate">🔵 {opp.metaTitle}</p>
             <p style={{ color: 'var(--text-muted)' }}>{opp.metaDescription}</p>
+            {opp.urlSlug && (
+              <p className="font-mono text-[10px] pt-0.5" style={{ color: 'var(--text-muted)' }}>
+                🔗 /{opp.urlSlug}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -289,7 +294,7 @@ function OpportunityCard({
       {/* Action buttons */}
       <div className="px-5 py-3.5 border-t flex items-center gap-3 flex-wrap"
         style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}>
-        {opp.type === 'calculator' ? (
+        {opp.type === 'calculator' && (
           <Link
             href={`/admin/factory?prompt=${encodeURIComponent(
               `${opp.keyword}. Keywords: ${opp.primaryKeyword}, ${opp.secondaryKeywords.slice(0, 2).join(', ')}. ${opp.intentAnalysis}`,
@@ -299,15 +304,14 @@ function OpportunityCard({
           >
             🧮 Build Calculator
           </Link>
-        ) : (
-          <button
-            onClick={() => onWriteArticle(opp)}
-            disabled={!!dispatching}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider rounded-xl transition shadow-lg shadow-purple-600/20 flex items-center gap-1.5"
-          >
-            {isDispatching ? '⏳ Generating…' : '✍️ Generate & Open Article'}
-          </button>
         )}
+        <button
+          onClick={() => onWriteArticle(opp)}
+          disabled={!!dispatching}
+          className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider rounded-xl transition shadow-lg shadow-purple-600/20 flex items-center gap-1.5"
+        >
+          {isDispatching ? '⏳ Generating…' : '✍️ Generate Article'}
+        </button>
         <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
           Score: {opp.opportunityScore}/100 · {opp.estimatedMonthlySearches || '?'} searches/mo
         </span>
@@ -819,6 +823,31 @@ export default function EditorialWorkspacePage() {
 
   return (
     <div className="space-y-6">
+      {/* ── Full-screen generation overlay ───────────────────────────────── */}
+      {dispatching && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}>
+          <div className="flex flex-col items-center gap-4 max-w-sm text-center px-8">
+            {/* Spinner */}
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 rounded-full border-4 border-purple-500/20" />
+              <div className="absolute inset-0 rounded-full border-4 border-t-purple-500 animate-spin" />
+              <span className="absolute inset-0 flex items-center justify-center text-2xl">✍️</span>
+            </div>
+            <div>
+              <p className="text-white font-black text-lg tracking-tight">AI is crafting your article…</p>
+              <p className="text-purple-300 text-sm mt-1 font-medium">"{dispatching}"</p>
+              <p className="text-white/50 text-xs mt-3 leading-relaxed">
+                Writing 1,400–2,000 words · Building Key Takeaways · Adding FAQ Schema · Injecting calculator links
+              </p>
+            </div>
+            <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-full bg-purple-500 rounded-full animate-pulse" style={{ width: '70%' }} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Page header ───────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>

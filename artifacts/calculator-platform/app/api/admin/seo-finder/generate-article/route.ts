@@ -155,10 +155,15 @@ export async function POST(req: Request) {
     }
 
     const db = getDb();
-    const orKey = db.settings.openrouterApiKey;
+    // Resolve API key: DB setting → OPENROUTER_API_KEY env → OPENAI_API_KEY env (sk-or- prefix means it's actually an OpenRouter key)
+    const orKey =
+      db.settings.openrouterApiKey ||
+      process.env.OPENROUTER_API_KEY ||
+      (process.env.OPENAI_API_KEY?.startsWith('sk-or-') ? process.env.OPENAI_API_KEY : undefined) ||
+      '';
     if (!orKey) {
       return NextResponse.json(
-        { error: 'OpenRouter API Key is not configured. Add it in Platform Settings.' },
+        { error: 'No AI API key configured. Add your OpenRouter key in Platform Settings → AI Configuration.' },
         { status: 400 },
       );
     }
@@ -208,10 +213,12 @@ CRITICAL STYLE RULES — ZERO TOLERANCE:
 - Start directly with the Key Takeaways box — no preamble, no "Introduction:" heading.
 - Be specific. Include real numbers, percentages, or examples where relevant.`;
 
+    // Long-form prose models: Nemotron Ultra first (best quality), Nano as fast fallback.
+    // Gemma free tiers are heavily rate-limited — kept only as last resort.
     const articleModels = [
-      'google/gemma-4-31b-it:free',
-      'google/gemma-4-26b-a4b:free',
       'nvidia/nemotron-3-ultra-550b-a55b:free',
+      'nvidia/nemotron-3-nano-30b-a3b:free',
+      'google/gemma-4-31b-it:free',
     ];
 
     let content = '';
