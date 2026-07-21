@@ -170,7 +170,7 @@ export default async function CalculatorCatchAllPage({ params }: Props) {
     faqSchemaResult,
     howToSchemaResult,
     relatedItemListSchema,
-  ].filter((s): s is object => s != null);
+  ].filter((s) => s != null) as object[];
 
   return (
     <>

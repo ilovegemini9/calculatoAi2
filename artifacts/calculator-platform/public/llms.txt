@@ -1,0 +1,43 @@
+# CalculatorFree — llms.txt
+# https://llmstxt.org
+# AI/LLM access policy for CalculatorFree calculator platform
+
+## Site Overview
+CalculatorFree provides free, privacy-first online calculators for finance,
+fitness, math, and lifestyle. All computations run client-side in the browser.
+No personal data is stored or transmitted.
+
+## Available Calculators
+
+- [Age Calculator](https://calculatorfree.vercel.app/calculator/age)
+  Calculate exact age in years, months, days, hours, and minutes.
+
+- [BMI Calculator](https://calculatorfree.vercel.app/calculator/bmi)
+  Body Mass Index using WHO/CDC classification (metric & imperial).
+
+- [Calorie Calculator](https://calculatorfree.vercel.app/calculator/calorie)
+  BMR and TDEE via Mifflin-St Jeor equation; activity-adjusted targets.
+
+- [GPA Calculator](https://calculatorfree.vercel.app/calculator/gpa)
+  Weighted and unweighted GPA on 4.0 scale; supports AP/IB and Honors.
+
+- [Loan Calculator](https://calculatorfree.vercel.app/calculator/loan)
+  Monthly payment, total interest, and full amortization schedule.
+
+- [Mortgage Calculator](https://calculatorfree.vercel.app/calculator/mortgage)
+  PITI payment (principal, interest, tax, insurance) with amortization.
+
+- [Percentage Calculator](https://calculatorfree.vercel.app/calculator/percentage)
+  Percent of, what percent, and percent change calculations.
+
+- [Tip Calculator](https://calculatorfree.vercel.app/calculator/tip)
+  Tip amount and bill split across any number of people.
+
+## Formulas & Methodology
+All formulas are validated against primary sources (WHO, CDC, Mifflin et al.,
+standard amortization finance). See each calculator page for full formula
+breakdowns, worked examples, and authoritative citations.
+
+## Licensing & Attribution
+Content is freely usable for informational purposes. Attribution appreciated.
+Contact: https://calculatorfree.vercel.app/contact

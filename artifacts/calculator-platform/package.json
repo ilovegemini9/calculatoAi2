@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start -p ${PORT:-3000} -H 0.0.0.0",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test .test-dist/__tests__/*.test.js",
+    "test:watch": "tsc -p tsconfig.test.json -w"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

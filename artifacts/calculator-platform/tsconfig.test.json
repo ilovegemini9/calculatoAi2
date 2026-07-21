@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": ".test-dist",
+    "rootDir": ".",
+    "declaration": false,
+    "sourceMap": false
+  },
+  "include": [
+    "__tests__/**/*.ts",
+    "lib/calculators/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next", ".test-dist", "app", "components", "config"]
+}
