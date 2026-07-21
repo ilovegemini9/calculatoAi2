@@ -211,11 +211,11 @@ export function AdminShell({ children }: Props) {
                         🧮 AI Builder: {searchQuery}
                       </Link>
                       <Link 
-                        href="/admin/blog" 
+                        href="/admin/seo-finder" 
                         onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
                         className="block text-xs p-1.5 hover:bg-[var(--bg-card-hover)] rounded-lg"
                       >
-                        ✍️ Blog Content: {searchQuery}
+                        ✍️ Editorial Workspace: {searchQuery}
                       </Link>
                       <Link 
                         href="/admin/seo" 
@@ -253,11 +253,11 @@ export function AdminShell({ children }: Props) {
                       🤖 Synthesize with AI
                     </Link>
                     <Link 
-                      href="/admin/blog" 
+                      href="/admin/seo-finder" 
                       onClick={() => setQuickActionsOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-xs font-bold hover:bg-[var(--bg-card-hover)] rounded-lg text-[var(--text-primary)]"
                     >
-                      ✍️ Compose Article
+                      ✍️ Editorial Workspace
                     </Link>
                   </div>
                   <div className="py-1">

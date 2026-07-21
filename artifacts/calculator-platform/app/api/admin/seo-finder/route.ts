@@ -106,6 +106,7 @@ For each opportunity produce:
 12. H2/H3 outline (4-6 headings with 2-3 subpoints each)
 13. Meta title (under 60 characters, includes primary keyword)
 14. Meta description (under 155 characters, includes CTA)
+15. URL slug (lowercase, hyphenated, e.g. /mortgage-payoff-calculator-guide — no leading slash)
 
 Return this exact JSON structure:
 {
@@ -126,7 +127,8 @@ Return this exact JSON structure:
         { "heading": string, "level": "h2" | "h3", "subpoints": [string, string] }
       ],
       "metaTitle": string,
-      "metaDescription": string
+      "metaDescription": string,
+      "urlSlug": string
     }
   ]
 }`;

@@ -137,6 +137,7 @@ export async function POST(req: Request) {
       outline,
       metaTitle,
       metaDescription,
+      urlSlug: suggestedSlug,
     } = body as {
       keyword: string;
       primaryKeyword: string;
@@ -146,6 +147,7 @@ export async function POST(req: Request) {
       outline: { heading: string; level: string; subpoints: string[] }[];
       metaTitle: string;
       metaDescription: string;
+      urlSlug?: string;
     };
 
     if (!keyword?.trim()) {
@@ -240,11 +242,11 @@ CRITICAL STYLE RULES — ZERO TOLERANCE:
       content = content + '\n' + buildFaqSchema(keyword, faqPairs);
     }
 
-    // Build slug from the first title
-    const slug = (titles[0] || keyword)
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+    // Use suggested slug from the opportunity if available, else derive from title
+    const slug = (suggestedSlug?.trim()
+      ? suggestedSlug.replace(/^\//, '').replace(/[^a-z0-9-]+/g, '-').replace(/(^-|-$)/g, '')
+      : (titles[0] || keyword).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    );
 
     // Find most relevant calculator to link as primary
     const primaryCalcSlug =

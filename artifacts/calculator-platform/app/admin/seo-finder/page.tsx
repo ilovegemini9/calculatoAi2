@@ -28,6 +28,7 @@ interface KeywordOpportunity {
   outline: OutlineItem[];
   metaTitle: string;
   metaDescription: string;
+  urlSlug: string;
 }
 
 interface FinderResult {
@@ -718,6 +719,7 @@ export default function EditorialWorkspacePage() {
           outline: opp.outline,
           metaTitle: opp.metaTitle,
           metaDescription: opp.metaDescription,
+          urlSlug: opp.urlSlug,
         }),
       });
       const d = await res.json();
