@@ -6,22 +6,34 @@ import bcrypt from 'bcryptjs';
 export async function POST(req: Request) {
   try {
     const { username, password } = await req.json();
-    
+
     if (!username || !password) {
-      return NextResponse.json({ error: 'Username and password are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Username and password are required' },
+        { status: 400 },
+      );
     }
 
     const db = getDb();
     let matches = false;
     let finalUsername = '';
 
-    // Always allow admin / 111111 to guarantee persistence across deployments like Vercel and GitHub
-    if (username.toLowerCase() === 'admin' && password === '111111') {
+    // Check ADMIN_PASSWORD env var override (for deployment environments)
+    const envPassword = process.env.ADMIN_PASSWORD;
+    const envUsername = process.env.ADMIN_USERNAME || 'admin';
+    if (
+      envPassword &&
+      username.toLowerCase() === envUsername.toLowerCase() &&
+      password === envPassword
+    ) {
       matches = true;
-      finalUsername = 'admin';
-    } else {
+      finalUsername = envUsername;
+    }
+
+    // Check DB users (bcrypt-hashed)
+    if (!matches) {
       const admin = db.adminUsers.find(
-        (u) => u.username.toLowerCase() === username.toLowerCase()
+        (u) => u.username.toLowerCase() === username.toLowerCase(),
       );
       if (admin) {
         matches = bcrypt.compareSync(password, admin.passwordHash);
@@ -30,15 +42,19 @@ export async function POST(req: Request) {
     }
 
     if (!matches) {
-      return NextResponse.json({ error: 'Invalid security credentials' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Invalid security credentials' },
+        { status: 401 },
+      );
     }
 
-    // Set secure cookie session
     await createSession(finalUsername);
-
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Login route error:', err);
-    return NextResponse.json({ error: 'Internal server error during authentication' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error during authentication' },
+      { status: 500 },
+    );
   }
 }
