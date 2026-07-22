@@ -24,9 +24,8 @@ export function AdminShell({ children }: Props) {
   useEffect(() => setMounted(true), []);
 
   const navItems = [
-    { href: '/admin', label: 'Dashboard Overview', icon: '📊' },
+    { href: '/admin/seo-finder', label: 'AI Articles Manager', icon: '✍️' },
     { href: '/admin/factory', label: 'AI Calculator Factory', icon: '⚡' },
-    { href: '/admin/seo-finder', label: 'Editorial Workspace', icon: '✍️' },
     { href: '/admin/seo', label: 'SEO Audit Hub', icon: '🔍' },
     { href: '/admin/media', label: 'Media Optimization', icon: '🖼️' },
     { href: '/admin/users', label: 'Security & Access Control', icon: '👥' },
