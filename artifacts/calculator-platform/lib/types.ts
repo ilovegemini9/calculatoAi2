@@ -54,6 +54,16 @@ export interface FaqItem {
   answer: string;
 }
 
+export interface ArticleKeywordData {
+  keyword: string;
+  searchVolume: string;
+  competition: string;
+  difficulty: number;
+  opportunityScore: number;
+  trend: string;
+  estimatedCtr: string;
+}
+
 export interface Article {
   id: string;
   calculatorId: string;
@@ -69,6 +79,21 @@ export interface Article {
   };
   version: number;
   createdAt: string;
+  // Extended fields (optional — backward compatible)
+  relatedKeywords?: string[];
+  openGraph?: { title: string; description: string; url: string; type: string };
+  faqItems?: { q: string; a: string }[];
+  howToSteps?: string[];
+  readingTime?: number;
+  wordCount?: number;
+  tableOfContents?: string;
+  outline?: { heading: string; level: string; subpoints: string[] }[];
+  relatedCalculators?: string[];
+  schemaFaq?: string;
+  schemaArticle?: string;
+  schemaHowTo?: string;
+  keywordData?: ArticleKeywordData;
+  updatedAt?: string;
 }
 
 export interface ArticleVersion {
