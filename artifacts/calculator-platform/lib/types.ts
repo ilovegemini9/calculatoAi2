@@ -5,6 +5,23 @@ export interface AdminUser {
   createdAt: string;
 }
 
+export interface TestCase {
+  name: string;
+  type: 'unit' | 'edge' | 'formula';
+  inputs: Record<string, number | string>;
+  expectedOutputs: Record<string, number | string>;
+  tolerance?: number; // relative tolerance, default 0.01 (1%)
+}
+
+export interface TestResult {
+  name: string;
+  type: 'unit' | 'edge' | 'formula';
+  passed: boolean;
+  actual?: Record<string, unknown>;
+  expected: Record<string, number | string>;
+  error?: string;
+}
+
 export interface Calculator {
   id: string;
   slug: string;
@@ -22,6 +39,30 @@ export interface Calculator {
     faqItems?: FaqItem[];
     shortDescription?: string;
     schemaJsonLd?: string;
+    // Extended fields added by Calculator Factory
+    formula?: {
+      expression: string;
+      variables: { symbol: string; definition: string }[];
+      notes?: string;
+    };
+    examples?: {
+      title: string;
+      scenario: string;
+      steps: string[];
+      result: string;
+    }[];
+    internalLinks?: { text: string; slug: string }[];
+    tests?: TestCase[];
+    testStatus?: 'pending' | 'passed' | 'failed';
+    lastTestRun?: string;
+    testResults?: TestResult[];
+    opportunityData?: {
+      searchVolume: string;
+      competition: string;
+      trend: string;
+      opportunityScore: number;
+      estimatedTraffic: string;
+    };
   };
   settings: {
     customFormula?: string;

@@ -37,7 +37,8 @@ async function getCalculatorData(calculatorSlug: string) {
 
   try {
     const db = getDb();
-    const dynamicCalc = db.calculators.find((c) => c.slug === baseSlug);
+    // Only serve active calculators — inactive ones require passing tests first
+    const dynamicCalc = db.calculators.find((c) => c.slug === baseSlug && c.status === 'active');
     if (dynamicCalc) {
       return {
         calc: {
@@ -54,6 +55,8 @@ async function getCalculatorData(calculatorSlug: string) {
         content: {
           howToSteps: dynamicCalc.metadata.howToUse ?? [],
           faqs: dynamicCalc.metadata.faqItems ?? [],
+          formula: dynamicCalc.metadata.formula,
+          examples: dynamicCalc.metadata.examples,
         } as CalcContent,
       };
     }

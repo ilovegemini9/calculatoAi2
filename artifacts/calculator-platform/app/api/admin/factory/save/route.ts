@@ -16,21 +16,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Name, slug, and calculateBody are required' }, { status: 400 });
     }
 
-    // Safety check again
+    // Safety check
     const violations = validateGeneratedCode({
       meta: { calculateBody: payload.calculateBody }
     });
 
     if (violations.length > 0) {
-      return NextResponse.json({ 
-        error: `Security Alert: The formula contains unsafe references: ${violations.join(', ')}` 
+      return NextResponse.json({
+        error: `Security Alert: The formula contains unsafe references: ${violations.join(', ')}`
       }, { status: 400 });
     }
 
     const db = getDb();
     const slug = payload.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-    // Check if dynamic calculator already exists, or overwrite/update
     const existingIndex = db.calculators.findIndex((c) => c.slug === slug);
 
     const calcData: Calculator = {
@@ -38,7 +37,8 @@ export async function POST(req: Request) {
       slug,
       name: payload.name,
       category: payload.category || 'lifestyle',
-      status: 'active',
+      // Always start inactive — must pass tests before enabling
+      status: 'inactive',
       metadata: {
         title: payload.title || payload.name,
         description: payload.description || '',
@@ -49,6 +49,13 @@ export async function POST(req: Request) {
         howToUse: payload.howToUse || [],
         faqItems: payload.faqItems || [],
         shortDescription: payload.shortDescription || '',
+        // Extended Factory fields
+        formula: payload.formula || undefined,
+        examples: payload.examples || undefined,
+        internalLinks: payload.internalLinks || undefined,
+        tests: payload.tests || undefined,
+        testStatus: 'pending',
+        opportunityData: payload.opportunityData || undefined,
       },
       settings: {
         customFormula: payload.calculateBody,
@@ -57,6 +64,10 @@ export async function POST(req: Request) {
     };
 
     if (existingIndex > -1) {
+      // Preserve existing test results and status unless this is a fresh generation
+      const existing = db.calculators[existingIndex];
+      calcData.id = existing.id;
+      calcData.createdAt = existing.createdAt;
       db.calculators[existingIndex] = calcData;
     } else {
       db.calculators.push(calcData);
