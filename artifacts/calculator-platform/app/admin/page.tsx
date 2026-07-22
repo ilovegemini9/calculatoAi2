@@ -2,37 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import Link from 'next/link';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-interface CalcStats {
-  total: number; staticCount: number; dynamicCount: number;
-  published: number; draft: number; disabled: number;
-}
-interface ArticleStats {
-  total: number; published: number; draft: number; pendingReview: number; scheduled: number;
-}
+interface CalcStats { total: number; staticCount: number; dynamicCount: number; published: number; draft: number; }
+interface ArticleStats { total: number; published: number; draft: number; pendingReview: number; }
 interface TrendPoint { date: string; views: number; calculations: number; }
 interface AnalyticsData {
   totalDynamic: number; totalArticles: number; totalRedirects: number;
   calcStats: CalcStats; articleStats: ArticleStats; trends: TrendPoint[];
   settings: { adsenseEnabled: boolean; adsenseCode: string; analyticsCode: string; };
-}
-interface LogEntry {
-  id: string; timestamp: string; level: 'INFO' | 'WARN' | 'ERROR'; message: string; route: string;
-}
-interface BackupEntry {
-  id: string; date: string; size: string; status: 'Completed' | 'Pending'; type: string;
 }
 interface SystemData {
   serverTime: string; environment: string; nodeVersion: string; platform: string;
@@ -41,682 +22,505 @@ interface SystemData {
   cpu: { count: number; model: string; };
   uptime: { seconds: number; display: string; };
 }
+interface LogEntry { id: string; timestamp: string; level: 'INFO' | 'WARN' | 'ERROR'; message: string; route: string; }
 interface AiData {
   connected: boolean; aiEnabled: boolean; provider: string | null;
   stats: { totalGenerated: number; published: number; pendingApproval: number; failed: number; generatedThisWeek: number; };
-  tokenUsage: null;
   recentActivity: { name: string; slug: string; category: string; status: string; createdAt: string; }[];
 }
 
-// ── Stat card helper ──────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-function StatCard({ label, value, sub, color }: { label: string; value: number | string; sub?: string; color: string }) {
+function MetricCard({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent?: string }) {
   return (
-    <div className="rounded-2xl border p-5" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-      <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{label}</span>
-      <p className={`text-4xl font-extrabold mt-1 ${color}`}>{value}</p>
-      {sub && <p className="text-[10px] mt-2 font-semibold" style={{ color: 'var(--text-muted)' }}>{sub}</p>}
+    <div className="rounded-2xl border p-5 flex flex-col gap-2" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{label}</span>
+      <p className={`text-4xl font-black ${accent ?? 'text-[var(--text-primary)]'}`}>{value}</p>
+      {sub && <p className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>{sub}</p>}
     </div>
   );
 }
 
-function EmptyState({ icon, title, description, href, cta }: {
-  icon: string; title: string; description: string; href?: string; cta?: string;
-}) {
+function SectionCard({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
-      <span className="text-4xl">{icon}</span>
-      <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{title}</p>
-      <p className="text-xs max-w-sm" style={{ color: 'var(--text-muted)' }}>{description}</p>
-      {href && cta && (
-        <Link href={href} className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition">
-          {cta}
-        </Link>
-      )}
+    <div className="rounded-2xl border overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+      <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border)' }}>
+        <p className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>{title}</p>
+        {action}
+      </div>
+      {children}
     </div>
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
+  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-2 rounded-full bg-white/10 overflow-hidden">
+        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
+      </div>
+      <span className="text-xs font-bold w-10 text-right" style={{ color: 'var(--text-muted)' }}>{pct}%</span>
+    </div>
+  );
+}
+
+function StatusDot({ ok }: { ok: boolean }) {
+  return <span className={`inline-block w-2 h-2 rounded-full ${ok ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />;
+}
+
+function NoData() {
+  return <span className="text-xs italic" style={{ color: 'var(--text-muted)' }}>No data available</span>;
+}
+
+// ── Tab types ─────────────────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'overview',  label: '📊 Overview' },
-  { id: 'ai',        label: '🤖 AI Engine' },
-  { id: 'system',    label: '🖥️ System' },
-  { id: 'logs',      label: '🧾 Logs' },
-  { id: 'adsense',   label: '💵 Ads' },
-  { id: 'gsc',       label: '🔍 GSC' },
+  { id: 'overview', label: 'Overview', icon: '📊' },
+  { id: 'articles', label: 'Articles', icon: '✍️' },
+  { id: 'ai', label: 'AI Engine', icon: '🤖' },
+  { id: 'system', label: 'System', icon: '🖥️' },
+  { id: 'logs', label: 'Logs', icon: '🧾' },
 ] as const;
 type Tab = typeof TABS[number]['id'];
 
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>('overview');
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [system, setSystem] = useState<SystemData | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [aiData, setAiData] = useState<AiData | null>(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
+  const [loadingSystem, setLoadingSystem] = useState(false);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [loadingAi, setLoadingAi] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Overview
-  const [data, setData]       = useState<AnalyticsData | null>(null);
-  const [dataLoading, setDataLoading] = useState(true);
-
-  // AI Engine
-  const [aiData, setAiData]   = useState<AiData | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-
-  // System
-  const [sys, setSys]         = useState<SystemData | null>(null);
-  const [sysLoading, setSysLoading] = useState(false);
-
-  // Logs
-  const [logs, setLogs]       = useState<LogEntry[]>([]);
-  const [logsLoading, setLogsLoading] = useState(false);
-  const [logLevel, setLogLevel] = useState('ALL');
-  const [logSearch, setLogSearch] = useState('');
-  const [backups, setBackups] = useState<BackupEntry[]>([]);
-  const [backupsLoading, setBackupsLoading] = useState(false);
-  const [creatingBackup, setCreatingBackup] = useState(false);
-
-  // Initial overview fetch
+  // Fetch analytics on mount
   useEffect(() => {
-    fetch('/api/admin/analytics')
-      .then((r) => r.json())
-      .then((d) => { setData(d); setDataLoading(false); })
-      .catch(() => { toast.error('Failed to load dashboard analytics.'); setDataLoading(false); });
+    (async () => {
+      setLoadingAnalytics(true);
+      try {
+        const res = await fetch('/api/admin/analytics');
+        if (!res.ok) throw new Error('Failed');
+        setAnalytics(await res.json());
+      } catch { toast.error('Failed to load analytics'); }
+      finally { setLoadingAnalytics(false); }
+    })();
   }, []);
 
-  // Lazy tab fetches
+  // Lazy-load system info when tab selected
   useEffect(() => {
-    if (activeTab === 'ai' && !aiData && !aiLoading) {
-      setAiLoading(true);
-      fetch('/api/admin/ai-usage')
-        .then((r) => r.json())
-        .then((d) => { setAiData(d); setAiLoading(false); })
-        .catch(() => { toast.error('Failed to load AI usage data.'); setAiLoading(false); });
+    if (tab === 'system' && !system) {
+      setLoadingSystem(true);
+      fetch('/api/admin/system').then((r) => r.json()).then(setSystem).catch(() => toast.error('Failed to load system info')).finally(() => setLoadingSystem(false));
     }
-    if (activeTab === 'system' && !sys && !sysLoading) {
-      setSysLoading(true);
-      fetch('/api/admin/system')
-        .then((r) => r.json())
-        .then((d) => { setSys(d); setSysLoading(false); })
-        .catch(() => { toast.error('Failed to load system health data.'); setSysLoading(false); });
+    if (tab === 'logs' && logs.length === 0) {
+      setLoadingLogs(true);
+      fetch('/api/admin/logs').then((r) => r.json()).then((d) => setLogs(Array.isArray(d) ? d : [])).catch(() => toast.error('Failed to load logs')).finally(() => setLoadingLogs(false));
     }
-    if (activeTab === 'logs') {
-      setLogsLoading(true);
-      setBackupsLoading(true);
-      const params = new URLSearchParams();
-      if (logLevel !== 'ALL') params.set('level', logLevel);
-      if (logSearch) params.set('search', logSearch);
-      fetch(`/api/admin/logs?${params}`)
-        .then((r) => r.json())
-        .then((d) => { setLogs(d); setLogsLoading(false); })
-        .catch(() => { toast.error('Failed to load logs.'); setLogsLoading(false); });
-      fetch('/api/admin/backups')
-        .then((r) => r.json())
-        .then((d) => { setBackups(d); setBackupsLoading(false); })
-        .catch(() => { toast.error('Failed to load backups.'); setBackupsLoading(false); });
+    if (tab === 'ai' && !aiData) {
+      setLoadingAi(true);
+      fetch('/api/admin/ai-usage').then((r) => r.json()).then(setAiData).catch(() => toast.error('Failed to load AI data')).finally(() => setLoadingAi(false));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, logLevel, logSearch]);
+  }, [tab]);
 
-  const handleClearLogs = async () => {
-    const res = await fetch('/api/admin/logs', { method: 'DELETE' });
-    if (res.ok) { setLogs([]); toast.success('System logs cleared.'); }
-    else toast.error('Failed to clear logs.');
-  };
-
-  const handleCreateBackup = async () => {
-    setCreatingBackup(true);
+  const refreshSystem = async () => {
+    setRefreshing(true);
     try {
-      const res = await fetch('/api/admin/backups', { method: 'POST' });
-      if (res.ok) {
-        const backup = await res.json();
-        setBackups([backup, ...backups]);
-        toast.success('Database snapshot saved.');
-      } else toast.error('Failed to create backup.');
-    } catch { toast.error('An error occurred creating the backup.'); }
-    finally { setCreatingBackup(false); }
+      const res = await fetch('/api/admin/system');
+      if (!res.ok) throw new Error();
+      setSystem(await res.json());
+    } catch { toast.error('Refresh failed'); }
+    finally { setRefreshing(false); }
   };
 
-  const refreshSystem = () => {
-    setSys(null);
-    setSysLoading(true);
-    fetch('/api/admin/system')
-      .then((r) => r.json())
-      .then((d) => { setSys(d); setSysLoading(false); })
-      .catch(() => { toast.error('Failed to refresh system health.'); setSysLoading(false); });
-  };
+  const ca = analytics?.calcStats;
+  const aa = analytics?.articleStats;
+  const hasTrends = (analytics?.trends?.length ?? 0) > 0;
 
-  // Loading skeleton
-  if (dataLoading || !data) {
-    return (
-      <div className="py-12 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-        Loading console data…
-      </div>
-    );
-  }
-
-  const { calcStats, articleStats, trends, settings } = data;
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-8">
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
-            Enterprise Console
+            Control Panel
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-            Real-time platform metrics sourced from live database tables and system APIs.
+            Real-time metrics from the database · {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
-        <div className="flex flex-wrap gap-1 self-start">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-2 text-xs font-bold rounded-lg transition ${
-                activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-[var(--bg-card)] border text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'
-              }`}
-              style={activeTab !== tab.id ? { borderColor: 'var(--border)' } : undefined}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <Link href="/admin/seo-finder"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-xl transition shadow-lg shadow-purple-600/20">
+            ✍️ AI Articles
+          </Link>
+          <Link href="/admin/factory"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-wider rounded-xl transition shadow-lg shadow-blue-600/20">
+            ⚡ AI Factory
+          </Link>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          TAB: OVERVIEW
-      ══════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'overview' && (
-        <div className="space-y-8">
+      {/* Tabs */}
+      <div className="flex items-center gap-1 p-1 rounded-2xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+        {TABS.map((t) => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition flex-1 justify-center ${tab === t.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'hover:bg-[var(--bg-card-hover)]'}`}
+            style={{ color: tab === t.id ? undefined : 'var(--text-secondary)' }}>
+            <span>{t.icon}</span>
+            <span className="hidden sm:inline">{t.label}</span>
+          </button>
+        ))}
+      </div>
 
-          {/* Calculator stats */}
-          <div>
-            <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-              Calculators — queried from calculators table
-            </h2>
+      {/* ── Overview Tab ─────────────────────────────────────────────────────── */}
+      {tab === 'overview' && (
+        <div className="space-y-6">
+          {loadingAnalytics ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard label="Total"     value={calcStats.total}     color="text-blue-500"   sub={`${calcStats.staticCount} static + ${data.totalDynamic} dynamic`} />
-              <StatCard label="Published" value={calcStats.published} color="text-green-500"  sub="Live & indexed by search engines" />
-              <StatCard label="Draft"     value={calcStats.draft}     color="text-yellow-500" sub="Pending activation" />
-              <StatCard label="Disabled"  value={calcStats.disabled}  color="text-red-500"    sub="Removed from public routing" />
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="rounded-2xl border p-5 h-28 animate-pulse" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }} />
+              ))}
             </div>
-          </div>
-
-          {/* Article stats */}
-          <div>
-            <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-              Articles — queried from articles table
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard label="Published"     value={articleStats.published}     color="text-green-500"  />
-              <StatCard label="Draft"         value={articleStats.draft}         color="text-yellow-500" />
-              <StatCard label="Pending Review" value={articleStats.pendingReview} color="text-orange-500" />
-              <StatCard label="Scheduled"     value={articleStats.scheduled}     color="text-blue-500"   />
-            </div>
-          </div>
-
-          {/* Analytics — connection check */}
-          <div className="rounded-2xl border p-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-4">Traffic & Usage Analytics</h2>
-            {settings.analyticsCode ? (
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                Analytics script configured.{' '}
-                Real-time users, sessions, and page views are collected via the embedded provider script.
-              </p>
-            ) : (
-              <EmptyState
-                icon="📡"
-                title="Analytics provider not connected"
-                description="Connect a GA4 or compatible analytics provider to stream real Users, Sessions, Page Views, and Top Calculators here."
-                href="/admin/settings"
-                cta="Connect Analytics →"
-              />
-            )}
-          </div>
-
-          {/* Historical chart — real analytics records or empty state */}
-          <div className="rounded-2xl border p-6 space-y-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500">
-              Historical Traffic & Calculations
-            </h2>
-            {trends.length === 0 ? (
-              <EmptyState
-                icon="📉"
-                title="No historical data available"
-                description="Charts render automatically as traffic accumulates in the analytics table via POST /api/analytics/hit."
-              />
-            ) : (
-              <div className="w-full h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#3b82f6" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}   />
-                      </linearGradient>
-                      <linearGradient id="colorCalcs" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#10b981" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}   />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                    <XAxis dataKey="date"  stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-                    <YAxis              stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)', borderRadius: '12px' }} />
-                    <Area type="monotone" dataKey="views"        name="Page Views"    stroke="#3b82f6" strokeWidth={2.5} fillOpacity={1} fill="url(#colorViews)" />
-                    <Area type="monotone" dataKey="calculations" name="Calculations"  stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#colorCalcs)" />
-                  </AreaChart>
-                </ResponsiveContainer>
+          ) : analytics ? (
+            <>
+              {/* Calculator stats */}
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>Calculators</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <MetricCard label="Total Calculators" value={ca?.total ?? 0} accent="text-blue-400" sub={`${ca?.staticCount ?? 0} static · ${ca?.dynamicCount ?? 0} dynamic`} />
+                  <MetricCard label="Published" value={ca?.published ?? 0} accent="text-green-400" />
+                  <MetricCard label="Draft / Inactive" value={ca?.draft ?? 0} accent="text-yellow-400" />
+                  <MetricCard label="Redirects" value={analytics.totalRedirects} accent="text-[var(--text-primary)]" />
+                </div>
               </div>
-            )}
-          </div>
+
+              {/* Article stats */}
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>Articles</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <MetricCard label="Total Articles" value={aa?.total ?? 0} accent="text-purple-400" />
+                  <MetricCard label="Published" value={aa?.published ?? 0} accent="text-green-400" />
+                  <MetricCard label="Pending Review" value={aa?.pendingReview ?? 0} accent="text-yellow-400" />
+                  <MetricCard label="Drafts" value={aa?.draft ?? 0} accent="text-gray-400" />
+                </div>
+              </div>
+
+              {/* Trend chart */}
+              <SectionCard
+                title="Traffic Trend (last 14 days)"
+                action={
+                  <span className="text-[10px] px-2 py-1 rounded-lg" style={{ backgroundColor: 'var(--bg-input)', color: 'var(--text-muted)' }}>
+                    From DB analytics table
+                  </span>
+                }
+              >
+                <div className="p-5">
+                  {hasTrends ? (
+                    <ResponsiveContainer width="100%" height={220}>
+                      <AreaChart data={analytics.trends} margin={{ top: 5, right: 10, bottom: 0, left: -10 }}>
+                        <defs>
+                          <linearGradient id="gViews" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.25} />
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="gCalcs" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#a855f7" stopOpacity={0.25} />
+                            <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                        <XAxis dataKey="date" tick={{ fill: 'var(--text-muted)', fontSize: 9, fontWeight: 700 }} />
+                        <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 9 }} />
+                        <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, fontSize: 11 }} />
+                        <Area type="monotone" dataKey="views" name="Views" stroke="#3b82f6" strokeWidth={2} fill="url(#gViews)" />
+                        <Area type="monotone" dataKey="calculations" name="Calculations" stroke="#a855f7" strokeWidth={2} fill="url(#gCalcs)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[220px] flex items-center justify-center flex-col gap-3">
+                      <span className="text-3xl">📊</span>
+                      <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>No analytics data available</p>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Traffic trends appear here once analytics events are recorded in the database.</p>
+                    </div>
+                  )}
+                </div>
+              </SectionCard>
+
+              {/* Quick Actions */}
+              <SectionCard title="Quick Actions">
+                <div className="p-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { label: 'AI Articles Manager', href: '/admin/seo-finder', icon: '✍️', color: 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/20' },
+                    { label: 'Calculator Factory', href: '/admin/factory', icon: '⚡', color: 'bg-blue-600 hover:bg-blue-500 shadow-blue-600/20' },
+                    { label: 'SEO Audit Hub', href: '/admin/seo', icon: '🔍', color: 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-600/20' },
+                    { label: 'Platform Settings', href: '/admin/settings', icon: '⚙️', color: 'bg-gray-600 hover:bg-gray-500 shadow-gray-600/20' },
+                  ].map((a) => (
+                    <Link key={a.href} href={a.href}
+                      className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-black text-white uppercase tracking-wider transition shadow-lg ${a.color}`}>
+                      <span>{a.icon}</span>
+                      <span>{a.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </SectionCard>
+            </>
+          ) : (
+            <div className="rounded-2xl border p-12 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <NoData />
+            </div>
+          )}
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          TAB: AI ENGINE
-      ══════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'ai' && (
-        <div className="space-y-6">
-          {aiLoading || !aiData ? (
-            <div className="py-12 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-              Querying AI engine stats…
+      {/* ── Articles Tab ──────────────────────────────────────────────────────── */}
+      {tab === 'articles' && (
+        <div className="space-y-5">
+          {loadingAnalytics ? (
+            <div className="rounded-2xl border p-12 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : !aiData.connected || !aiData.aiEnabled ? (
-            <div className="rounded-2xl border p-10 flex flex-col items-center gap-4 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-              <span className="text-5xl">🤖</span>
-              <p className="text-lg font-black" style={{ color: 'var(--text-primary)' }}>
-                {!aiData.aiEnabled ? 'AI features are disabled' : 'AI provider not connected'}
-              </p>
-              <p className="text-xs max-w-md" style={{ color: 'var(--text-muted)' }}>
-                {!aiData.aiEnabled
-                  ? 'Enable AI features in Platform Settings to activate the Calculator Factory engine.'
-                  : 'Add an OpenRouter API key or set GEMINI_API_KEY to connect the AI generation engine.'}
-              </p>
-              <Link href="/admin/settings" className="mt-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition shadow-lg shadow-blue-600/20">
-                Configure in Settings →
-              </Link>
-            </div>
-          ) : (
+          ) : analytics ? (
             <>
-              {/* Provider banner */}
-              <div className="rounded-2xl border p-4 flex items-center gap-3" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
-                <div>
-                  <p className="text-xs font-black" style={{ color: 'var(--text-primary)' }}>
-                    AI Engine Online — Provider: {aiData.provider}
-                  </p>
-                  <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                    AI features enabled · Calculator Factory active
-                  </p>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <MetricCard label="Total Articles" value={aa?.total ?? 0} accent="text-purple-400" />
+                <MetricCard label="Published" value={aa?.published ?? 0} accent="text-green-400" sub="Live on site" />
+                <MetricCard label="Pending Review" value={aa?.pendingReview ?? 0} accent="text-yellow-400" sub="Awaiting approval" />
+                <MetricCard label="Drafts" value={aa?.draft ?? 0} accent="text-gray-400" sub="Not published" />
               </div>
 
-              {/* Stats from DB */}
-              <div>
-                <h2 className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-                  Factory stats — queried from calculators table
-                </h2>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  <StatCard label="Total Generated"   value={aiData.stats.totalGenerated}   color="text-blue-500"   />
-                  <StatCard label="Published"          value={aiData.stats.published}         color="text-green-500"  />
-                  <StatCard label="Pending Approval"   value={aiData.stats.pendingApproval}   color="text-yellow-500" />
-                  <StatCard label="Factory Errors"     value={aiData.stats.failed}            color="text-red-500"    />
-                  <StatCard label="Generated This Week" value={aiData.stats.generatedThisWeek} color="text-purple-500" />
+              <SectionCard
+                title="Article Workflow Status"
+                action={
+                  <Link href="/admin/seo-finder" className="text-xs font-bold text-blue-400 hover:underline">Manage →</Link>
+                }
+              >
+                <div className="p-5 space-y-4">
+                  {aa && aa.total > 0 ? (
+                    <>
+                      <div className="space-y-3">
+                        {[
+                          { label: 'Published', value: aa.published, color: '#22c55e' },
+                          { label: 'Pending Review', value: aa.pendingReview, color: '#f59e0b' },
+                          { label: 'Draft', value: aa.draft, color: '#6b7280' },
+                        ].map(({ label, value, color }) => (
+                          <div key={label} className="flex items-center gap-4">
+                            <span className="text-xs font-bold w-28 shrink-0" style={{ color: 'var(--text-secondary)' }}>{label}</span>
+                            <ProgressBar value={value} max={aa.total} color={color} />
+                            <span className="text-xs font-black w-8 text-right shrink-0" style={{ color: 'var(--text-primary)' }}>{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-[10px] pt-2 border-t" style={{ color: 'var(--text-muted)', borderColor: 'var(--border)' }}>
+                        Articles always start as <strong>Draft</strong> → <strong>Pending Review</strong> → <strong>Published</strong>. Auto-publishing is disabled.
+                      </p>
+                    </>
+                  ) : (
+                    <div className="py-8 text-center space-y-2">
+                      <NoData />
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Generate articles using the AI Articles Manager.</p>
+                      <Link href="/admin/seo-finder" className="inline-block mt-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-black rounded-xl">✍️ Open AI Articles Manager</Link>
+                    </div>
+                  )}
                 </div>
+              </SectionCard>
+            </>
+          ) : <NoData />}
+        </div>
+      )}
+
+      {/* ── AI Engine Tab ─────────────────────────────────────────────────────── */}
+      {tab === 'ai' && (
+        <div className="space-y-5">
+          {loadingAi ? (
+            <div className="rounded-2xl border p-12 flex items-center justify-center gap-3" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading AI data…</span>
+            </div>
+          ) : aiData ? (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <MetricCard label="Total Generated" value={aiData.stats.totalGenerated || 'No data available'} accent="text-purple-400" />
+                <MetricCard label="Published" value={aiData.stats.published || 'No data available'} accent="text-green-400" />
+                <MetricCard label="Pending Approval" value={aiData.stats.pendingApproval || 'No data available'} accent="text-yellow-400" />
+                <MetricCard label="This Week" value={aiData.stats.generatedThisWeek || 'No data available'} accent="text-blue-400" />
               </div>
 
-              {/* Token usage — empty state (no DB tracking) */}
-              <div className="rounded-2xl border p-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-4">Token Usage & Budget</h2>
-                <EmptyState
-                  icon="🪙"
-                  title="Token usage not tracked server-side"
-                  description="Tokens used, daily budget, and response times are available in your OpenRouter or Google AI Studio dashboard. The Calculator Factory does not log token counts locally."
-                />
-                {aiData.provider === 'OpenRouter' && (
-                  <div className="flex justify-center mt-2">
-                    <a href="https://openrouter.ai/activity" target="_blank" rel="noopener noreferrer"
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition">
-                      View OpenRouter Usage Dashboard →
-                    </a>
+              <SectionCard title="AI Provider Status">
+                <div className="p-5 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <StatusDot ok={aiData.connected} />
+                    <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {aiData.connected ? `Connected · ${aiData.provider ?? 'OpenRouter'}` : 'Not connected'}
+                    </span>
+                    {!aiData.connected && (
+                      <Link href="/admin/settings" className="text-xs font-bold text-blue-400 hover:underline">Configure →</Link>
+                    )}
                   </div>
-                )}
-              </div>
+                  {aiData.connected && (
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { label: 'Keyword Research', model: 'google/gemma-4-31b-it:free' },
+                        { label: 'Article Writing', model: 'nvidia/nemotron-3-ultra-550b-a55b:free' },
+                      ].map(({ label, model }) => (
+                        <div key={label} className="p-3 rounded-xl border" style={{ backgroundColor: 'var(--bg-input)', borderColor: 'var(--border)' }}>
+                          <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
+                          <code className="text-xs font-mono text-blue-400">{model}</code>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </SectionCard>
 
-              {/* Recent activity from DB */}
-              <div className="rounded-2xl border p-6 space-y-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500">Recent AI-Generated Calculators</h2>
-                {aiData.recentActivity.length === 0 ? (
-                  <EmptyState icon="⚡" title="No calculators generated yet" description="Use the AI Calculator Factory to generate your first dynamic calculator." href="/admin/factory" cta="Open Factory →" />
-                ) : (
-                  <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-                    {aiData.recentActivity.map((c) => (
-                      <div key={c.slug} className="py-3 flex items-center justify-between gap-4">
-                        <div>
-                          <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{c.name}</p>
-                          <p className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>/{c.slug}-calculator · {c.category}</p>
+              <SectionCard title="Recent AI Activity">
+                <div>
+                  {aiData.recentActivity.length === 0 ? (
+                    <div className="p-8 text-center"><NoData /></div>
+                  ) : (
+                    <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
+                      {aiData.recentActivity.map((item, i) => (
+                        <div key={i} className="px-5 py-3 flex items-center gap-4">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>/{item.slug} · {item.category}</p>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                              item.status === 'published' ? 'bg-green-500/15 text-green-400' :
+                              item.status === 'pending_review' ? 'bg-yellow-500/15 text-yellow-400' :
+                              'bg-gray-500/15 text-gray-400'
+                            }`}>{item.status.replace('_', ' ')}</span>
+                            <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{new Date(item.createdAt).toLocaleDateString()}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                            c.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
-                          }`}>
-                            {c.status === 'active' ? 'Live' : 'Draft'}
-                          </span>
-                          <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                            {new Date(c.createdAt).toLocaleDateString()}
-                          </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </SectionCard>
+            </>
+          ) : <div className="rounded-2xl border p-8 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}><NoData /></div>}
+        </div>
+      )}
+
+      {/* ── System Tab ────────────────────────────────────────────────────────── */}
+      {tab === 'system' && (
+        <div className="space-y-5">
+          {loadingSystem ? (
+            <div className="rounded-2xl border p-12 flex items-center justify-center gap-3" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+              <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading system data…</span>
+            </div>
+          ) : system ? (
+            <>
+              {/* System identity */}
+              <SectionCard
+                title="System Info"
+                action={
+                  <button onClick={refreshSystem} disabled={refreshing}
+                    className="text-xs font-bold text-blue-400 hover:underline disabled:opacity-50">
+                    {refreshing ? 'Refreshing…' : '↻ Refresh'}
+                  </button>
+                }
+              >
+                <div className="p-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: 'Environment', value: system.environment },
+                    { label: 'Node.js', value: system.nodeVersion },
+                    { label: 'Platform', value: system.platform },
+                    { label: 'Uptime', value: system.uptime.display },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
+                      <p className="text-sm font-bold font-mono" style={{ color: 'var(--text-primary)' }}>{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+
+              {/* DB status */}
+              <SectionCard title="Database">
+                <div className="p-5 flex items-center gap-5">
+                  <StatusDot ok={system.db.status === 'healthy'} />
+                  <div>
+                    <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                      {system.db.status === 'healthy' ? `Healthy · ${system.db.pingMs}ms ping` : `Error: ${system.db.error}`}
+                    </p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>PostgreSQL via Drizzle ORM</p>
+                  </div>
+                </div>
+              </SectionCard>
+
+              {/* Memory */}
+              <SectionCard title="Memory Usage">
+                <div className="p-5 space-y-4">
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Heap Used', used: system.memory.heapUsedMB, total: system.memory.heapTotalMB, color: system.memory.heapUsedPct > 80 ? '#ef4444' : '#3b82f6' },
+                      { label: 'System RAM', used: system.memory.sysUsedMB, total: system.memory.sysTotalMB, color: system.memory.sysUsedPct > 80 ? '#ef4444' : '#22c55e' },
+                    ].map(({ label, used, total, color }) => (
+                      <div key={label} className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>{label}</span>
+                          <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>{used} MB / {total} MB</span>
                         </div>
+                        <ProgressBar value={used} max={total} color={color} />
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
+                  <div className="pt-3 border-t text-[10px]" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
+                    CPU: {system.cpu.count} cores · {system.cpu.model} · RSS: {system.memory.rssUsedMB} MB
+                  </div>
+                </div>
+              </SectionCard>
             </>
-          )}
+          ) : <div className="rounded-2xl border p-8 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}><NoData /></div>}
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          TAB: SYSTEM HEALTH
-      ══════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'system' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-              Live system metrics from Node.js runtime
-            </h2>
-            <button
-              onClick={refreshSystem}
-              disabled={sysLoading}
-              className="px-3 py-1.5 border text-xs font-bold rounded-lg hover:bg-[var(--bg-card-hover)] transition disabled:opacity-50"
-              style={{ borderColor: 'var(--border)' }}
-            >
-              {sysLoading ? 'Refreshing…' : '↻ Refresh'}
+      {/* ── Logs Tab ──────────────────────────────────────────────────────────── */}
+      {tab === 'logs' && (
+        <SectionCard
+          title="System Logs"
+          action={
+            <button onClick={() => { setLogs([]); setLoadingLogs(true); fetch('/api/admin/logs').then((r) => r.json()).then((d) => setLogs(Array.isArray(d) ? d : [])).finally(() => setLoadingLogs(false)); }}
+              className="text-xs font-bold text-blue-400 hover:underline">
+              ↻ Refresh
             </button>
+          }
+        >
+          <div>
+            {loadingLogs ? (
+              <div className="p-12 flex items-center justify-center gap-3">
+                <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : logs.length === 0 ? (
+              <div className="p-8 text-center"><NoData /></div>
+            ) : (
+              <div className="divide-y overflow-y-auto" style={{ borderColor: 'var(--border)', maxHeight: 480 }}>
+                {logs.map((log) => (
+                  <div key={log.id} className="px-5 py-3 flex items-start gap-4 font-mono text-xs">
+                    <span className={`shrink-0 px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                      log.level === 'ERROR' ? 'bg-red-500/15 text-red-400' :
+                      log.level === 'WARN' ? 'bg-yellow-500/15 text-yellow-400' :
+                      'bg-blue-500/15 text-blue-400'
+                    }`}>{log.level}</span>
+                    <span className="shrink-0 w-36" style={{ color: 'var(--text-muted)' }}>{new Date(log.timestamp).toLocaleTimeString()}</span>
+                    <span className="shrink-0 w-32 truncate text-purple-400">{log.route}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{log.message}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-
-          {sysLoading || !sys ? (
-            <div className="py-12 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-              Reading system runtime metrics…
-            </div>
-          ) : (
-            <>
-              {/* Status row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {/* DB status */}
-                <div className="rounded-2xl border p-5 space-y-1" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                  <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Database</span>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${sys.db.status === 'healthy' ? 'bg-green-500' : 'bg-red-500'}`} />
-                    <p className={`text-xl font-extrabold ${sys.db.status === 'healthy' ? 'text-green-500' : 'text-red-500'}`}>
-                      {sys.db.status === 'healthy' ? 'Healthy' : 'Error'}
-                    </p>
-                  </div>
-                  <p className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>
-                    {sys.db.status === 'healthy' ? `Ping: ${sys.db.pingMs}ms` : sys.db.error ?? 'Connection failed'}
-                  </p>
-                </div>
-
-                {/* Uptime */}
-                <div className="rounded-2xl border p-5 space-y-1" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                  <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Uptime</span>
-                  <p className="text-xl font-extrabold mt-1 text-blue-500">{sys.uptime.display}</p>
-                  <p className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>Process uptime</p>
-                </div>
-
-                {/* Environment */}
-                <div className="rounded-2xl border p-5 space-y-1" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                  <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Environment</span>
-                  <p className="text-xl font-extrabold mt-1 text-purple-500 capitalize">{sys.environment}</p>
-                  <p className="text-[10px] font-semibold font-mono" style={{ color: 'var(--text-muted)' }}>Node {sys.nodeVersion}</p>
-                </div>
-
-                {/* Server time */}
-                <div className="rounded-2xl border p-5 space-y-1" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                  <span className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Server Time (UTC)</span>
-                  <p className="text-sm font-extrabold mt-1 text-orange-500 font-mono">
-                    {new Date(sys.serverTime).toLocaleTimeString('en-US', { timeZone: 'UTC', hour12: false })}
-                  </p>
-                  <p className="text-[10px] font-semibold" style={{ color: 'var(--text-muted)' }}>
-                    {new Date(sys.serverTime).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-                  </p>
-                </div>
-              </div>
-
-              {/* Memory */}
-              <div className="rounded-2xl border p-6 space-y-5" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500">Memory Usage</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Heap */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="font-bold" style={{ color: 'var(--text-secondary)' }}>Process Heap</span>
-                      <span className="font-mono" style={{ color: 'var(--text-primary)' }}>{sys.memory.heapUsedMB} / {sys.memory.heapTotalMB} MB</span>
-                    </div>
-                    <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border)' }}>
-                      <div
-                        className={`h-full rounded-full transition-all ${sys.memory.heapUsedPct > 80 ? 'bg-red-500' : sys.memory.heapUsedPct > 60 ? 'bg-yellow-500' : 'bg-blue-500'}`}
-                        style={{ width: `${sys.memory.heapUsedPct}%` }}
-                      />
-                    </div>
-                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{sys.memory.heapUsedPct}% used · RSS {sys.memory.rssUsedMB} MB</p>
-                  </div>
-
-                  {/* System RAM */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="font-bold" style={{ color: 'var(--text-secondary)' }}>System RAM</span>
-                      <span className="font-mono" style={{ color: 'var(--text-primary)' }}>{sys.memory.sysUsedMB} / {sys.memory.sysTotalMB} MB</span>
-                    </div>
-                    <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border)' }}>
-                      <div
-                        className={`h-full rounded-full transition-all ${sys.memory.sysUsedPct > 85 ? 'bg-red-500' : sys.memory.sysUsedPct > 65 ? 'bg-yellow-500' : 'bg-green-500'}`}
-                        style={{ width: `${sys.memory.sysUsedPct}%` }}
-                      />
-                    </div>
-                    <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{sys.memory.sysUsedPct}% used · {sys.memory.sysFreeMB} MB free</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* CPU */}
-              <div className="rounded-2xl border p-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-4">CPU</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-bold mb-1" style={{ color: 'var(--text-secondary)' }}>Logical Cores</p>
-                    <p className="text-2xl font-extrabold text-blue-500">{sys.cpu.count}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold mb-1" style={{ color: 'var(--text-secondary)' }}>Model</p>
-                    <p className="text-xs font-mono" style={{ color: 'var(--text-primary)' }}>{sys.cpu.model}</p>
-                    <p className="text-[10px] mt-1" style={{ color: 'var(--text-muted)' }}>
-                      Real-time CPU % requires OS-level sampling. Use host monitoring tools for per-core load.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Queue — no queue worker in current architecture */}
-              <div className="rounded-2xl border p-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-4">Queue Worker</h2>
-                <EmptyState
-                  icon="📋"
-                  title="No background queue configured"
-                  description="The platform currently processes AI generation requests synchronously. A Redis-backed queue (BullMQ) would enable pending/running/failed/retry tracking. Pending/Running/Completed/Failed counts will appear here once a queue worker is connected."
-                />
-              </div>
-
-              {/* Disk — no Node API */}
-              <div className="rounded-2xl border p-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-                <h2 className="text-xs font-bold uppercase tracking-wider text-blue-500 mb-4">Disk Storage</h2>
-                <EmptyState
-                  icon="💾"
-                  title="Disk metrics require OS-level access"
-                  description="Node.js does not expose disk usage natively. Use df -h on the server or connect a monitoring integration (Datadog, New Relic) to surface storage metrics here."
-                />
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          TAB: LOGS & BACKUPS
-      ══════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'logs' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Logs panel */}
-          <div className="rounded-2xl border p-6 space-y-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>🧾 Error & Trace Logs</h2>
-              <button onClick={handleClearLogs} className="text-xs text-red-500 hover:underline font-bold">Clear all</button>
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text" placeholder="Search logs…" value={logSearch}
-                onChange={(e) => setLogSearch(e.target.value)}
-                className="flex-1 p-2 border rounded-lg outline-none text-xs"
-                style={{ backgroundColor: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-              />
-              <select
-                value={logLevel} onChange={(e) => setLogLevel(e.target.value)}
-                className="p-2 border rounded-lg outline-none text-xs cursor-pointer"
-                style={{ backgroundColor: 'var(--bg-input)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-              >
-                <option value="ALL">All levels</option>
-                <option value="INFO">INFO</option>
-                <option value="WARN">WARN</option>
-                <option value="ERROR">ERROR</option>
-              </select>
-            </div>
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
-              {logsLoading ? (
-                <p className="text-xs text-center py-12" style={{ color: 'var(--text-muted)' }}>Loading logs…</p>
-              ) : logs.length === 0 ? (
-                <EmptyState icon="📋" title="No log entries recorded" description="Logs appear here when the system records events. Errors and warnings are captured automatically." />
-              ) : (
-                logs.map((log) => (
-                  <div key={log.id} className="p-3 border rounded-xl" style={{ backgroundColor: 'var(--bg-input)', borderColor: 'var(--border)' }}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                        log.level === 'ERROR' ? 'bg-red-500/15 text-red-500' :
-                        log.level === 'WARN'  ? 'bg-yellow-500/15 text-yellow-500' : 'bg-blue-500/15 text-blue-500'
-                      }`}>{log.level}</span>
-                      <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>{log.timestamp}</span>
-                    </div>
-                    <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{log.message}</p>
-                    <p className="text-[10px] font-mono text-blue-500 mt-1">{log.route}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Backups panel */}
-          <div className="rounded-2xl border p-6 space-y-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>🗄️ Snapshot History</h2>
-              <button
-                onClick={handleCreateBackup} disabled={creatingBackup}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-[10px] uppercase font-bold tracking-wider rounded-lg transition"
-              >
-                {creatingBackup ? 'Saving…' : 'Backup now'}
-              </button>
-            </div>
-            <div className="divide-y max-h-96 overflow-y-auto" style={{ borderColor: 'var(--border)' }}>
-              {backupsLoading ? (
-                <p className="text-xs text-center py-12" style={{ color: 'var(--text-muted)' }}>Loading snapshots…</p>
-              ) : backups.length === 0 ? (
-                <EmptyState icon="🗄️" title="No snapshots yet" description='Click "Backup now" to create your first database snapshot.' />
-              ) : (
-                backups.map((bk) => (
-                  <div key={bk.id} className="py-3.5 flex items-center justify-between gap-4" style={{ borderColor: 'var(--border)' }}>
-                    <div>
-                      <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{bk.type}</p>
-                      <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>Size: {bk.size} · {bk.date}</p>
-                    </div>
-                    <span className="text-[10px] font-bold text-green-500 uppercase bg-green-500/10 px-2 py-0.5 rounded">{bk.status}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          TAB: ADS MANAGER
-      ══════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'adsense' && (
-        <div className="space-y-6">
-          {settings.adsenseEnabled && settings.adsenseCode ? (
-            <div className="rounded-2xl border p-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-              <h2 className="text-sm font-black uppercase tracking-wider mb-4" style={{ color: 'var(--text-primary)' }}>AdSense Connected</h2>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                Publisher script configured.
-              </p>
-              <EmptyState
-                icon="📊"
-                title="Revenue metrics require AdSense Management API"
-                description="Estimated Earnings, RPM, CTR, and Impressions must be fetched via Google's OAuth2 AdSense API using a service account — not available without a connected OAuth credential. View live data directly in Google AdSense."
-              />
-              <div className="flex justify-center mt-2">
-                <a href="https://www.google.com/adsense" target="_blank" rel="noopener noreferrer"
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition">
-                  Open AdSense Dashboard →
-                </a>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl border p-10 flex flex-col items-center gap-4 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-              <span className="text-5xl">💵</span>
-              <p className="text-lg font-black" style={{ color: 'var(--text-primary)' }}>AdSense not connected</p>
-              <p className="text-xs max-w-md" style={{ color: 'var(--text-muted)' }}>
-                No AdSense publisher script is configured. Earnings, RPM, CTR, and impression data require a live AdSense connection.
-              </p>
-              <Link href="/admin/settings" className="mt-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition shadow-lg shadow-blue-600/20">
-                Configure AdSense in Settings →
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          TAB: GOOGLE SEARCH CONSOLE
-      ══════════════════════════════════════════════════════════════════════ */}
-      {activeTab === 'gsc' && (
-        <div className="space-y-6">
-          <div className="rounded-2xl border p-10 flex flex-col items-center gap-4 text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <span className="text-5xl">🔍</span>
-            <p className="text-lg font-black" style={{ color: 'var(--text-primary)' }}>Google Search Console is not connected</p>
-            <p className="text-xs max-w-md" style={{ color: 'var(--text-muted)' }}>
-              Connect the GSC Search Analytics API to fetch real Clicks, Impressions, CTR, and Average Position data.
-              Requires a verified property and a service account with read access.
-            </p>
-            <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer"
-              className="mt-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase rounded-xl transition shadow-lg shadow-blue-600/20">
-              Connect GSC API →
-            </a>
-          </div>
-          <div className="rounded-2xl border p-6 space-y-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <h2 className="text-sm font-black uppercase tracking-wider" style={{ color: 'var(--text-primary)' }}>Site Verification</h2>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-              Configure Google and Bing verification tokens in{' '}
-              <Link href="/admin/settings" className="text-blue-500 hover:underline font-bold">Settings</Link>.
-              They are injected automatically into the HTML head once saved.
-            </p>
-            <div className="rounded-xl border p-4 flex items-center gap-3" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}>
-              <span className="text-xl">ℹ️</span>
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Verification keys are stored in Settings and never displayed in plain text here for security.
-              </p>
-            </div>
-          </div>
-        </div>
+        </SectionCard>
       )}
     </div>
   );
