@@ -161,6 +161,7 @@ export interface Analytic {
 
 export interface SystemSettings {
   openrouterApiKey: string;
+  serpApiKeyEncrypted?: string;
   adsenseEnabled: boolean;
   adsenseCode: string;
   analyticsCode: string;
@@ -172,6 +173,48 @@ export interface SystemSettings {
     aiEnabled: boolean;
     maintenanceMode: boolean;
   };
+}
+
+// ─── Articles Manager 2.0 ─────────────────────────────────────────────────────
+
+export interface ResearchTitleCard {
+  title: string;
+  searchVolumeLabel: string | null;
+  competition: 'Low' | 'Medium' | 'High' | null;
+  trend: 'Rising' | 'Stable' | 'Declining' | null;
+  opportunityScore: number | null;
+}
+
+export interface ResearchKeywordChip {
+  keyword: string;
+  searchVolumeLabel: string | null;
+  competition: 'Low' | 'Medium' | 'High' | null;
+  trend: 'Rising' | 'Stable' | 'Declining' | null;
+}
+
+export interface ArticleOutlineSection {
+  id: string;
+  type: 'h2' | 'h3' | 'faq' | 'howto' | 'examples' | 'comparison' | 'proscons' | 'internal-links' | 'related';
+  heading: string;
+  subpoints: string[];
+}
+
+export interface ArticleResearchSummary {
+  topic: string;
+  liveData: boolean;
+  serpDataAvailable: boolean;
+  organicCount: number;
+  hasFeaturedSnippet: boolean;
+  paaQuestions: string[];
+  relatedSearches: string[];
+  trendDirection: 'rising' | 'stable' | 'declining' | null;
+  trendInterest: number | null;
+  redditCount: number;
+  autocomplete: string[];
+  organicResults: { title: string; link: string; snippet: string }[];
+  featuredSnippet: { title: string; snippet: string } | null;
+  trendingQueries: string[];
+  titleCards: ResearchTitleCard[];
 }
 
 export type AiProvider = 'openrouter' | 'openai' | 'gemini' | 'anthropic';

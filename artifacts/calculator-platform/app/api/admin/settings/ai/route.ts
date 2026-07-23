@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
 import { getDb, saveDb } from '@/lib/db';
 import {
+  encryptSerpApiKey,
   getAiProviderKey,
   getAiSettings,
   getPublicAiSettings,
@@ -27,7 +28,9 @@ export async function GET() {
   const settings = resetUsagePeriodIfNeeded(getAiSettings(db.settings.ai, db.settings.openrouterApiKey));
   db.settings.ai = settings;
   saveDb(db);
-  return publicResponse(settings);
+  return publicResponse(settings, {
+    serpApiKeyConfigured: Boolean(db.settings.serpApiKeyEncrypted),
+  });
 }
 
 export async function POST(req: Request) {
@@ -38,6 +41,7 @@ export async function POST(req: Request) {
       providers?: Partial<Record<AiProvider, Partial<AiProviderSettings> & { apiKey?: string }>>;
       action?: 'save' | 'test' | 'reset-cache';
       provider?: AiProvider;
+      serpApiKey?: string;
     };
     const db = getDb();
     let settings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
@@ -49,7 +53,10 @@ export async function POST(req: Request) {
       };
       db.settings.ai = settings;
       saveDb(db);
-      return publicResponse(settings, { message: 'AI cache reset.' });
+      return publicResponse(settings, {
+        message: 'AI cache reset.',
+        serpApiKeyConfigured: Boolean(db.settings.serpApiKeyEncrypted),
+      });
     }
 
     const nextProviders = { ...settings.providers };
@@ -63,27 +70,38 @@ export async function POST(req: Request) {
       providers: nextProviders,
     };
 
+    // Handle SerpAPI key
+    if (typeof payload.serpApiKey === 'string' && payload.serpApiKey.trim()) {
+      db.settings.serpApiKeyEncrypted = encryptSerpApiKey(payload.serpApiKey.trim());
+    }
+
     if (payload.action === 'test') {
       const provider = isProvider(payload.provider) ? payload.provider : settings.activeProvider;
       const result = await testProvider(
-        {
-          ...settings,
-          providers: nextProviders,
-        },
+        { ...settings, providers: nextProviders },
         provider,
       );
-      if (!result.ok) return publicResponse(settings, { success: false, error: result.error });
+      if (!result.ok) return publicResponse(settings, {
+        success: false,
+        error: result.error,
+        serpApiKeyConfigured: Boolean(db.settings.serpApiKeyEncrypted),
+      });
       db.settings.ai = recordAiUsage(settings, result.tokens);
       saveDb(db);
       return publicResponse(db.settings.ai, {
         success: true,
         message: `${providerLabel(provider)} connection successful.`,
+        serpApiKeyConfigured: Boolean(db.settings.serpApiKeyEncrypted),
       });
     }
 
     db.settings.ai = settings;
     saveDb(db);
-    return publicResponse(settings, { success: true, message: 'AI settings saved securely.' });
+    return publicResponse(settings, {
+      success: true,
+      message: 'AI settings saved securely.',
+      serpApiKeyConfigured: Boolean(db.settings.serpApiKeyEncrypted),
+    });
   } catch (error) {
     console.error('Save AI settings error:', error);
     return NextResponse.json({ error: 'Unable to save AI settings.' }, { status: 500 });

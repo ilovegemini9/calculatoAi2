@@ -1,0 +1,563 @@
+==================================================
+AI ARTICLES MANAGER 2.0
+Hybrid AI Research Engine (OpenRouter + SerpAPI)
+==================================================
+
+Completely redesign the AI Articles Manager into an enterprise-grade AI SEO research and content generation system.
+
+The objective is NOT to generate articles blindly.
+
+The objective is:
+
+• Discover real search opportunities.
+• Understand user search intent.
+• Understand user pain points.
+• Generate human-first content.
+• Optimize for SEO and AI Search.
+• Never invent metrics.
+• Never auto-publish.
+
+Everything must run server-side.
+
+Never expose API keys.
+
+Everything must be editable before saving.
+
+==================================================
+DATA SOURCES
+==================================================
+
+Use a Hybrid Research Engine.
+
+SEO Sources (SerpAPI)
+
+• Google Search
+(engine=google)
+
+• Google Related Questions
+(engine=google_related_questions)
+
+• Google Trends
+(engine=google_trends)
+
+• Google Trends Autocomplete
+(engine=google_trends_autocomplete)
+
+Google Search must also extract whenever available:
+
+• Related Searches
+
+• Organic Results
+
+• Featured Snippets
+
+• Knowledge Graph
+
+Community Sources
+
+• Reddit
+
+• Quora
+
+Technical Sources (only when relevant)
+
+• Stack Overflow
+
+• GitHub Discussions
+
+Video Sources (optional)
+
+• YouTube Questions
+
+• YouTube Comments
+
+AI Engine
+
+• OpenRouter
+
+The configured OpenRouter model analyzes every collected signal before generating any suggestion.
+
+==================================================
+STEP 1
+LIVE RESEARCH
+==================================================
+
+When the administrator enters a topic
+
+Example:
+
+Mortgage Calculator
+
+The system first performs research.
+
+Collect:
+
+Search Intent
+
+Google Results
+
+Featured Snippets
+
+People Also Ask
+
+Related Searches
+
+Google Trends
+
+Trending Queries
+
+Autocomplete
+
+Reddit Discussions
+
+Quora Discussions
+
+Common Problems
+
+Common Mistakes
+
+Pain Points
+
+Beginner Questions
+
+Advanced Questions
+
+Semantic Entities
+
+Search Intent Classification
+
+Competitor Pages
+
+Do NOT generate titles yet.
+
+==================================================
+STEP 2
+AI ANALYSIS
+==================================================
+
+Send every collected signal to OpenRouter.
+
+The AI must analyze:
+
+• What users are actually trying to solve.
+
+• Which topics competitors forgot.
+
+• Which questions are unanswered.
+
+• Which search intent is dominant.
+
+• Which information is most useful.
+
+Never copy Google.
+
+Never copy Reddit.
+
+Never copy Quora.
+
+Use them ONLY as research sources.
+
+==================================================
+STEP 3
+ARTICLE TITLE
+==================================================
+
+Generate ONLY the 5 strongest SEO title suggestions.
+
+Titles must be created by AI.
+
+Never display raw Google suggestions.
+
+Never display Reddit titles.
+
+Never display Quora titles.
+
+Rank using:
+
+• Search Intent
+
+• Search Volume (when available)
+
+• Competition
+
+• Current Trend
+
+• Opportunity Score
+
+Display below Article Title.
+
+No tables.
+
+Beautiful clickable cards.
+
+Each card displays only:
+
+Title
+
+Search Volume
+
+Competition
+
+Trend
+
+Opportunity Score
+
+Clicking a card:
+
+• fills Article Title
+
+• highlights the card
+
+• displays "Selected"
+
+• disables duplicate selection
+
+• automatically generates the SEO Slug
+
+==================================================
+STEP 4
+FOCUS KEYWORD
+==================================================
+
+Generate ONLY after the title has been selected.
+
+Generate 5 keyword suggestions related ONLY to the selected title.
+
+Rank them using:
+
+• Search Intent
+
+• Search Volume
+
+• Competition
+
+• Trend
+
+• Opportunity Score
+
+Display as clickable chips.
+
+Each chip shows:
+
+Keyword
+
+Search Volume
+
+Competition
+
+Trend
+
+Clicking:
+
+• fills Focus Keyword
+
+• locks selection
+
+• highlights chip
+
+• prevents duplicates
+
+==================================================
+STEP 5
+SEO SLUG
+==================================================
+
+Automatically generate the SEO-friendly URL slug.
+
+Allow manual editing.
+
+==================================================
+STEP 6
+ARTICLE OUTLINE
+==================================================
+
+Generate:
+
+H1
+
+H2
+
+H3
+
+FAQ
+
+How To
+
+Examples
+
+Comparison Sections
+
+Pros & Cons
+
+Internal Links
+
+Related Calculators
+
+Related Articles
+
+Schema Plan
+
+Administrator can edit everything.
+
+==================================================
+STEP 7
+ARTICLE GENERATION
+==================================================
+
+Generate the article ONLY after:
+
+✓ Title selected
+
+✓ Keyword selected
+
+✓ Slug generated
+
+The article must help the visitor first.
+
+SEO comes second.
+
+Write naturally.
+
+Human tone.
+
+No AI patterns.
+
+No repetitive sentences.
+
+No keyword stuffing.
+
+No duplicate content.
+
+No filler.
+
+No fake information.
+
+The article must solve the user's problem completely.
+
+Always answer hidden questions.
+
+Use practical explanations.
+
+Use real examples.
+
+Use real scenarios.
+
+Only insert tables when they improve understanding.
+
+Never insert unnecessary tables.
+
+==================================================
+ARTICLE STRUCTURE
+==================================================
+
+Generate:
+
+Introduction
+
+Summary
+
+Table of Contents
+
+H2
+
+H3
+
+Step-by-Step Guide
+
+Formula (if applicable)
+
+Examples
+
+Use Cases
+
+Tips
+
+Common Mistakes
+
+FAQ
+
+Pros & Cons
+
+Related Calculators
+
+Related Articles
+
+Internal Links
+
+References
+
+Reading Time
+
+Last Updated
+
+Conclusion
+
+Call To Action
+
+==================================================
+SEO OUTPUT
+==================================================
+
+Automatically generate:
+
+Meta Title
+
+Meta Description
+
+Canonical
+
+OpenGraph
+
+Twitter Cards
+
+JSON-LD
+
+FAQ Schema
+
+Breadcrumb Schema
+
+Article Schema
+
+Internal Links
+
+Everything must be optimized for:
+
+Google Search
+
+Google AI Overview
+
+ChatGPT
+
+Gemini
+
+Claude
+
+Perplexity
+
+Voice Search
+
+Featured Snippets
+
+Entity SEO
+
+E-E-A-T
+
+Helpful Content
+
+==================================================
+PUBLICATION
+==================================================
+
+Workflow
+
+Draft
+
+↓
+
+Pending Review
+
+↓
+
+Published
+
+Never auto publish.
+
+Administrator approval is mandatory.
+
+==================================================
+LIVE DATA POLICY
+==================================================
+
+Never invent:
+
+Search Volume
+
+Competition
+
+Trend
+
+Keyword Difficulty
+
+Opportunity Score
+
+If live metrics cannot be retrieved,
+
+display:
+
+"Live search data unavailable."
+
+Never fabricate metrics.
+
+==================================================
+OPENROUTER SETTINGS
+==================================================
+
+Create:
+
+/admin/settings/ai
+
+Provider
+
+OpenRouter API Key
+
+Default Model
+
+Fallback Model
+
+Temperature
+
+Max Tokens
+
+Daily Budget
+
+Monthly Budget
+
+Daily Requests
+
+Monthly Requests
+
+Usage Counter
+
+Test Connection
+
+Save
+
+Reset Cache
+
+Store API keys encrypted server-side only.
+
+==================================================
+FINAL GOAL
+==================================================
+
+The AI must behave like a senior SEO strategist, content researcher and technical writer.
+
+It must first understand:
+
+• What people search.
+
+• Why they search.
+
+• What problems they have.
+
+• What competitors missed.
+
+• Which opportunities have the highest ranking potential.
+
+Then OpenRouter transforms all collected research into:
+
+• 5 intelligent SEO titles
+
+• 5 focus keywords
+
+• SEO slug
+
+• Article outline
+
+• High-quality human article
+
+• Complete SEO metadata
+
+• Internal linking suggestions
+
+The final content must be genuinely useful, trustworthy, optimized for modern search engines and AI search systems, while remaining natural, original and focused on helping users rather than simply chasing rankings.

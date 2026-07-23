@@ -16,6 +16,7 @@ const DB_PATH = process.env.VERCEL
 
 const DEFAULT_SETTINGS: SystemSettings = {
   openrouterApiKey: '',
+  serpApiKeyEncrypted: '',
   adsenseEnabled: false,
   adsenseCode: '',
   analyticsCode: '',

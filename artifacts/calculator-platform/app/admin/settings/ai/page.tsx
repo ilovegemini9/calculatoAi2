@@ -108,6 +108,9 @@ export default function AiSettingsPage() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [selected, setSelected] = useState<AiProvider>('openrouter');
   const [showKey, setShowKey] = useState(false);
+  const [serpKeyInput, setSerpKeyInput] = useState('');
+  const [serpKeyConfigured, setSerpKeyConfigured] = useState(false);
+  const [showSerpKey, setShowSerpKey] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -119,9 +122,10 @@ export default function AiSettingsPage() {
     try {
       const response = await fetch('/api/admin/settings/ai', { cache: 'no-store' });
       if (!response.ok) throw new Error('Unable to load AI settings.');
-      const result = await response.json() as { ai: PublicAi };
+      const result = await response.json() as { ai: PublicAi; serpApiKeyConfigured?: boolean };
       setDraft(providerDraft(result.ai));
       setSelected(result.ai.activeProvider);
+      setSerpKeyConfigured(Boolean(result.serpApiKeyConfigured));
     } catch (error) {
       setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Unable to load AI settings.' });
     } finally {
@@ -151,11 +155,16 @@ export default function AiSettingsPage() {
             activeProvider: draft.activeProvider,
             provider: selected,
             providers: draft.providers,
+            ...(action === 'save' && serpKeyInput.trim() ? { serpApiKey: serpKeyInput.trim() } : {}),
           };
       const response = await fetch('/api/admin/settings/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const result = await response.json() as { ai?: PublicAi; success?: boolean; message?: string; error?: string };
       if (!response.ok || result.success === false) throw new Error(result.error || 'AI settings request failed.');
       if (result.ai) setDraft(providerDraft(result.ai));
+      if (typeof (result as { serpApiKeyConfigured?: boolean }).serpApiKeyConfigured === 'boolean') {
+        setSerpKeyConfigured((result as { serpApiKeyConfigured?: boolean }).serpApiKeyConfigured!);
+        if (serpKeyInput.trim()) setSerpKeyInput('');
+      }
       setMessage({ type: 'success', text: result.message || 'AI settings saved securely.' });
     } catch (error) {
       setMessage({ type: 'error', text: error instanceof Error ? error.message : 'AI settings request failed.' });
@@ -201,6 +210,37 @@ export default function AiSettingsPage() {
           </div>
         </ContentCard>
       </div>
+
+      <ContentCard title="SerpAPI — Live Search Data" description="Powers real Google search signals, People Also Ask, trends, and competitor analysis in the Articles Manager 2.0." action={<ShieldCheck className="h-4 w-4 text-emerald-500" />}>
+        <div className="space-y-4">
+          <div className={`flex items-center gap-2 rounded-lg border p-3 text-xs font-semibold ${serpKeyConfigured ? 'border-emerald-500/25 bg-emerald-500/8 text-emerald-600 dark:text-emerald-400' : 'border-amber-500/25 bg-amber-500/8 text-amber-600 dark:text-amber-400'}`}>
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            {serpKeyConfigured ? 'SerpAPI key is stored securely — live search data enabled.' : 'No SerpAPI key configured — articles manager will use free fallback sources only.'}
+          </div>
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-semibold text-[var(--text-secondary)]">SerpAPI key</span>
+            <div className="relative">
+              <input
+                type={showSerpKey ? 'text' : 'password'}
+                value={serpKeyInput}
+                onChange={(event) => setSerpKeyInput(event.target.value)}
+                placeholder={serpKeyConfigured ? 'Enter a new key to replace the stored key' : 'Paste your SerpAPI key'}
+                autoComplete="new-password"
+                className={`${inputClass} pr-10`}
+                style={inputStyle}
+              />
+              <button type="button" onClick={() => setShowSerpKey(!showSerpKey)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]" aria-label={showSerpKey ? 'Hide key' : 'Show key'}>
+                {showSerpKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <span className="mt-1.5 block text-xs text-[var(--text-muted)]">
+              Stored encrypted server-side, never returned to the browser. Free tier: 100 searches/month at{' '}
+              <a href="https://serpapi.com" target="_blank" rel="noreferrer" className="text-blue-500 underline">serpapi.com</a>.
+              Saved with the AI settings Save button above.
+            </span>
+          </label>
+        </div>
+      </ContentCard>
 
       <ContentCard title="Usage counter" description="Server-side request and token counters reset automatically by day and month." action={<ShieldCheck className="h-4 w-4 text-blue-500" />}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><StatCard label="Requests today" value={draft.usage.dailyRequests} /><StatCard label="Tokens today" value={draft.usage.dailyTokens.toLocaleString()} /><StatCard label="Requests this month" value={draft.usage.monthlyRequests} /><StatCard label="Tokens this month" value={draft.usage.monthlyTokens.toLocaleString()} /></div>

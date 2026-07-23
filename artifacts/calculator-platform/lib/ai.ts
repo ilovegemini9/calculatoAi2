@@ -205,6 +205,16 @@ export function recordAiUsage(settings: AiSettings, tokens = 0): AiSettings {
   };
 }
 
+// ─── SerpAPI key helpers ──────────────────────────────────────────────────────
+
+export function getSerpApiKey(settings: { serpApiKeyEncrypted?: string }): string {
+  return decryptApiKey(settings.serpApiKeyEncrypted ?? '');
+}
+
+export function encryptSerpApiKey(plainKey: string): string {
+  return plainKey.trim() ? encryptApiKey(plainKey.trim()) : '';
+}
+
 export function sanitizeProviderSettings(
   current: AiProviderSettings,
   incoming: Partial<AiProviderSettings> & { apiKey?: string },
