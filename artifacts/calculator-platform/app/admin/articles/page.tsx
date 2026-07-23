@@ -593,12 +593,25 @@ function LoadingPulse({ message }: { message: string }) {
   );
 }
 
+// ─── Default topic suggestions shown immediately on page load ─────────────────
+
+const DEFAULT_TOPIC_SUGGESTIONS: TopicSuggestion[] = [
+  { topic: 'Mortgage Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+  { topic: 'BMI Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+  { topic: 'Loan Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+  { topic: 'Tax Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+  { topic: 'Salary Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+  { topic: 'Compound Interest Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+  { topic: 'Calorie Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+  { topic: 'Retirement Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
+];
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ArticlesPage() {
   // ── Workflow state ──────────────────────────────────────────────────────────
   const [topic, setTopic] = useState('');
-  const [topicSuggestions, setTopicSuggestions] = useState<TopicSuggestion[]>([]);
+  const [topicSuggestions, setTopicSuggestions] = useState<TopicSuggestion[]>(DEFAULT_TOPIC_SUGGESTIONS);
   const [selectedTopicIdx, setSelectedTopicIdx] = useState<number | null>(null);
   const [loadingTopics, setLoadingTopics] = useState(false);
   const topicAbortRef = useRef<AbortController | null>(null);
@@ -667,8 +680,14 @@ export default function ArticlesPage() {
   // ── Debounced topic suggestions ─────────────────────────────────────────────
   useEffect(() => {
     const trimmed = topic.trim();
-    if (trimmed.length < 3 || phase !== 'idle') {
+    if (phase !== 'idle') {
       setTopicSuggestions([]);
+      setSelectedTopicIdx(null);
+      return;
+    }
+    // Empty or too short → restore default popular suggestions
+    if (trimmed.length < 3) {
+      setTopicSuggestions(trimmed.length === 0 ? DEFAULT_TOPIC_SUGGESTIONS : []);
       setSelectedTopicIdx(null);
       return;
     }
@@ -1011,7 +1030,7 @@ export default function ArticlesPage() {
               <div className="space-y-2">
                 <p className="flex items-center gap-1.5 text-xs font-semibold text-blue-500">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Click a suggestion to start the full workflow automatically
+                  {topic.trim().length === 0 ? 'Suggestions populaires — cliquez pour démarrer automatiquement' : 'Cliquez une suggestion pour démarrer le workflow automatiquement'}
                 </p>
                 <div className="space-y-2">
                   {topicSuggestions.map((suggestion, i) => (
@@ -1026,12 +1045,9 @@ export default function ArticlesPage() {
               </div>
             )}
 
-            {/* Typing hint */}
+            {/* Typing hint — only shown for 1-2 chars */}
             {phase === 'idle' && topic.trim().length > 0 && topic.trim().length < 3 && (
-              <p className="text-xs text-[var(--text-muted)]">Keep typing to see suggestions…</p>
-            )}
-            {phase === 'idle' && topic.trim().length === 0 && (
-              <p className="text-xs text-[var(--text-muted)]">Start typing any topic — suggestions appear automatically after 3 characters.</p>
+              <p className="text-xs text-[var(--text-muted)]">Continuez à taper pour voir des suggestions…</p>
             )}
           </div>
 
