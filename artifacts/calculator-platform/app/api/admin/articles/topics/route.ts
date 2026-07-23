@@ -100,9 +100,7 @@ export async function POST(req: Request) {
     const db = (await import('@/lib/db')).getDb();
     const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
     const orKey = getAiProviderKey(aiSettings, 'openrouter') || process.env.OPENROUTER_API_KEY || '';
-    if (!orKey) {
-      return NextResponse.json({ error: 'OpenRouter API key not configured.' }, { status: 400 });
-    }
+    // orKey is optional here — free autocomplete works without it
 
     const serpKey = getSerpApiKey(db.settings);
 

@@ -985,56 +985,55 @@ export default function ArticlesPage() {
           {research && phase !== 'idle' && phase !== 'researching' && <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-500" />}
         </div>
         <div className="p-5 space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div className="flex-1">
-              <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Research Topic</label>
-              <div className="relative">
-                <input
-                  value={topic}
-                  onChange={(e) => {
-                    setTopic(e.target.value);
-                    setSelectedTopicIdx(null);
-                    if (phase !== 'idle') reset();
-                  }}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && !working) void runResearch(); }}
-                  placeholder="e.g. Mortgage, BMI, Tax, Loan, Salary, Insurance…"
-                  className={inputCls}
-                  style={inputStyle}
-                  disabled={phase === 'researching'}
-                />
-                {loadingTopics && (
-                  <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-blue-400" />
-                )}
-              </div>
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+              <input
+                value={topic}
+                onChange={(e) => {
+                  setTopic(e.target.value);
+                  setSelectedTopicIdx(null);
+                  if (phase !== 'idle') reset();
+                }}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !working) void runResearch(); }}
+                placeholder="Type a topic and click a suggestion — e.g. Mortgage, BMI, Tax, Loan…"
+                className={`${inputCls} pl-10`}
+                style={inputStyle}
+                disabled={phase === 'researching'}
+              />
+              {loadingTopics && (
+                <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-blue-400" />
+              )}
             </div>
-            <PrimaryButton
-              onClick={() => void runResearch()}
-              disabled={working !== null || !topic.trim() || phase === 'researching'}
-              loading={working === 'research'}
-            >
-              {working !== 'research' && <Search className="h-4 w-4" />}
-              {working === 'research' ? 'Researching…' : 'Run Research'}
-            </PrimaryButton>
-          </div>
 
-          {/* Topic suggestions */}
-          {phase === 'idle' && topicSuggestions.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                5 Topic Opportunities — click one to start automatically
-              </p>
+            {/* Topic suggestions — primary action */}
+            {phase === 'idle' && topicSuggestions.length > 0 && (
               <div className="space-y-2">
-                {topicSuggestions.map((suggestion, i) => (
-                  <TopicSuggestionCard
-                    key={i}
-                    suggestion={suggestion}
-                    selected={selectedTopicIdx === i}
-                    onClick={() => { if (working === null) selectTopicSuggestion(i, suggestion); }}
-                  />
-                ))}
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-blue-500">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Click a suggestion to start the full workflow automatically
+                </p>
+                <div className="space-y-2">
+                  {topicSuggestions.map((suggestion, i) => (
+                    <TopicSuggestionCard
+                      key={i}
+                      suggestion={suggestion}
+                      selected={selectedTopicIdx === i}
+                      onClick={() => { if (working === null) selectTopicSuggestion(i, suggestion); }}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Typing hint */}
+            {phase === 'idle' && topic.trim().length > 0 && topic.trim().length < 3 && (
+              <p className="text-xs text-[var(--text-muted)]">Keep typing to see suggestions…</p>
+            )}
+            {phase === 'idle' && topic.trim().length === 0 && (
+              <p className="text-xs text-[var(--text-muted)]">Start typing any topic — suggestions appear automatically after 3 characters.</p>
+            )}
+          </div>
 
           {/* Research in progress */}
           {phase === 'researching' && (
