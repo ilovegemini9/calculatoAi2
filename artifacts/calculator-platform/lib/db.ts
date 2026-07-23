@@ -3,6 +3,8 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 import type { AppSchema, SystemSettings } from './types';
 import { DEFAULT_SEO_SETTINGS, getSeoSettings } from './seo';
+import { DEFAULT_ADS_SETTINGS, getAdsSettings } from './ads';
+import { DEFAULT_VERIFICATION_SETTINGS, getVerificationSettings } from './verification';
 
 // On read-only hosts (e.g. Vercel serverless), fall back to /tmp which is always writable.
 // Note: /tmp is ephemeral on serverless — data resets between cold starts.
@@ -17,6 +19,8 @@ const DEFAULT_SETTINGS: SystemSettings = {
   adsenseCode: '',
   analyticsCode: '',
   seo: DEFAULT_SEO_SETTINGS,
+  ads: DEFAULT_ADS_SETTINGS,
+  verification: DEFAULT_VERIFICATION_SETTINGS,
   featureFlags: {
     aiEnabled: true,
     maintenanceMode: false,
@@ -80,6 +84,8 @@ export function getDb(): AppSchema {
       ...DEFAULT_SETTINGS,
       ...db.settings,
       seo: getSeoSettings(db.settings?.seo),
+      ads: getAdsSettings(db.settings?.ads),
+      verification: getVerificationSettings(db.settings?.verification),
       featureFlags: { ...DEFAULT_SETTINGS.featureFlags, ...db.settings.featureFlags },
     };
     db.logs = db.logs || [];

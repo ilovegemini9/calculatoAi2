@@ -165,6 +165,8 @@ export interface SystemSettings {
   adsenseCode: string;
   analyticsCode: string;
   seo: SeoSettings;
+  ads: AdsSettings;
+  verification: VerificationSettings;
   featureFlags: {
     aiEnabled: boolean;
     maintenanceMode: boolean;
@@ -211,6 +213,46 @@ export interface SeoSettings {
     propertyUrl: string;
     verificationCode: string;
   };
+}
+
+export type AdPlacement = 'header' | 'sidebar' | 'footer' | 'inContent';
+
+export interface AdSlotSettings {
+  enabled: boolean;
+  slotId: string;
+  desktopHeight: number;
+  mobileHeight: number;
+}
+
+export interface AdsSettings {
+  enabled: boolean;
+  provider: 'adsense' | 'custom';
+  publisherId: string;
+  customNetworkName: string;
+  customNetworkCode: string;
+  slots: Record<AdPlacement, AdSlotSettings>;
+}
+
+export interface VerificationSettings {
+  googleSearchConsole: {
+    enabled: boolean;
+    propertyUrl: string;
+    verificationCode: string;
+  };
+  googleAdsense: {
+    enabled: boolean;
+    publisherId: string;
+    verificationCode: string;
+  };
+  bing: {
+    enabled: boolean;
+    verificationCode: string;
+  };
+  yandex: {
+    enabled: boolean;
+    verificationCode: string;
+  };
+  customMetaTags: string;
 }
 
 export interface LogEntry {

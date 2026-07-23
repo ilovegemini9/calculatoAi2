@@ -29,6 +29,8 @@ export async function POST(req: Request) {
       adsenseCode: typeof payload.adsenseCode === 'string' ? payload.adsenseCode : db.settings.adsenseCode,
       analyticsCode: typeof payload.analyticsCode === 'string' ? payload.analyticsCode : db.settings.analyticsCode,
       seo: db.settings.seo,
+      ads: db.settings.ads,
+      verification: db.settings.verification,
       featureFlags: {
         ...db.settings.featureFlags,
         aiEnabled: typeof payload.featureFlags?.aiEnabled === 'boolean' ? payload.featureFlags.aiEnabled : db.settings.featureFlags.aiEnabled,

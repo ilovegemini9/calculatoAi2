@@ -15,6 +15,8 @@ import { DynamicCalculator } from '@/components/calculators/DynamicCalculator';
 import { calculatorSchema, breadcrumbSchema, faqSchema, howToSchema, itemListSchema } from '@/lib/schemas';
 import { RelatedCalculators, getRelatedCalculators } from '@/components/RelatedCalculators';
 import { getDb } from '@/lib/db';
+import { getAdsSettings } from '@/lib/ads';
+import { AdSlot } from '@/components/ads/AdSlot';
 
 interface Props {
   params: Promise<{ calculatorSlug: string }>;
@@ -156,6 +158,7 @@ export default async function CalculatorPage({ params }: Props) {
   const colors = CATEGORY_COLORS[calc.category] || { bg: 'bg-blue-500/10', text: 'text-blue-500' };
 
   const db = getDb();
+  const ads = getAdsSettings(db.settings.ads);
   const allCalculatorsList: CalculatorMeta[] = [
     ...CALCULATORS,
     ...db.calculators.map((c) => ({
@@ -236,16 +239,25 @@ export default async function CalculatorPage({ params }: Props) {
       </div>
 
       {/* ── Calculator widget ─────────────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {isDynamic && dynamicSpec ? (
-          <DynamicCalculator
-            inputs={dynamicSpec.metadata.inputs || []}
-            outputs={dynamicSpec.metadata.outputs || []}
-            calculateBody={dynamicSpec.metadata.calculateBody || ''}
-          />
-        ) : (
-          <CalculatorRenderer slug={baseSlug} />
-        )}
+      <div className="mx-auto grid max-w-6xl items-start gap-8 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="min-w-0">
+          {isDynamic && dynamicSpec ? (
+            <DynamicCalculator
+              inputs={dynamicSpec.metadata.inputs || []}
+              outputs={dynamicSpec.metadata.outputs || []}
+              calculateBody={dynamicSpec.metadata.calculateBody || ''}
+            />
+          ) : (
+            <CalculatorRenderer slug={baseSlug} />
+          )}
+        </div>
+        <aside className="min-w-0 lg:sticky lg:top-20">
+          <AdSlot placement="sidebar" ads={ads} />
+        </aside>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 pb-8">
+        <AdSlot placement="inContent" ads={ads} />
       </div>
 
       {/* ── How to use ────────────────────────────────────────────────────── */}
