@@ -8,13 +8,12 @@ import {
   Check,
   CheckCircle2,
   FileText,
-  Lightbulb,
+  Info,
   Loader2,
   Lock,
   Pencil,
   RefreshCw,
   Send,
-  Sparkles,
   Wand2,
   X,
   XCircle,
@@ -22,16 +21,14 @@ import {
 } from 'lucide-react';
 import type { Article } from '@/lib/types';
 
-type SuggestionKind = 'titles' | 'keywords' | 'slug';
-type WorkflowAction = 'draft' | 'review' | 'publish';
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-const inputClass =
-  'w-full rounded-xl border px-3.5 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15';
-const inputStyle = {
-  borderColor: 'var(--border)',
-  backgroundColor: 'var(--bg-input)',
-  color: 'var(--text-primary)',
-};
+type Step = 'title' | 'keyword' | 'slug' | 'generate' | 'save';
+type WorkflowAction = 'draft' | 'review' | 'publish';
+type Working = 'titles' | 'keywords' | 'slug' | 'generate' | WorkflowAction | null;
+type NoticeKind = 'success' | 'error' | 'info';
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function slugify(value: string) {
   return value
@@ -43,43 +40,53 @@ function slugify(value: string) {
 }
 
 function statusLabel(status: Article['status']) {
-  return status === 'pending_review' ? 'Pending Review' : status.charAt(0).toUpperCase() + status.slice(1);
+  if (status === 'pending_review') return 'Pending Review';
+  return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-function statusClass(status: Article['status']) {
-  return status === 'published'
-    ? 'bg-emerald-500/10 text-emerald-500'
-    : status === 'pending_review'
-      ? 'bg-amber-500/10 text-amber-500'
-      : 'bg-slate-500/10 text-[var(--text-muted)]';
+function statusBadge(status: Article['status']) {
+  const map: Record<Article['status'], string> = {
+    published: 'bg-emerald-500/10 text-emerald-500',
+    pending_review: 'bg-amber-500/10 text-amber-500',
+    draft: 'bg-slate-500/10 text-[var(--text-muted)]',
+  };
+  return map[status] ?? map.draft;
 }
 
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+// ─── Small components ─────────────────────────────────────────────────────────
+
+function Notice({ kind, children }: { kind: NoticeKind; children: React.ReactNode }) {
+  const map: Record<NoticeKind, { cls: string; Icon: typeof Info }> = {
+    success: { cls: 'border-emerald-500/25 bg-emerald-500/8 text-emerald-600 dark:text-emerald-400', Icon: CheckCircle2 },
+    error:   { cls: 'border-red-500/25 bg-red-500/8 text-red-600 dark:text-red-400', Icon: XCircle },
+    info:    { cls: 'border-blue-500/25 bg-blue-500/8 text-blue-600 dark:text-blue-400', Icon: Info },
+  };
+  const { cls, Icon } = map[kind];
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold text-[var(--text-secondary)]">{label}</span>
-      {hint && <span className="mb-2 block text-xs text-[var(--text-muted)]">{hint}</span>}
-      {children}
-    </label>
+    <div className={`flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm ${cls}`}>
+      <Icon className="mt-0.5 h-4 w-4 shrink-0" />
+      <span>{children}</span>
+    </div>
   );
 }
 
-function Section({
-  step,
+function FieldLabel({ children, hint }: { children: React.ReactNode; hint?: string }) {
+  return (
+    <div className="mb-2">
+      <span className="block text-xs font-semibold text-[var(--text-secondary)]">{children}</span>
+      {hint && <span className="mt-0.5 block text-xs text-[var(--text-muted)]">{hint}</span>}
+    </div>
+  );
+}
+
+function StepCard({
+  number,
   title,
   description,
-  locked = false,
+  locked,
   children,
 }: {
-  step: string;
+  number: string;
   title: string;
   description: string;
   locked?: boolean;
@@ -87,111 +94,170 @@ function Section({
 }) {
   return (
     <section
-      className={`rounded-2xl border ${locked ? 'opacity-60' : ''}`}
+      className={`rounded-2xl border transition-opacity ${locked ? 'opacity-55 pointer-events-none select-none' : ''}`}
       style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
     >
       <div className="flex items-start gap-3 border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-xs font-bold text-blue-500">
-          {step}
+          {number}
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h2 className="text-sm font-semibold text-[var(--text-primary)]">{title}</h2>
           <p className="mt-0.5 text-xs text-[var(--text-muted)]">{description}</p>
         </div>
-        {locked && <Lock className="ml-auto mt-1 h-4 w-4 shrink-0 text-[var(--text-muted)]" />}
+        {locked && <Lock className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-muted)]" />}
       </div>
       <div className="p-5">{children}</div>
     </section>
   );
 }
 
-function Notice({
-  type,
+function PrimaryButton({
+  onClick,
+  disabled,
+  loading,
   children,
 }: {
-  type: 'success' | 'error' | 'info';
+  onClick: () => void;
+  disabled?: boolean;
+  loading?: boolean;
   children: React.ReactNode;
 }) {
-  const styles = {
-    success: 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    error: 'border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-400',
-    info: 'border-blue-500/25 bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  };
-  const Icon = type === 'success' ? CheckCircle2 : type === 'error' ? XCircle : Lightbulb;
   return (
-    <div className={`flex items-start gap-2 rounded-xl border px-4 py-3 text-sm ${styles[type]}`}>
-      <Icon className="mt-0.5 h-4 w-4 shrink-0" />
-      <span>{children}</span>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || loading}
+      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+      {children}
+    </button>
   );
 }
 
+function GhostButton({
+  onClick,
+  disabled,
+  loading,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled || loading}
+      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+      {children}
+    </button>
+  );
+}
+
+const inputCls =
+  'w-full rounded-xl border px-3.5 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15';
+const inputStyle = {
+  borderColor: 'var(--border)',
+  backgroundColor: 'var(--bg-input)',
+  color: 'var(--text-primary)',
+};
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function ArticlesPage() {
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loadingArticles, setLoadingArticles] = useState(true);
+  // Composer state
   const [title, setTitle] = useState('');
   const [titleSuggestions, setTitleSuggestions] = useState<string[]>([]);
-  const [keywordSuggestions, setKeywordSuggestions] = useState<string[]>([]);
+  const [liveDataUsed, setLiveDataUsed] = useState<boolean | null>(null);
+
   const [focusKeyword, setFocusKeyword] = useState('');
   const [keywordLocked, setKeywordLocked] = useState(false);
+  const [keywordSuggestions, setKeywordSuggestions] = useState<string[]>([]);
+
   const [slug, setSlug] = useState('');
+
   const [article, setArticle] = useState<Article | null>(null);
-  const [working, setWorking] = useState<SuggestionKind | 'generate' | WorkflowAction | null>(null);
-  const [notice, setNotice] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [generationStage, setGenerationStage] = useState('');
 
-  const loadArticles = useCallback(async () => {
-    setLoadingArticles(true);
-    try {
-      const response = await fetch('/api/admin/blog', { cache: 'no-store' });
-      if (!response.ok) throw new Error('Unable to load saved articles.');
-      const data = await response.json();
-      setArticles(Array.isArray(data) ? data : []);
-    } catch (error) {
-      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to load saved articles.' });
-    } finally {
-      setLoadingArticles(false);
-    }
-  }, []);
+  const [working, setWorking] = useState<Working>(null);
+  const [notice, setNotice] = useState<{ kind: NoticeKind; text: string } | null>(null);
 
-  useEffect(() => {
-    void loadArticles();
-  }, [loadArticles]);
+  // Saved articles
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loadingArticles, setLoadingArticles] = useState(true);
+
+  // Derived
+  const hasTitle = title.trim().length > 0;
+  const hasKeyword = focusKeyword.trim().length > 0 && keywordLocked;
+  const hasSlug = slug.trim().length > 0;
+  const canGenerate = hasTitle && hasKeyword && hasSlug && !article;
 
   const duplicateKeyword = useMemo(
     () =>
       Boolean(
         focusKeyword.trim() &&
-          articles.some((item) =>
-            (item.seoData.keywords ?? []).some(
-              (keyword) => keyword.toLowerCase() === focusKeyword.trim().toLowerCase(),
+          articles.some((a) =>
+            (a.seoData.keywords ?? []).some(
+              (k) => k.toLowerCase() === focusKeyword.trim().toLowerCase(),
             ),
           ),
       ),
     [articles, focusKeyword],
   );
 
-  const requestSuggestions = async (kind: SuggestionKind) => {
-    if (!title.trim()) {
-      setNotice({ type: 'info', text: 'Enter a topic or working title first.' });
-      return;
-    }
-    setWorking(kind);
-    setNotice(null);
-    if (kind === 'titles') setTitleSuggestions([]);
-    if (kind === 'keywords') setKeywordSuggestions([]);
+  // ─── Data loading ──────────────────────────────────────────────────────────
+
+  const loadArticles = useCallback(async () => {
+    setLoadingArticles(true);
     try {
-      const response = await fetch('/api/admin/articles/suggest', {
+      const res = await fetch('/api/admin/blog', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Unable to load saved articles.');
+      const data = await res.json();
+      setArticles(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Unable to load saved articles.' });
+    } finally {
+      setLoadingArticles(false);
+    }
+  }, []);
+
+  useEffect(() => { void loadArticles(); }, [loadArticles]);
+
+  // ─── Actions ───────────────────────────────────────────────────────────────
+
+  const suggestTitles = async () => {
+    if (!title.trim()) { setNotice({ kind: 'info', text: 'Enter a topic or working title first.' }); return; }
+    setWorking('titles');
+    setNotice(null);
+    setTitleSuggestions([]);
+    setLiveDataUsed(null);
+    try {
+      const res = await fetch('/api/admin/articles/suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind, title: title.trim() }),
+        body: JSON.stringify({ kind: 'titles', title: title.trim() }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Live suggestions unavailable.');
-      if (kind === 'titles') setTitleSuggestions(data.suggestions ?? []);
-      if (kind === 'keywords') setKeywordSuggestions(data.suggestions ?? []);
-    } catch (error) {
-      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Live suggestions unavailable.' });
+      const data = await res.json();
+      if (!res.ok) {
+        setNotice({ kind: 'info', text: data.error ?? 'Live keyword data unavailable.' });
+        return;
+      }
+      const suggestions: string[] = Array.isArray(data.suggestions) ? data.suggestions : [];
+      if (suggestions.length === 0) {
+        setNotice({ kind: 'info', text: 'Live keyword data unavailable.' });
+        return;
+      }
+      setTitleSuggestions(suggestions);
+      setLiveDataUsed(!!data.liveData);
+    } catch {
+      setNotice({ kind: 'info', text: 'Live keyword data unavailable.' });
     } finally {
       setWorking(null);
     }
@@ -204,6 +270,36 @@ export default function ArticlesPage() {
     setKeywordLocked(false);
     setKeywordSuggestions([]);
     setArticle(null);
+    setNotice(null);
+  };
+
+  const suggestKeywords = async () => {
+    if (!title.trim()) return;
+    setWorking('keywords');
+    setNotice(null);
+    setKeywordSuggestions([]);
+    try {
+      const res = await fetch('/api/admin/articles/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'keywords', title: title.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setNotice({ kind: 'info', text: data.error ?? 'Live keyword data unavailable.' });
+        return;
+      }
+      const suggestions: string[] = Array.isArray(data.suggestions) ? data.suggestions : [];
+      if (suggestions.length === 0) {
+        setNotice({ kind: 'info', text: 'Live keyword data unavailable.' });
+        return;
+      }
+      setKeywordSuggestions(suggestions);
+    } catch {
+      setNotice({ kind: 'info', text: 'Live keyword data unavailable.' });
+    } finally {
+      setWorking(null);
+    }
   };
 
   const chooseKeyword = (value: string) => {
@@ -217,40 +313,40 @@ export default function ArticlesPage() {
     setWorking('slug');
     setNotice(null);
     try {
-      const response = await fetch('/api/admin/articles/suggest', {
+      const res = await fetch('/api/admin/articles/suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind: 'slug', title: title.trim() }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Unable to improve slug.');
-      setSlug(data.slug);
-    } catch (error) {
-      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to improve slug.' });
+      const data = await res.json();
+      if (!res.ok) { setNotice({ kind: 'error', text: data.error ?? 'Unable to improve slug.' }); return; }
+      if (data.slug) setSlug(data.slug);
+    } catch (err) {
+      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Unable to improve slug.' });
     } finally {
       setWorking(null);
     }
   };
 
   const generateArticle = async () => {
-    if (!title.trim() || !focusKeyword.trim() || !slug.trim() || duplicateKeyword) return;
+    if (!canGenerate || duplicateKeyword) return;
     setWorking('generate');
     setNotice(null);
-    setGenerationStage('Preparing the article brief…');
     const stages = [
       'Preparing the article brief…',
-      'Writing the introduction and key takeaways…',
-      'Building sections, examples, and comparisons…',
-      'Adding FAQ, How-To, links, and structured data…',
-      'Saving the article as a draft…',
+      'Writing introduction and key takeaways…',
+      'Building sections, examples and comparisons…',
+      'Adding FAQ, How-To, internal links and structured data…',
+      'Saving article as draft…',
     ];
-    let stageIndex = 0;
-    const interval = window.setInterval(() => {
-      stageIndex = Math.min(stageIndex + 1, stages.length - 1);
-      setGenerationStage(stages[stageIndex]);
+    let idx = 0;
+    setGenerationStage(stages[0]);
+    const timer = window.setInterval(() => {
+      idx = Math.min(idx + 1, stages.length - 1);
+      setGenerationStage(stages[idx]);
     }, 9000);
     try {
-      const response = await fetch('/api/admin/articles/generate', {
+      const res = await fetch('/api/admin/articles/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -266,15 +362,15 @@ export default function ArticlesPage() {
           lockedKeywords: [focusKeyword.trim()],
         }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Article generation failed.');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Article generation failed.');
       setArticle(data.article);
       await loadArticles();
-      setNotice({ type: 'success', text: 'Article generated and saved as a draft. Review it before sending or publishing.' });
-    } catch (error) {
-      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Article generation failed.' });
+      setNotice({ kind: 'success', text: 'Article saved as a draft. Review and edit before publishing.' });
+    } catch (err) {
+      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Article generation failed.' });
     } finally {
-      window.clearInterval(interval);
+      window.clearInterval(timer);
       setWorking(null);
       setGenerationStage('');
     }
@@ -283,7 +379,7 @@ export default function ArticlesPage() {
   const saveWorkflow = async (action: WorkflowAction) => {
     if (!article) return;
     if (action === 'publish' && article.status !== 'pending_review') {
-      setNotice({ type: 'info', text: 'Send the article to review before publishing.' });
+      setNotice({ kind: 'info', text: 'Send to review first before publishing.' });
       return;
     }
     setWorking(action);
@@ -291,7 +387,7 @@ export default function ArticlesPage() {
     const nextStatus: Article['status'] =
       action === 'publish' ? 'published' : action === 'review' ? 'pending_review' : 'draft';
     try {
-      const response = await fetch(`/api/admin/articles/${article.id}`, {
+      const res = await fetch(`/api/admin/articles/${article.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -307,56 +403,53 @@ export default function ArticlesPage() {
           },
         }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Unable to save article.');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Unable to save article.');
       setArticle(data.article);
       await loadArticles();
-      setNotice({
-        type: 'success',
-        text:
-          action === 'publish'
-            ? 'Article published.'
-            : action === 'review'
-              ? 'Article sent to review.'
-              : 'Draft saved.',
-      });
-    } catch (error) {
-      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to save article.' });
+      const msg =
+        action === 'publish' ? 'Article published.' :
+        action === 'review'  ? 'Article sent to review.' :
+        'Draft saved.';
+      setNotice({ kind: 'success', text: msg });
+    } catch (err) {
+      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Unable to save article.' });
     } finally {
       setWorking(null);
     }
   };
 
-  const resetComposer = () => {
+  const reset = () => {
     setTitle('');
     setTitleSuggestions([]);
-    setKeywordSuggestions([]);
+    setLiveDataUsed(null);
     setFocusKeyword('');
     setKeywordLocked(false);
+    setKeywordSuggestions([]);
     setSlug('');
     setArticle(null);
     setNotice(null);
+    setGenerationStage('');
   };
 
-  const canGenerate = Boolean(title.trim() && focusKeyword.trim() && slug.trim() && !duplicateKeyword);
+  // ─── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 pb-12">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div className="mx-auto max-w-3xl space-y-6 pb-16">
+
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">
-            <Sparkles className="h-3.5 w-3.5" />
-            Content studio
-          </div>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-blue-500">Content Studio</p>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">AI Articles Manager</h1>
-          <p className="mt-1 max-w-2xl text-sm text-[var(--text-muted)]">
-            Build one useful article at a time with live search-informed suggestions and a deliberate review workflow.
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
+            Build one focused, SEO-ready article at a time.
           </p>
         </div>
         <button
           type="button"
-          onClick={resetComposer}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
+          onClick={reset}
+          className="inline-flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
           style={{ borderColor: 'var(--border)' }}
         >
           <X className="h-4 w-4" />
@@ -364,292 +457,363 @@ export default function ArticlesPage() {
         </button>
       </div>
 
-      {notice && <Notice type={notice.type}>{notice.text}</Notice>}
+      {/* Global notice */}
+      {notice && <Notice kind={notice.kind}>{notice.text}</Notice>}
 
-      <div className="space-y-4">
-        <Section
-          step="1"
-          title="Article title"
-          description="Start with a topic or working title, then use live search suggestions to sharpen it."
-        >
-          <div className="flex flex-col gap-3 md:flex-row md:items-end">
-            <Field label="Article Title" hint="Use a topic seed when you want AI to suggest titles.">
-              <input
-                value={title}
-                onChange={(event) => {
-                  setTitle(event.target.value);
-                  if (!article) setSlug(slugify(event.target.value));
-                }}
-                placeholder="e.g. mortgage calculator for first-time buyers"
-                className={inputClass}
-                style={inputStyle}
-              />
-            </Field>
-            <button
-              type="button"
-              onClick={() => void requestSuggestions('titles')}
-              disabled={working !== null || !title.trim()}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {working === 'titles' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              AI Suggest Titles
-            </button>
+      {/* ── Step 1 — Title ── */}
+      <StepCard
+        number="1"
+        title="Article Title"
+        description="Enter a topic or title, then use AI to get live search-informed suggestions."
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
+            <FieldLabel>Article Title</FieldLabel>
+            <input
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (!article) setSlug(slugify(e.target.value));
+              }}
+              placeholder="e.g. mortgage calculator for first-time buyers"
+              className={inputCls}
+              style={inputStyle}
+            />
           </div>
-          {titleSuggestions.length > 0 && (
-            <div className="mt-5 space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Live-informed suggestions</p>
-                <span className="text-xs text-[var(--text-muted)]">Click one to use it</span>
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {titleSuggestions.map((suggestion) => (
-                  <button
-                    type="button"
-                    key={suggestion}
-                    onClick={() => chooseTitle(suggestion)}
-                    className="group flex items-center justify-between gap-3 rounded-xl border p-3 text-left text-sm text-[var(--text-primary)] transition hover:border-blue-500 hover:bg-blue-500/5"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <span>{suggestion}</span>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />
-                  </button>
-                ))}
-              </div>
+          <PrimaryButton
+            onClick={() => void suggestTitles()}
+            disabled={working !== null}
+            loading={working === 'titles'}
+          >
+            {working !== 'titles' && <span>✨</span>}
+            AI Suggest Titles
+          </PrimaryButton>
+        </div>
+
+        {titleSuggestions.length > 0 && (
+          <div className="mt-5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                {liveDataUsed ? 'Live search–informed suggestions' : 'AI suggestions'}
+              </p>
+              <span className="text-xs text-[var(--text-muted)]">Click to use</span>
             </div>
-          )}
-        </Section>
-
-        <Section
-          step="2"
-          title="Focus keyword"
-          description="Choose one focused phrase. It is locked after selection to prevent accidental duplicates."
-          locked={!title.trim()}
-        >
-          <div className="flex flex-col gap-3 md:flex-row md:items-end">
-            <Field label="Focus Keyword">
-              <div className="relative">
-                <input
-                  value={focusKeyword}
-                  readOnly={keywordLocked}
-                  onChange={(event) => setFocusKeyword(event.target.value)}
-                  placeholder={title.trim() ? 'Select a keyword or enter one' : 'Select a title first'}
-                  className={`${inputClass} ${keywordLocked ? 'pr-10' : ''}`}
-                  style={inputStyle}
-                  disabled={!title.trim()}
-                />
-                {keywordLocked && <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />}
-              </div>
-            </Field>
-            {keywordLocked ? (
-              <button
-                type="button"
-                onClick={() => setKeywordLocked(false)}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                Change keyword
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => void requestSuggestions('keywords')}
-                disabled={working !== null || !title.trim()}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {working === 'keywords' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                AI Suggest Keywords
-              </button>
+            {!liveDataUsed && (
+              <Notice kind="info">Live keyword data unavailable. Showing AI-generated suggestions only.</Notice>
             )}
-          </div>
-          {duplicateKeyword && (
-            <p className="mt-3 flex items-center gap-2 text-xs text-amber-500">
-              <AlertCircle className="h-4 w-4" />
-              This keyword is already assigned to a saved article. Choose a different keyword.
-            </p>
-          )}
-          {keywordSuggestions.length > 0 && !keywordLocked && (
-            <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {keywordSuggestions.map((suggestion) => (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {titleSuggestions.map((s) => (
                 <button
+                  key={s}
                   type="button"
-                  key={suggestion}
-                  onClick={() => chooseKeyword(suggestion)}
-                  className="flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm text-[var(--text-primary)] transition hover:border-blue-500 hover:bg-blue-500/5"
+                  onClick={() => chooseTitle(s)}
+                  className="group flex items-center justify-between gap-3 rounded-xl border p-3.5 text-left text-sm text-[var(--text-primary)] transition hover:border-blue-500 hover:bg-blue-500/5"
                   style={{ borderColor: 'var(--border)' }}
                 >
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                  {suggestion}
+                  <span className="leading-snug">{s}</span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />
                 </button>
               ))}
             </div>
-          )}
-        </Section>
+          </div>
+        )}
+      </StepCard>
 
-        <Section
-          step="3"
-          title="URL slug"
-          description="Generated from the title. Edit it directly or ask AI for a tighter SEO-friendly version."
-          locked={!title.trim()}
-        >
-          <div className="flex flex-col gap-3 md:flex-row md:items-end">
-            <Field label="Slug" hint="The article will be available at /blog/{slug || 'your-slug'}">
-              <div className="flex items-center gap-2">
-                <span className="hidden text-sm text-[var(--text-muted)] sm:inline">/blog/</span>
-                <input
-                  value={slug}
-                  onChange={(event) => setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'))}
-                  placeholder="article-slug"
-                  className={`${inputClass} font-mono`}
-                  style={inputStyle}
-                  disabled={!title.trim()}
-                />
-              </div>
-            </Field>
-            <button
-              type="button"
-              onClick={() => void improveSlug()}
-              disabled={working !== null || !title.trim()}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+      {/* ── Step 2 — Focus Keyword ── */}
+      <StepCard
+        number="2"
+        title="Focus Keyword"
+        description="Choose the single keyword this article targets. It locks after selection to prevent duplicates."
+        locked={!hasTitle}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
+            <FieldLabel>Focus Keyword</FieldLabel>
+            <div className="relative">
+              <input
+                value={focusKeyword}
+                readOnly={keywordLocked}
+                onChange={(e) => setFocusKeyword(e.target.value)}
+                placeholder={hasTitle ? 'Select a suggestion or type a keyword' : 'Select a title first'}
+                className={`${inputCls} ${keywordLocked ? 'pr-10' : ''}`}
+                style={inputStyle}
+                disabled={!hasTitle}
+              />
+              {keywordLocked && (
+                <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />
+              )}
+            </div>
+          </div>
+          {keywordLocked ? (
+            <GhostButton onClick={() => { setKeywordLocked(false); setKeywordSuggestions([]); }}>
+              Change keyword
+            </GhostButton>
+          ) : (
+            <PrimaryButton
+              onClick={() => void suggestKeywords()}
+              disabled={working !== null || !hasTitle}
+              loading={working === 'keywords'}
+            >
+              {working !== 'keywords' && <span>✨</span>}
+              AI Suggest Keywords
+            </PrimaryButton>
+          )}
+        </div>
+
+        {duplicateKeyword && (
+          <p className="mt-3 flex items-center gap-2 text-xs text-amber-500">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            This keyword already exists in another saved article. Choose a different one.
+          </p>
+        )}
+
+        {keywordSuggestions.length > 0 && !keywordLocked && (
+          <div className="mt-5 space-y-2.5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+              Related keywords — click to select
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {keywordSuggestions.map((kw) => (
+                <button
+                  key={kw}
+                  type="button"
+                  onClick={() => chooseKeyword(kw)}
+                  className="flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm text-[var(--text-primary)] transition hover:border-blue-500 hover:bg-blue-500/5 hover:text-blue-500"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500/60" />
+                  {kw}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </StepCard>
+
+      {/* ── Step 3 — URL Slug ── */}
+      <StepCard
+        number="3"
+        title="URL Slug"
+        description="Auto-generated from the title. Edit directly or let AI tighten it."
+        locked={!hasTitle}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1">
+            <FieldLabel hint={`/blog/${slug || 'your-slug'}`}>Slug</FieldLabel>
+            <div className="flex items-center gap-2">
+              <span className="hidden text-sm text-[var(--text-muted)] sm:inline shrink-0">/blog/</span>
+              <input
+                value={slug}
+                onChange={(e) =>
+                  setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'))
+                }
+                placeholder="your-article-slug"
+                className={`${inputCls} font-mono`}
+                style={inputStyle}
+                disabled={!hasTitle}
+              />
+            </div>
+          </div>
+          <GhostButton
+            onClick={() => void improveSlug()}
+            disabled={working !== null || !hasTitle}
+            loading={working === 'slug'}
+          >
+            {working !== 'slug' && <Wand2 className="h-4 w-4" />}
+            ✨ AI Improve Slug
+          </GhostButton>
+        </div>
+      </StepCard>
+
+      {/* ── Step 4 — Generate Article ── */}
+      <StepCard
+        number="4"
+        title="Article"
+        description="Generate a complete SEO and AI-search-ready article. Edit the content before saving."
+        locked={!hasTitle || !hasKeyword || !hasSlug}
+      >
+        {!article ? (
+          <div className="space-y-4">
+            <div
+              className="rounded-xl border border-dashed p-5 text-sm text-[var(--text-muted)]"
               style={{ borderColor: 'var(--border)' }}
             >
-              {working === 'slug' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-              AI Improve Slug
-            </button>
-          </div>
-        </Section>
-
-        <Section
-          step="4"
-          title="Article"
-          description="Generate a complete SEO and AI-search-ready article, then edit the content before saving."
-          locked={!canGenerate}
-        >
-          {!article ? (
-            <div className="space-y-4">
-              <div className="rounded-xl border border-dashed p-5 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
-                <div className="mb-2 flex items-center gap-2 font-semibold text-[var(--text-secondary)]">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  Ready when your title, keyword, and slug are set
-                </div>
-                <p>
-                  The generated article includes introduction, table of contents, H2/H3 sections, FAQ, How-To, comparison content, examples, internal links, related calculators, CTA, conclusion, references, reading time, metadata, OpenGraph, and JSON-LD.
-                </p>
+              <div className="mb-2 flex items-center gap-2 font-semibold text-[var(--text-secondary)]">
+                <FileText className="h-4 w-4 text-blue-500" />
+                What gets generated
               </div>
-              {generationStage && <Notice type="info">{generationStage}</Notice>}
+              <p>
+                Introduction · Table of Contents · H2 / H3 sections · FAQ · How-To · Comparison sections ·
+                Bullet and numbered lists · Examples · Internal links · Related calculators · CTA ·
+                Conclusion · References · Reading time · Meta title · Meta description ·
+                OpenGraph · JSON-LD schema
+              </p>
+            </div>
+
+            {generationStage && <Notice kind="info">{generationStage}</Notice>}
+
+            {duplicateKeyword && (
+              <Notice kind="error">
+                Duplicate keyword — choose a different focus keyword before generating.
+              </Notice>
+            )}
+
+            <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => void generateArticle()}
-                disabled={working !== null || !canGenerate}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={working !== null || !canGenerate || duplicateKeyword}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {working === 'generate' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                {working === 'generate' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <span>🚀</span>
+                )}
                 {working === 'generate' ? 'Generating article…' : 'Generate Article'}
               </button>
-              {!canGenerate && <p className="text-xs text-[var(--text-muted)]">Select a title, focus keyword, and slug to enable generation.</p>}
+              {!canGenerate && !article && (
+                <p className="text-xs text-[var(--text-muted)]">
+                  Complete title, keyword, and slug to unlock.
+                </p>
+              )}
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(article.status)}`}>
-                    {statusLabel(article.status)}
-                  </span>
-                  <span className="text-xs text-[var(--text-muted)]">
-                    {article.wordCount ? `${article.wordCount.toLocaleString()} words` : 'Editable draft'}
-                  </span>
-                </div>
-                <span className="text-xs text-[var(--text-muted)]">HTML content</span>
-              </div>
-              <textarea
-                value={article.content}
-                onChange={(event) => setArticle({ ...article, content: event.target.value })}
-                rows={24}
-                className={`${inputClass} resize-y font-mono text-xs leading-relaxed`}
-                style={inputStyle}
-                aria-label="Article content"
-              />
-              <div className="flex flex-wrap items-center gap-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
-                <button
-                  type="button"
-                  onClick={() => void saveWorkflow('draft')}
-                  disabled={working !== null}
-                  className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:opacity-50"
-                  style={{ borderColor: 'var(--border)' }}
-                >
-                  {working === 'draft' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                  Save Draft
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void saveWorkflow('review')}
-                  disabled={working !== null}
-                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-400 disabled:opacity-50"
-                >
-                  {working === 'review' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                  Send to Review
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void saveWorkflow('publish')}
-                  disabled={working !== null || article.status !== 'pending_review'}
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {working === 'publish' ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                  Publish
-                </button>
-                <span className="ml-auto text-xs text-[var(--text-muted)]">
-                  {article.status === 'pending_review' ? 'Ready for explicit publishing.' : 'Publishing unlocks after review.'}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusBadge(article.status)}`}>
+                {statusLabel(article.status)}
+              </span>
+              {article.wordCount && (
+                <span className="text-xs text-[var(--text-muted)]">
+                  {article.wordCount.toLocaleString()} words
                 </span>
-              </div>
+              )}
+              {article.readingTime && (
+                <span className="text-xs text-[var(--text-muted)]">
+                  {article.readingTime} min read
+                </span>
+              )}
+              <span className="ml-auto text-xs text-[var(--text-muted)]">HTML — editable</span>
             </div>
-          )}
-        </Section>
-      </div>
 
-      <section className="rounded-2xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+            <textarea
+              value={article.content}
+              onChange={(e) => setArticle({ ...article, content: e.target.value })}
+              rows={24}
+              className={`${inputCls} resize-y font-mono text-xs leading-relaxed`}
+              style={inputStyle}
+              aria-label="Article content"
+            />
+
+            {/* ── Step 5 — Save ── */}
+            <div
+              className="flex flex-wrap items-center gap-2 rounded-xl border p-4"
+              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}
+            >
+              <div className="mr-1 flex-1">
+                <p className="text-xs font-semibold text-[var(--text-secondary)]">Save workflow</p>
+                <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                  Draft → Pending Review → Published.{' '}
+                  {article.status === 'pending_review'
+                    ? 'Ready to publish.'
+                    : 'Send to review before publishing.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void saveWorkflow('draft')}
+                disabled={working !== null}
+                className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:opacity-50"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                {working === 'draft' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                Save Draft
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveWorkflow('review')}
+                disabled={working !== null}
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-400 disabled:opacity-50"
+              >
+                {working === 'review' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                Send to Review
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveWorkflow('publish')}
+                disabled={working !== null || article.status !== 'pending_review'}
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {working === 'publish' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="h-4 w-4" />
+                )}
+                Publish
+              </button>
+            </div>
+          </div>
+        )}
+      </StepCard>
+
+      {/* ── Saved Articles ── */}
+      <section
+        className="rounded-2xl border"
+        style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+      >
         <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
           <div>
             <h2 className="text-sm font-semibold text-[var(--text-primary)]">Saved articles</h2>
-            <p className="mt-0.5 text-xs text-[var(--text-muted)]">Open an article to edit its full SEO, schema, FAQ, and How-To fields.</p>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+              Open an article to edit its full SEO, schema, FAQ, and How-To fields.
+            </p>
           </div>
           <button
             type="button"
             onClick={() => void loadArticles()}
+            title="Refresh"
             className="rounded-lg p-2 text-[var(--text-muted)] transition hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
-            title="Refresh saved articles"
           >
             <RefreshCw className={`h-4 w-4 ${loadingArticles ? 'animate-spin' : ''}`} />
           </button>
         </div>
+
         <div className="space-y-2 p-5">
           {loadingArticles ? (
             <div className="flex items-center gap-2 py-6 text-sm text-[var(--text-muted)]">
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading saved articles…
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading saved articles…
             </div>
           ) : articles.length === 0 ? (
-            <div className="rounded-xl border border-dashed p-6 text-center text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
-              No saved articles yet.
+            <div
+              className="rounded-xl border border-dashed p-6 text-center text-sm text-[var(--text-muted)]"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              No saved articles yet. Generate your first one above.
             </div>
           ) : (
-            articles.map((savedArticle) => (
+            articles.map((a) => (
               <div
-                key={savedArticle.id}
-                className="flex flex-col gap-3 rounded-xl border p-4 transition hover:border-blue-500/50 sm:flex-row sm:items-center sm:justify-between"
+                key={a.id}
+                className="flex flex-col gap-3 rounded-xl border p-4 transition hover:border-blue-500/40 sm:flex-row sm:items-center sm:justify-between"
                 style={{ borderColor: 'var(--border)' }}
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{savedArticle.title}</p>
-                  <p className="mt-1 truncate font-mono text-xs text-[var(--text-muted)]">/blog/{savedArticle.slug}</p>
+                  <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{a.title}</p>
+                  <p className="mt-0.5 truncate font-mono text-xs text-[var(--text-muted)]">/blog/{a.slug}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(savedArticle.status)}`}>
-                    {statusLabel(savedArticle.status)}
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusBadge(a.status)}`}>
+                    {statusLabel(a.status)}
                   </span>
                   <Link
-                    href={`/admin/articles/${savedArticle.id}`}
+                    href={`/admin/articles/${a.id}`}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-500 hover:text-blue-400"
                   >
-                    <Pencil className="h-3.5 w-3.5" /> Edit
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit
                   </Link>
                 </div>
               </div>
