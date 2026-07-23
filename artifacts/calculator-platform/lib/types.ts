@@ -177,6 +177,14 @@ export interface SystemSettings {
 
 // ─── Articles Manager 2.0 ─────────────────────────────────────────────────────
 
+export interface TopicSuggestion {
+  topic: string;
+  searchVolumeLabel: string | null;
+  competition: 'Low' | 'Medium' | 'High' | null;
+  trend: 'Rising' | 'Stable' | 'Declining' | null;
+  opportunityScore: number | null;
+}
+
 export interface ResearchTitleCard {
   title: string;
   searchVolumeLabel: string | null;

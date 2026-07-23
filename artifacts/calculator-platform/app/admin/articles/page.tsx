@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   AlertCircle,
@@ -36,6 +36,7 @@ import type {
   ArticleResearchSummary,
   ResearchKeywordChip,
   ResearchTitleCard,
+  TopicSuggestion,
 } from '@/lib/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -285,6 +286,81 @@ function KeywordChipItem({ chip, selected, onClick }: {
   );
 }
 
+// ─── Topic Suggestion Card ────────────────────────────────────────────────────
+
+function TopicSuggestionCard({ suggestion, selected, onClick }: {
+  suggestion: TopicSuggestion; selected: boolean; onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group w-full rounded-2xl border text-left transition ${
+        selected
+          ? 'border-blue-500 bg-blue-500/5 shadow-sm shadow-blue-500/10'
+          : 'hover:border-blue-400/60 hover:bg-blue-500/3'
+      }`}
+      style={{ borderColor: selected ? undefined : 'var(--border)' }}
+    >
+      <div className="flex items-center justify-between gap-3 p-4">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{suggestion.topic}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+            {suggestion.searchVolumeLabel && (
+              <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
+                <Search className="h-3 w-3" />
+                {suggestion.searchVolumeLabel}
+              </span>
+            )}
+            {suggestion.competition && (
+              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                suggestion.competition === 'Low'
+                  ? 'bg-emerald-500/10 text-emerald-600'
+                  : suggestion.competition === 'Medium'
+                  ? 'bg-amber-500/10 text-amber-600'
+                  : 'bg-red-500/10 text-red-600'
+              }`}>
+                {suggestion.competition}
+              </span>
+            )}
+            {suggestion.trend && (
+              <span className="inline-flex items-center gap-0.5 text-xs text-[var(--text-muted)]">
+                {suggestion.trend === 'Rising'
+                  ? <span className="font-bold text-emerald-500">↑</span>
+                  : suggestion.trend === 'Declining'
+                  ? <span className="font-bold text-red-500">↓</span>
+                  : <span className="text-[var(--text-muted)]">→</span>}
+                <span className="ml-0.5">{suggestion.trend}</span>
+              </span>
+            )}
+            {suggestion.opportunityScore !== null && (
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                suggestion.opportunityScore >= 70
+                  ? 'bg-emerald-500/10 text-emerald-600'
+                  : suggestion.opportunityScore >= 45
+                  ? 'bg-amber-500/10 text-amber-600'
+                  : 'bg-red-500/10 text-red-600'
+              }`}>
+                <Zap className="h-2.5 w-2.5" />
+                {suggestion.opportunityScore}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="shrink-0">
+          {selected ? (
+            <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+              <Check className="h-3 w-3" /> Selected
+            </span>
+          ) : (
+            <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />
+          )}
+        </div>
+      </div>
+    </button>
+  );
+}
+
 // ─── Research Summary ─────────────────────────────────────────────────────────
 
 function ResearchSummary({ research }: { research: ArticleResearchSummary }) {
@@ -500,6 +576,11 @@ function OutlineEditor({
 export default function ArticlesPage() {
   // ── Composer state ─────────────────────────────────────────────────────────
   const [topic, setTopic] = useState('');
+  const [topicSuggestions, setTopicSuggestions] = useState<TopicSuggestion[]>([]);
+  const [selectedTopicIdx, setSelectedTopicIdx] = useState<number | null>(null);
+  const [loadingTopics, setLoadingTopics] = useState(false);
+  const topicAbortRef = useRef<AbortController | null>(null);
+
   const [research, setResearch] = useState<ArticleResearchSummary | null>(null);
   const [intentAnalysis, setIntentAnalysis] = useState('');
 
@@ -553,10 +634,43 @@ export default function ArticlesPage() {
 
   useEffect(() => { void loadArticles(); }, [loadArticles]);
 
+  // ── Debounced topic suggestions ────────────────────────────────────────────
+  useEffect(() => {
+    const trimmed = topic.trim();
+    if (trimmed.length < 3 || phase !== 'idle') {
+      setTopicSuggestions([]);
+      setSelectedTopicIdx(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      topicAbortRef.current?.abort();
+      const controller = new AbortController();
+      topicAbortRef.current = controller;
+      setLoadingTopics(true);
+      try {
+        const res = await fetch('/api/admin/articles/topics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: trimmed }),
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        setTopicSuggestions(Array.isArray(data.suggestions) ? data.suggestions : []);
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return;
+      } finally {
+        setLoadingTopics(false);
+      }
+    }, 650);
+    return () => clearTimeout(timer);
+  }, [topic, phase]);
+
   // ── Actions ────────────────────────────────────────────────────────────────
 
-  const runResearch = async () => {
-    if (!topic.trim()) { setNotice({ kind: 'info', text: 'Enter a topic first.' }); return; }
+  const runResearch = async (topicOverride?: string) => {
+    const researchTopic = (topicOverride ?? topic).trim();
+    if (!researchTopic) { setNotice({ kind: 'info', text: 'Enter a topic first.' }); return; }
     setWorking('research');
     setNotice(null);
     setPhase('researching');
@@ -572,7 +686,7 @@ export default function ArticlesPage() {
       const res = await fetch('/api/admin/articles/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: topic.trim() }),
+        body: JSON.stringify({ topic: researchTopic }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Research failed.');
@@ -773,8 +887,20 @@ export default function ArticlesPage() {
     }
   };
 
+  const selectTopicSuggestion = (idx: number, suggestion: TopicSuggestion) => {
+    topicAbortRef.current?.abort();
+    setTopic(suggestion.topic);
+    setSelectedTopicIdx(idx);
+    setLoadingTopics(false);
+    void runResearch(suggestion.topic);
+  };
+
   const reset = () => {
+    topicAbortRef.current?.abort();
     setTopic('');
+    setTopicSuggestions([]);
+    setSelectedTopicIdx(null);
+    setLoadingTopics(false);
     setResearch(null);
     setIntentAnalysis('');
     setSelectedTitle('');
@@ -839,15 +965,24 @@ export default function ArticlesPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1">
               <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Research Topic</label>
-              <input
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !working) void runResearch(); }}
-                placeholder="e.g. mortgage calculator, BMI calculator for adults"
-                className={inputCls}
-                style={inputStyle}
-                disabled={phase === 'researching'}
-              />
+              <div className="relative">
+                <input
+                  value={topic}
+                  onChange={(e) => {
+                    setTopic(e.target.value);
+                    setSelectedTopicIdx(null);
+                    if (phase !== 'idle') reset();
+                  }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !working) void runResearch(); }}
+                  placeholder="Start typing a topic — suggestions appear automatically…"
+                  className={inputCls}
+                  style={inputStyle}
+                  disabled={phase === 'researching'}
+                />
+                {loadingTopics && (
+                  <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-blue-400" />
+                )}
+              </div>
             </div>
             <PrimaryButton
               onClick={() => void runResearch()}
@@ -855,9 +990,28 @@ export default function ArticlesPage() {
               loading={working === 'research'}
             >
               {working !== 'research' && <Search className="h-4 w-4" />}
-              {working === 'research' ? 'Researching…' : 'Run Live Research'}
+              {working === 'research' ? 'Researching…' : 'Run Research'}
             </PrimaryButton>
           </div>
+
+          {/* Topic suggestion cards */}
+          {phase === 'idle' && topicSuggestions.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                5 Topic Opportunities — click one to start the full workflow automatically
+              </p>
+              <div className="space-y-2">
+                {topicSuggestions.map((suggestion, i) => (
+                  <TopicSuggestionCard
+                    key={i}
+                    suggestion={suggestion}
+                    selected={selectedTopicIdx === i}
+                    onClick={() => { if (working === null) selectTopicSuggestion(i, suggestion); }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Research loading stages */}
           {phase === 'researching' && (
