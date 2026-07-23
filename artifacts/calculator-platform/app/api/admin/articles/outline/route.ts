@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
 import { getAiProviderKey, getAiSettings, getProviderModels } from '@/lib/ai';
-import type { ArticleOutlineSection, ArticleResearchSummary } from '@/lib/types';
+import type { ArticleAutoSeoData, ArticleOutlineSection, ArticleResearchSummary } from '@/lib/types';
 
 async function callOpenRouter(
   apiKey: string,
@@ -62,8 +62,10 @@ export async function POST(req: Request) {
     const paaQuestions = research?.paaQuestions ?? [];
     const relatedSearches = research?.relatedSearches ?? [];
     const hasFeaturedSnippet = research?.hasFeaturedSnippet ?? false;
+    const trendDirection = research?.trendDirection ?? null;
+    const serpDataAvailable = research?.serpDataAvailable ?? false;
 
-    const systemPrompt = `You are a Senior Content Strategist. Generate a detailed, structured article outline.
+    const systemPrompt = `You are a Senior SEO Content Strategist. Generate complete SEO data AND a detailed article outline simultaneously.
 CRITICAL: Output ONLY valid JSON. No markdown, no explanation, no code fences.`;
 
     const userPrompt = `ARTICLE TITLE: "${title}"
@@ -76,18 +78,45 @@ ${paaQuestions.slice(0, 8).map((q, i) => `${i + 1}. ${q}`).join('\n') || 'None c
 Related Searches (topics to cover):
 ${relatedSearches.slice(0, 6).map((s, i) => `${i + 1}. ${s}`).join('\n') || 'None captured'}
 
+Trend direction: ${trendDirection ?? 'Unknown'}
 Featured snippet opportunity: ${hasFeaturedSnippet ? 'Yes — structure content to capture it' : 'No current snippet'}
+SerpAPI live data: ${serpDataAvailable ? 'Available' : 'Not available'}
 
-OUTLINE REQUIREMENTS:
-- Must include: introduction context, H2 main sections, H3 subsections, FAQ section (use PAA questions), How-To section, at least one Comparison or Examples section, Pros & Cons, Related Calculators, Conclusion with CTA
+TASK: Generate both SEO data and content outline for this article.
+
+SEO DATA requirements:
+- focusKeyword: the primary keyword to rank for (use the focus keyword above)
+- secondaryKeywords: 5-8 closely related keywords that support the primary
+- longTailKeywords: 5-8 specific longer phrases (4+ words) people search for
+- semanticKeywords: 5-8 LSI/topical keywords in the same semantic field
+- entityKeywords: 4-6 named entities (people, places, organizations, concepts) relevant to this topic
+- userIntent: what the user ultimately wants to achieve (1 sentence)
+- searchIntent: "informational" | "transactional" | "navigational" | "commercial"
+- targetAudience: who specifically is searching for this (1-2 sentences)
+- contentAngle: the unique editorial angle / perspective for this article (1-2 sentences)
+
+OUTLINE requirements:
+- Must include: H2 main sections, H3 subsections, FAQ (use PAA questions), How-To, at least one Comparison or Examples section, Pros & Cons, Related section, Conclusion with CTA
 - Each section must directly serve the user's intent
 - FAQ must use the real PAA questions above (adapted, not copied verbatim)
 - Internal Links section should suggest calculator cross-links
+- 10-16 sections total
 
 Available section types: "h2", "h3", "faq", "howto", "examples", "comparison", "proscons", "internal-links", "related"
 
-Return this EXACT JSON:
+Return this EXACT JSON (no extra fields, no extra nesting):
 {
+  "seoData": {
+    "focusKeyword": "string",
+    "secondaryKeywords": ["string"],
+    "longTailKeywords": ["string"],
+    "semanticKeywords": ["string"],
+    "entityKeywords": ["string"],
+    "userIntent": "string",
+    "searchIntent": "informational",
+    "targetAudience": "string",
+    "contentAngle": "string"
+  },
   "outline": [
     {
       "id": "sec-1",
@@ -96,9 +125,7 @@ Return this EXACT JSON:
       "subpoints": ["Subpoint 1", "Subpoint 2"]
     }
   ]
-}
-
-Generate 10-16 sections total. Make the outline genuinely useful — the kind a professional would actually write from.`;
+}`;
 
     const models = getProviderModels(aiSettings, 'openrouter', [
       'google/gemma-4-31b-it:free',
@@ -122,9 +149,9 @@ Generate 10-16 sections total. Make the outline genuinely useful — the kind a 
     }
     if (!rawText.trim()) throw new Error(`All AI models failed. Last error: ${lastErr}`);
 
-    let parsed: { outline?: ArticleOutlineSection[] };
+    let parsed: { seoData?: ArticleAutoSeoData; outline?: ArticleOutlineSection[] };
     try {
-      parsed = parseJson<{ outline?: ArticleOutlineSection[] }>(rawText);
+      parsed = parseJson<{ seoData?: ArticleAutoSeoData; outline?: ArticleOutlineSection[] }>(rawText);
     } catch {
       throw new Error('AI returned invalid JSON. Please try again.');
     }
@@ -142,7 +169,21 @@ Generate 10-16 sections total. Make the outline genuinely useful — the kind a 
 
     if (outline.length === 0) throw new Error('AI returned empty outline. Please try again.');
 
-    return NextResponse.json({ outline });
+    // Normalize seoData fields
+    const raw = parsed.seoData ?? {} as Partial<ArticleAutoSeoData>;
+    const seoData: ArticleAutoSeoData = {
+      focusKeyword: String(raw.focusKeyword ?? keyword).trim(),
+      secondaryKeywords: Array.isArray(raw.secondaryKeywords) ? raw.secondaryKeywords.filter(Boolean).slice(0, 8) : [],
+      longTailKeywords: Array.isArray(raw.longTailKeywords) ? raw.longTailKeywords.filter(Boolean).slice(0, 8) : [],
+      semanticKeywords: Array.isArray(raw.semanticKeywords) ? raw.semanticKeywords.filter(Boolean).slice(0, 8) : [],
+      entityKeywords: Array.isArray(raw.entityKeywords) ? raw.entityKeywords.filter(Boolean).slice(0, 6) : [],
+      userIntent: String(raw.userIntent ?? '').trim(),
+      searchIntent: String(raw.searchIntent ?? 'informational').trim(),
+      targetAudience: String(raw.targetAudience ?? '').trim(),
+      contentAngle: String(raw.contentAngle ?? '').trim(),
+    };
+
+    return NextResponse.json({ outline, seoData });
   } catch (err) {
     console.error('[articles/outline]', err);
     return NextResponse.json(

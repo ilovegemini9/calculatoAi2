@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { verifySession } from '@/lib/session';
 import { getAiProviderKey, getAiSettings, getProviderModels, getSerpApiKey } from '@/lib/ai';
-import type { ArticleResearchSummary, ResearchTitleCard } from '@/lib/types';
+import type { ArticleResearchSummary, ResearchKeywordChip } from '@/lib/types';
 
 // ─── SerpAPI helpers ──────────────────────────────────────────────────────────
 
@@ -173,9 +173,7 @@ export async function POST(req: Request) {
     const paaQuestions: string[] = (() => {
       const serpPaa = ((googleData?.related_questions as SerpPAA[]) ?? [])
         .map((q) => q.question ?? '').filter(Boolean).slice(0, 8);
-      const freePaa = autocomplete.status === 'fulfilled'
-        ? (questionAC.status === 'fulfilled' ? questionAC.value : [])
-        : [];
+      const freePaa = questionAC.status === 'fulfilled' ? questionAC.value : [];
       return [...new Set([...serpPaa, ...freePaa])].slice(0, 10);
     })();
 
@@ -202,7 +200,21 @@ export async function POST(req: Request) {
 
     const ac = autocomplete.status === 'fulfilled' ? autocomplete.value : [];
 
-    // ── Phase 2: AI analysis → 5 title cards ─────────────────────────────────
+    // ── Phase 2: AI analysis → 5 keyword opportunity chips ───────────────────
+
+    const trendVolumeLabel = interestToVolumeLabel(trendInterest);
+    const trendCompetition = (() => {
+      if (!serpDataAvailable || organicResults.length === 0) return null;
+      const strongDomains = organicResults.filter((r) => {
+        try {
+          return /\.(gov|edu|org)$/.test(new URL(r.link).hostname) ||
+            /wikipedia|nytimes|forbes|cnbc|investopedia/.test(r.link);
+        } catch { return false; }
+      }).length;
+      if (strongDomains >= 4) return 'High';
+      if (strongDomains >= 2) return 'Medium';
+      return 'Low';
+    })();
 
     const serpSummary = serpDataAvailable
       ? `
@@ -235,19 +247,7 @@ ${paaQuestions.slice(0, 6).map((q, i) => `${i + 1}. ${q}`).join('\n') || 'None'}
 RELATED TERMS (DuckDuckGo):
 ${relatedSearches.slice(0, 6).map((s, i) => `${i + 1}. ${s}`).join('\n') || 'None'}`;
 
-    const trendVolumeLabel = interestToVolumeLabel(trendInterest);
-    const trendCompetition = (() => {
-      if (!serpDataAvailable || organicResults.length === 0) return null;
-      const strongDomains = organicResults.filter((r) =>
-        /\.(gov|edu|org)$/.test(new URL(r.link).hostname) ||
-        /wikipedia|nytimes|forbes|cnbc|investopedia/.test(r.link)
-      ).length;
-      if (strongDomains >= 4) return 'High';
-      if (strongDomains >= 2) return 'Medium';
-      return 'Low';
-    })();
-
-    const systemPrompt = `You are a Senior SEO Strategist. Analyze real search signals and generate the 5 strongest article title opportunities.
+    const systemPrompt = `You are a Senior SEO Strategist. Analyze real search signals and identify the 5 strongest keyword opportunities for article creation.
 
 CRITICAL: Output ONLY valid JSON. No markdown, no explanation, no code fences.`;
 
@@ -261,20 +261,21 @@ CONTEXT:
 - Competition estimate: ${trendCompetition ?? 'Unknown (no SerpAPI data)'}
 - Typical search volume range: ${trendVolumeLabel ?? 'Unavailable'}
 
-TASK: Generate exactly 5 distinct, high-opportunity SEO article titles for this topic.
+TASK: Generate exactly 5 distinct, high-opportunity SEO keywords for this topic.
 
 Rules:
-- Titles must be AI-created based on research analysis — never copy raw Google/Reddit titles verbatim
-- Each title must address a different angle or intent (informational, how-to, comparison, beginner, expert)
+- Each keyword must be a real phrase people search for (use autocomplete data above)
+- Address different angles: head term, long-tail, question-based, comparison, how-to
+- Rank by: highest search volume × lowest competition × rising trend
 - Never invent numeric search volume figures — derive from real data only
-- Opportunity score 0-100 must reflect real signals: PAA density, featured snippet gap, competition, trend
+- Opportunity score 0-100 must reflect real signals: PAA density, competition, trend
 
 Return this EXACT JSON:
 {
   "intentAnalysis": "2-3 sentences on dominant user intent and pain points from the research",
-  "titleCards": [
+  "keywordChips": [
     {
-      "title": "Full article title here",
+      "keyword": "exact keyword phrase",
       "searchVolumeLabel": ${trendVolumeLabel ? `"${trendVolumeLabel}"` : 'null'},
       "competition": ${trendCompetition ? `"${trendCompetition}"` : 'null'},
       "trend": ${trendDirection ? `"${trendDirection === 'rising' ? 'Rising' : trendDirection === 'declining' ? 'Declining' : 'Stable'}"` : 'null'},
@@ -305,24 +306,24 @@ Return this EXACT JSON:
     }
     if (!rawText.trim()) throw new Error(`All AI models failed. Last error: ${lastErr}`);
 
-    let parsed: { intentAnalysis?: string; titleCards?: ResearchTitleCard[] };
+    let parsed: { intentAnalysis?: string; keywordChips?: ResearchKeywordChip[] };
     try {
-      parsed = parseJson<{ intentAnalysis?: string; titleCards?: ResearchTitleCard[] }>(rawText);
+      parsed = parseJson<{ intentAnalysis?: string; keywordChips?: ResearchKeywordChip[] }>(rawText);
     } catch {
       throw new Error('AI returned invalid JSON. Please try again.');
     }
 
-    const titleCards = (parsed.titleCards ?? []).slice(0, 5).map((c) => ({
-      title: String(c.title ?? '').trim(),
+    const keywordChips = (parsed.keywordChips ?? []).slice(0, 5).map((c) => ({
+      keyword: String(c.keyword ?? '').trim(),
       searchVolumeLabel: serpDataAvailable ? (c.searchVolumeLabel ?? null) : null,
       competition: serpDataAvailable ? (c.competition ?? null) : null,
       trend: serpDataAvailable ? (c.trend ?? null) : null,
       opportunityScore: typeof c.opportunityScore === 'number'
         ? Math.max(0, Math.min(100, Math.round(c.opportunityScore)))
         : null,
-    })).filter((c) => c.title);
+    })).filter((c) => c.keyword);
 
-    if (titleCards.length === 0) throw new Error('AI returned no title cards. Please try again.');
+    if (keywordChips.length === 0) throw new Error('AI returned no keyword suggestions. Please try again.');
 
     const summary: ArticleResearchSummary = {
       topic,
@@ -339,7 +340,7 @@ Return this EXACT JSON:
       organicResults,
       featuredSnippet,
       trendingQueries,
-      titleCards,
+      keywordChips,
     };
 
     return NextResponse.json({ summary, intentAnalysis: parsed.intentAnalysis ?? '' });

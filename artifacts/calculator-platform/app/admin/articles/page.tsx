@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   AlertCircle,
@@ -8,13 +8,17 @@ import {
   ArrowRight,
   ArrowUp,
   BarChart2,
+  BookOpen,
+  Brain,
   Check,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
+  Clock,
   FileText,
   Globe,
   Info,
+  Layers,
   Loader2,
   Lock,
   Plus,
@@ -22,9 +26,12 @@ import {
   Search,
   Send,
   Sparkles,
+  Tag,
+  Target,
   Trash2,
   TrendingDown,
   TrendingUp,
+  Users,
   Wand2,
   X,
   XCircle,
@@ -32,6 +39,7 @@ import {
 } from 'lucide-react';
 import type {
   Article,
+  ArticleAutoSeoData,
   ArticleOutlineSection,
   ArticleResearchSummary,
   ResearchKeywordChip,
@@ -44,16 +52,16 @@ import type {
 type Phase =
   | 'idle'
   | 'researching'
-  | 'titles'
-  | 'loading-keywords'
   | 'selecting-keyword'
-  | 'loading-outline'
+  | 'loading-titles'
+  | 'selecting-title'
+  | 'loading-content'
   | 'editing-outline'
   | 'generating'
   | 'done';
 
 type WorkflowAction = 'draft' | 'review' | 'publish';
-type Working = 'research' | 'keywords' | 'slug' | 'outline' | 'generate' | WorkflowAction | null;
+type Working = 'research' | 'titles' | 'content' | 'slug' | 'generate' | WorkflowAction | null;
 type NoticeKind = 'success' | 'error' | 'info';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -107,8 +115,8 @@ const inputStyle = { borderColor: 'var(--border)', backgroundColor: 'var(--bg-in
 function Notice({ kind, children }: { kind: NoticeKind; children: React.ReactNode }) {
   const map: Record<NoticeKind, { cls: string; Icon: React.ElementType }> = {
     success: { cls: 'border-emerald-500/25 bg-emerald-500/8 text-emerald-600 dark:text-emerald-400', Icon: CheckCircle2 },
-    error:   { cls: 'border-red-500/25 bg-red-500/8 text-red-600 dark:text-red-400', Icon: XCircle },
-    info:    { cls: 'border-blue-500/25 bg-blue-500/8 text-blue-600 dark:text-blue-400', Icon: Info },
+    error: { cls: 'border-red-500/25 bg-red-500/8 text-red-600 dark:text-red-400', Icon: XCircle },
+    info: { cls: 'border-blue-500/25 bg-blue-500/8 text-blue-600 dark:text-blue-400', Icon: Info },
   };
   const { cls, Icon } = map[kind];
   return (
@@ -119,16 +127,16 @@ function Notice({ kind, children }: { kind: NoticeKind; children: React.ReactNod
   );
 }
 
-function StepCard({ number, title, description, locked, children }: {
-  number: string; title: string; description: string; locked?: boolean; children: React.ReactNode;
+function StepCard({ number, title, description, locked, active, children }: {
+  number: string; title: string; description: string; locked?: boolean; active?: boolean; children: React.ReactNode;
 }) {
   return (
     <section
-      className={`rounded-2xl border transition-opacity ${locked ? 'opacity-50 pointer-events-none select-none' : ''}`}
-      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+      className={`rounded-2xl border transition-all duration-200 ${locked ? 'opacity-40 pointer-events-none select-none' : ''} ${active ? 'ring-2 ring-blue-500/30' : ''}`}
+      style={{ borderColor: active ? 'var(--blue-500, #3b82f6)' : 'var(--border)', backgroundColor: 'var(--bg-card)' }}
     >
       <div className="flex items-start gap-3 border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-xs font-bold text-blue-500">{number}</span>
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${active ? 'bg-blue-500 text-white' : 'bg-blue-500/10 text-blue-500'}`}>{number}</span>
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-semibold text-[var(--text-primary)]">{title}</h2>
           <p className="mt-0.5 text-xs text-[var(--text-muted)]">{description}</p>
@@ -167,19 +175,15 @@ function GhostButton({ onClick, disabled, loading, children }: {
 
 // ─── Metric display ───────────────────────────────────────────────────────────
 
-function MetricBadge({ label, value, icon: Icon }: { label: string; value: string | null; icon?: React.ElementType }) {
-  if (!value) return null;
-  return (
-    <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
-      {Icon && <Icon className="h-3 w-3" />}
-      <span className="font-medium text-[var(--text-secondary)]">{label}:</span>
-      {value}
-    </span>
-  );
+function TrendIcon({ trend }: { trend: string | null }) {
+  if (!trend) return null;
+  if (trend === 'Rising') return <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />;
+  if (trend === 'Declining') return <TrendingDown className="h-3.5 w-3.5 text-red-500" />;
+  return <BarChart2 className="h-3.5 w-3.5 text-[var(--text-muted)]" />;
 }
 
-function ScoreBadge({ score }: { score: number | null }) {
-  if (score === null) return null;
+function ScoreBadge({ score }: { score: number | null | undefined }) {
+  if (score === null || score === undefined) return null;
   const color = score >= 70 ? 'bg-emerald-500/10 text-emerald-600' : score >= 45 ? 'bg-amber-500/10 text-amber-600' : 'bg-red-500/10 text-red-600';
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold ${color}`}>
@@ -188,11 +192,61 @@ function ScoreBadge({ score }: { score: number | null }) {
   );
 }
 
-function TrendIcon({ trend }: { trend: string | null }) {
-  if (!trend) return null;
-  if (trend === 'Rising') return <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />;
-  if (trend === 'Declining') return <TrendingDown className="h-3.5 w-3.5 text-red-500" />;
-  return <BarChart2 className="h-3.5 w-3.5 text-[var(--text-muted)]" />;
+function CompetitionBadge({ competition }: { competition: string | null }) {
+  if (!competition) return null;
+  const color = competition === 'Low' ? 'bg-emerald-500/10 text-emerald-600' : competition === 'Medium' ? 'bg-amber-500/10 text-amber-600' : 'bg-red-500/10 text-red-600';
+  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${color}`}>{competition}</span>;
+}
+
+// ─── Keyword Chip Card ────────────────────────────────────────────────────────
+
+function KeywordChipCard({ chip, selected, onClick }: {
+  chip: ResearchKeywordChip; selected: boolean; onClick: () => void;
+}) {
+  const hasMetrics = chip.searchVolumeLabel || chip.competition || chip.trend;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group w-full rounded-2xl border text-left transition ${selected
+        ? 'border-blue-500 bg-blue-500/5 shadow-sm shadow-blue-500/10'
+        : 'hover:border-blue-400/60 hover:bg-blue-500/3'
+        }`}
+      style={{ borderColor: selected ? undefined : 'var(--border)' }}
+    >
+      <div className="p-4">
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className={`h-2 w-2 shrink-0 rounded-full ${selected ? 'bg-blue-500' : 'bg-blue-400/40'}`} />
+            <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{chip.keyword}</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <ScoreBadge score={chip.opportunityScore} />
+            {selected
+              ? <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white"><Check className="h-3 w-3" /> Selected</span>
+              : <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />}
+          </div>
+        </div>
+        {hasMetrics ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            {chip.searchVolumeLabel && (
+              <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
+                <Search className="h-3 w-3" /> {chip.searchVolumeLabel}
+              </span>
+            )}
+            <CompetitionBadge competition={chip.competition} />
+            {chip.trend && (
+              <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
+                <TrendIcon trend={chip.trend} /> {chip.trend}
+              </span>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs text-[var(--text-muted)] italic">Live search data unavailable.</p>
+        )}
+      </div>
+    </button>
+  );
 }
 
 // ─── Title Card ───────────────────────────────────────────────────────────────
@@ -205,36 +259,32 @@ function TitleCardItem({ card, selected, onClick }: {
     <button
       type="button"
       onClick={onClick}
-      className={`group w-full rounded-2xl border text-left transition ${
-        selected
-          ? 'border-blue-500 bg-blue-500/5 shadow-sm shadow-blue-500/10'
-          : 'hover:border-blue-400/60 hover:bg-blue-500/3'
-      }`}
+      className={`group w-full rounded-2xl border text-left transition ${selected
+        ? 'border-blue-500 bg-blue-500/5 shadow-sm shadow-blue-500/10'
+        : 'hover:border-blue-400/60 hover:bg-blue-500/3'
+        }`}
       style={{ borderColor: selected ? undefined : 'var(--border)' }}
     >
       <div className="p-4">
         <div className="mb-3 flex items-start justify-between gap-3">
           <p className="text-sm font-semibold leading-snug text-[var(--text-primary)]">{card.title}</p>
           <div className="flex shrink-0 items-center gap-2">
-            {selected && (
-              <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white">
-                <Check className="h-3 w-3" /> Selected
-              </span>
-            )}
-            {!selected && (
-              <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />
-            )}
+            {selected
+              ? <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white"><Check className="h-3 w-3" /> Selected</span>
+              : <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />}
           </div>
         </div>
-
         {hasMetrics ? (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-            <MetricBadge label="Vol" value={card.searchVolumeLabel} icon={Search} />
-            <MetricBadge label="Competition" value={card.competition} />
+            {card.searchVolumeLabel && (
+              <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
+                <Search className="h-3 w-3" /> {card.searchVolumeLabel}
+              </span>
+            )}
+            <CompetitionBadge competition={card.competition} />
             {card.trend && (
               <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                <TrendIcon trend={card.trend} />
-                <span>{card.trend}</span>
+                <TrendIcon trend={card.trend} /> {card.trend}
               </span>
             )}
             <ScoreBadge score={card.opportunityScore} />
@@ -247,59 +297,14 @@ function TitleCardItem({ card, selected, onClick }: {
   );
 }
 
-// ─── Keyword Chip ─────────────────────────────────────────────────────────────
-
-function KeywordChipItem({ chip, selected, onClick }: {
-  chip: ResearchKeywordChip; selected: boolean; onClick: () => void;
-}) {
-  const hasMetrics = chip.searchVolumeLabel || chip.competition || chip.trend;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group rounded-xl border p-3 text-left transition ${
-        selected
-          ? 'border-blue-500 bg-blue-500/5'
-          : 'hover:border-blue-400/60 hover:bg-blue-500/3'
-      }`}
-      style={{ borderColor: selected ? undefined : 'var(--border)' }}
-    >
-      <div className="mb-1.5 flex items-center gap-2">
-        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${selected ? 'bg-blue-500' : 'bg-blue-500/40'}`} />
-        <span className="text-sm font-semibold text-[var(--text-primary)]">{chip.keyword}</span>
-        {selected && <Check className="ml-auto h-3.5 w-3.5 text-blue-500" />}
-      </div>
-      {hasMetrics ? (
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          {chip.searchVolumeLabel && <span className="text-xs text-[var(--text-muted)]">{chip.searchVolumeLabel}</span>}
-          {chip.competition && <span className="text-xs text-[var(--text-muted)]">{chip.competition} comp.</span>}
-          {chip.trend && (
-            <span className="inline-flex items-center gap-0.5 text-xs text-[var(--text-muted)]">
-              <TrendIcon trend={chip.trend} />{chip.trend}
-            </span>
-          )}
-        </div>
-      ) : (
-        <p className="text-xs text-[var(--text-muted)] italic">Live data unavailable</p>
-      )}
-    </button>
-  );
-}
-
 // ─── Topic Suggestion Card ────────────────────────────────────────────────────
 
 function TopicSuggestionCard({ suggestion, selected, onClick }: {
   suggestion: TopicSuggestion; selected: boolean; onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group w-full rounded-2xl border text-left transition ${
-        selected
-          ? 'border-blue-500 bg-blue-500/5 shadow-sm shadow-blue-500/10'
-          : 'hover:border-blue-400/60 hover:bg-blue-500/3'
-      }`}
+    <button type="button" onClick={onClick}
+      className={`group w-full rounded-2xl border text-left transition ${selected ? 'border-blue-500 bg-blue-500/5' : 'hover:border-blue-400/60 hover:bg-blue-500/3'}`}
       style={{ borderColor: selected ? undefined : 'var(--border)' }}
     >
       <div className="flex items-center justify-between gap-3 p-4">
@@ -308,53 +313,29 @@ function TopicSuggestionCard({ suggestion, selected, onClick }: {
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
             {suggestion.searchVolumeLabel && (
               <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                <Search className="h-3 w-3" />
-                {suggestion.searchVolumeLabel}
+                <Search className="h-3 w-3" />{suggestion.searchVolumeLabel}
               </span>
             )}
-            {suggestion.competition && (
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                suggestion.competition === 'Low'
-                  ? 'bg-emerald-500/10 text-emerald-600'
-                  : suggestion.competition === 'Medium'
-                  ? 'bg-amber-500/10 text-amber-600'
-                  : 'bg-red-500/10 text-red-600'
-              }`}>
-                {suggestion.competition}
-              </span>
-            )}
+            <CompetitionBadge competition={suggestion.competition} />
             {suggestion.trend && (
               <span className="inline-flex items-center gap-0.5 text-xs text-[var(--text-muted)]">
-                {suggestion.trend === 'Rising'
-                  ? <span className="font-bold text-emerald-500">↑</span>
-                  : suggestion.trend === 'Declining'
-                  ? <span className="font-bold text-red-500">↓</span>
+                {suggestion.trend === 'Rising' ? <span className="font-bold text-emerald-500">↑</span>
+                  : suggestion.trend === 'Declining' ? <span className="font-bold text-red-500">↓</span>
                   : <span className="text-[var(--text-muted)]">→</span>}
                 <span className="ml-0.5">{suggestion.trend}</span>
               </span>
             )}
             {suggestion.opportunityScore !== null && (
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                suggestion.opportunityScore >= 70
-                  ? 'bg-emerald-500/10 text-emerald-600'
-                  : suggestion.opportunityScore >= 45
-                  ? 'bg-amber-500/10 text-amber-600'
-                  : 'bg-red-500/10 text-red-600'
-              }`}>
-                <Zap className="h-2.5 w-2.5" />
-                {suggestion.opportunityScore}
+              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${suggestion.opportunityScore >= 70 ? 'bg-emerald-500/10 text-emerald-600' : suggestion.opportunityScore >= 45 ? 'bg-amber-500/10 text-amber-600' : 'bg-red-500/10 text-red-600'}`}>
+                <Zap className="h-2.5 w-2.5" />{suggestion.opportunityScore}
               </span>
             )}
           </div>
         </div>
         <div className="shrink-0">
-          {selected ? (
-            <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white">
-              <Check className="h-3 w-3" /> Selected
-            </span>
-          ) : (
-            <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />
-          )}
+          {selected
+            ? <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white"><Check className="h-3 w-3" /> Selected</span>
+            : <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />}
         </div>
       </div>
     </button>
@@ -366,23 +347,17 @@ function TopicSuggestionCard({ suggestion, selected, onClick }: {
 function ResearchSummary({ research }: { research: ArticleResearchSummary }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="mt-4 rounded-xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}>
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between px-4 py-3 text-sm"
-      >
+    <div className="rounded-xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}>
+      <button type="button" onClick={() => setExpanded(!expanded)} className="flex w-full items-center justify-between px-4 py-3 text-sm">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
           <span className="font-semibold text-[var(--text-primary)]">Research Complete</span>
           {research.serpDataAvailable
             ? <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-600">Live SerpAPI data</span>
-            : <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-600">Free sources only</span>
-          }
+            : <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-600">Free sources only</span>}
         </div>
         {expanded ? <ChevronDown className="h-4 w-4 text-[var(--text-muted)]" /> : <ChevronRight className="h-4 w-4 text-[var(--text-muted)]" />}
       </button>
-
       {expanded && (
         <div className="border-t px-4 pb-4 pt-3" style={{ borderColor: 'var(--border)' }}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -392,12 +367,7 @@ function ResearchSummary({ research }: { research: ArticleResearchSummary }) {
               { label: 'Related Searches', value: research.relatedSearches.length },
               { label: 'Featured Snippet', value: research.hasFeaturedSnippet ? 'Yes' : 'No' },
               { label: 'Reddit Discussions', value: research.redditCount },
-              {
-                label: 'Trend',
-                value: research.trendDirection
-                  ? `${research.trendDirection.charAt(0).toUpperCase() + research.trendDirection.slice(1)} (${research.trendInterest ?? '?'}/100)`
-                  : 'Unavailable',
-              },
+              { label: 'Trend', value: research.trendDirection ? `${research.trendDirection.charAt(0).toUpperCase() + research.trendDirection.slice(1)} (${research.trendInterest ?? '?'}/100)` : 'Unavailable' },
             ].map(({ label, value }) => (
               <div key={label} className="rounded-lg border p-2.5" style={{ borderColor: 'var(--border)' }}>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">{label}</p>
@@ -405,7 +375,6 @@ function ResearchSummary({ research }: { research: ArticleResearchSummary }) {
               </div>
             ))}
           </div>
-
           {research.paaQuestions.length > 0 && (
             <div className="mt-3">
               <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">People Also Ask</p>
@@ -422,35 +391,127 @@ function ResearchSummary({ research }: { research: ArticleResearchSummary }) {
   );
 }
 
+// ─── SEO Data Panel ───────────────────────────────────────────────────────────
+
+function SeoDataPanel({ seoData }: { seoData: ArticleAutoSeoData }) {
+  const groups = [
+    {
+      icon: Target,
+      label: 'Focus Keyword',
+      color: 'text-blue-500',
+      bg: 'bg-blue-500/8',
+      content: (
+        <span className="rounded-lg bg-blue-500/10 px-3 py-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400">
+          {seoData.focusKeyword}
+        </span>
+      ),
+    },
+    {
+      icon: Tag,
+      label: 'Secondary Keywords',
+      color: 'text-violet-500',
+      bg: 'bg-violet-500/8',
+      content: (
+        <div className="flex flex-wrap gap-1.5">
+          {seoData.secondaryKeywords.map((kw) => (
+            <span key={kw} className="rounded-full bg-violet-500/10 px-2.5 py-1 text-xs font-medium text-violet-600 dark:text-violet-400">{kw}</span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: Search,
+      label: 'Long-Tail Keywords',
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-500/8',
+      content: (
+        <div className="flex flex-wrap gap-1.5">
+          {seoData.longTailKeywords.map((kw) => (
+            <span key={kw} className="rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">{kw}</span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: Layers,
+      label: 'Semantic Keywords',
+      color: 'text-cyan-500',
+      bg: 'bg-cyan-500/8',
+      content: (
+        <div className="flex flex-wrap gap-1.5">
+          {seoData.semanticKeywords.map((kw) => (
+            <span key={kw} className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-xs font-medium text-cyan-600 dark:text-cyan-400">{kw}</span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: Globe,
+      label: 'Entity Keywords',
+      color: 'text-teal-500',
+      bg: 'bg-teal-500/8',
+      content: (
+        <div className="flex flex-wrap gap-1.5">
+          {seoData.entityKeywords.map((kw) => (
+            <span key={kw} className="rounded-full bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-600 dark:text-teal-400">{kw}</span>
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Keyword groups */}
+      {groups.map(({ icon: Icon, label, color, content }) => (
+        <div key={label}>
+          <div className={`mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${color}`}>
+            <Icon className="h-3.5 w-3.5" /> {label}
+          </div>
+          {content}
+        </div>
+      ))}
+
+      {/* Intent / Audience / Angle row */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          { icon: Brain, label: 'User Intent', color: 'text-amber-500', value: seoData.userIntent, badge: null },
+          { icon: Users, label: 'Target Audience', color: 'text-orange-500', value: seoData.targetAudience, badge: null },
+          {
+            icon: Sparkles, label: 'Search Intent', color: 'text-pink-500', value: seoData.contentAngle,
+            badge: (
+              <span className="rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold capitalize text-pink-600">{seoData.searchIntent}</span>
+            ),
+          },
+        ].map(({ icon: Icon, label, color, value, badge }) => (
+          <div key={label} className="rounded-xl border p-3" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}>
+            <div className={`mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${color}`}>
+              <Icon className="h-3 w-3" /> {label}
+              {badge && <span className="ml-auto">{badge}</span>}
+            </div>
+            <p className="text-xs leading-relaxed text-[var(--text-secondary)]">{value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Outline Editor ───────────────────────────────────────────────────────────
 
-function OutlineEditor({
-  outline,
-  onChange,
-}: {
-  outline: ArticleOutlineSection[];
-  onChange: (updated: ArticleOutlineSection[]) => void;
-}) {
+function OutlineEditor({ outline, onChange }: { outline: ArticleOutlineSection[]; onChange: (updated: ArticleOutlineSection[]) => void }) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleExpanded = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+    setExpandedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
   };
-
   const updateSection = (id: string, patch: Partial<ArticleOutlineSection>) => {
     onChange(outline.map((s) => s.id === id ? { ...s, ...patch } : s));
   };
-
   const cycleType = (id: string, currentType: ArticleOutlineSection['type']) => {
     const idx = SECTION_TYPES.indexOf(currentType);
-    const next = SECTION_TYPES[(idx + 1) % SECTION_TYPES.length];
-    updateSection(id, { type: next });
+    updateSection(id, { type: SECTION_TYPES[(idx + 1) % SECTION_TYPES.length] });
   };
-
   const move = (id: string, dir: 'up' | 'down') => {
     const idx = outline.findIndex((s) => s.id === id);
     if (dir === 'up' && idx === 0) return;
@@ -460,16 +521,9 @@ function OutlineEditor({
     [next[idx], next[swap]] = [next[swap], next[idx]];
     onChange(next);
   };
-
   const remove = (id: string) => onChange(outline.filter((s) => s.id !== id));
-
   const addSection = () => {
-    const newSection: ArticleOutlineSection = {
-      id: `sec-${Date.now()}`,
-      type: 'h2',
-      heading: 'New Section',
-      subpoints: [],
-    };
+    const newSection: ArticleOutlineSection = { id: `sec-${Date.now()}`, type: 'h2', heading: 'New Section', subpoints: [] };
     onChange([...outline, newSection]);
     setExpandedIds((prev) => new Set([...prev, newSection.id]));
   };
@@ -479,75 +533,36 @@ function OutlineEditor({
       {outline.map((section, idx) => {
         const isExpanded = expandedIds.has(section.id);
         return (
-          <div
-            key={section.id}
-            className="rounded-xl border"
-            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}
-          >
+          <div key={section.id} className="rounded-xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}>
             <div className="flex items-center gap-2 px-3 py-2.5">
-              <button
-                type="button"
-                onClick={() => cycleType(section.id, section.type)}
-                title="Click to change section type"
-                className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide transition hover:opacity-75 ${SECTION_COLORS[section.type]}`}
-              >
+              <button type="button" onClick={() => cycleType(section.id, section.type)} title="Click to change section type"
+                className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide transition hover:opacity-75 ${SECTION_COLORS[section.type]}`}>
                 {SECTION_LABELS[section.type]}
               </button>
-
-              <input
-                value={section.heading}
-                onChange={(e) => updateSection(section.id, { heading: e.target.value })}
+              <input value={section.heading} onChange={(e) => updateSection(section.id, { heading: e.target.value })}
                 className="flex-1 bg-transparent text-sm font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
-                placeholder="Section heading..."
-              />
-
-              <button
-                type="button"
-                onClick={() => toggleExpanded(section.id)}
-                className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-blue-500"
-                title="Edit subpoints"
-              >
+                placeholder="Section heading..." />
+              <button type="button" onClick={() => toggleExpanded(section.id)} className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-blue-500">
                 {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
               </button>
-
-              <button
-                type="button"
-                onClick={() => move(section.id, 'up')}
-                disabled={idx === 0}
-                className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-blue-500 disabled:opacity-30"
-                title="Move up"
-              >
+              <button type="button" onClick={() => move(section.id, 'up')} disabled={idx === 0}
+                className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-blue-500 disabled:opacity-30">
                 <ArrowUp className="h-3.5 w-3.5" />
               </button>
-              <button
-                type="button"
-                onClick={() => move(section.id, 'down')}
-                disabled={idx === outline.length - 1}
-                className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-blue-500 disabled:opacity-30"
-                title="Move down"
-              >
+              <button type="button" onClick={() => move(section.id, 'down')} disabled={idx === outline.length - 1}
+                className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-blue-500 disabled:opacity-30">
                 <ArrowDown className="h-3.5 w-3.5" />
               </button>
-              <button
-                type="button"
-                onClick={() => remove(section.id)}
-                className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-red-500"
-                title="Remove section"
-              >
+              <button type="button" onClick={() => remove(section.id)} className="shrink-0 rounded p-1 text-[var(--text-muted)] hover:text-red-500">
                 <X className="h-3.5 w-3.5" />
               </button>
             </div>
-
             {isExpanded && (
               <div className="border-t px-3 pb-3 pt-2.5" style={{ borderColor: 'var(--border)' }}>
-                <label className="mb-1 block text-xs font-semibold text-[var(--text-muted)]">
-                  Subpoints (one per line)
-                </label>
+                <label className="mb-1 block text-xs font-semibold text-[var(--text-muted)]">Subpoints (one per line)</label>
                 <textarea
                   value={section.subpoints.join('\n')}
-                  onChange={(e) => updateSection(section.id, {
-                    subpoints: e.target.value.split('\n').map((s) => s.trim()).filter(Boolean),
-                  })}
+                  onChange={(e) => updateSection(section.id, { subpoints: e.target.value.split('\n').map((s) => s.trim()).filter(Boolean) })}
                   rows={Math.max(2, section.subpoints.length + 1)}
                   placeholder="- Key point to cover&#10;- Another point"
                   className={`${inputCls} resize-y font-mono text-xs`}
@@ -558,15 +573,22 @@ function OutlineEditor({
           </div>
         );
       })}
-
-      <button
-        type="button"
-        onClick={addSection}
+      <button type="button" onClick={addSection}
         className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed py-2.5 text-sm text-[var(--text-muted)] transition hover:border-blue-400 hover:text-blue-500"
-        style={{ borderColor: 'var(--border)' }}
-      >
+        style={{ borderColor: 'var(--border)' }}>
         <Plus className="h-4 w-4" /> Add Section
       </button>
+    </div>
+  );
+}
+
+// ─── Loading pulse ────────────────────────────────────────────────────────────
+
+function LoadingPulse({ message }: { message: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-sm text-blue-600 dark:text-blue-400">
+      <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+      <span>{message}</span>
     </div>
   );
 }
@@ -574,7 +596,7 @@ function OutlineEditor({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ArticlesPage() {
-  // ── Composer state ─────────────────────────────────────────────────────────
+  // ── Workflow state ──────────────────────────────────────────────────────────
   const [topic, setTopic] = useState('');
   const [topicSuggestions, setTopicSuggestions] = useState<TopicSuggestion[]>([]);
   const [selectedTopicIdx, setSelectedTopicIdx] = useState<number | null>(null);
@@ -584,40 +606,48 @@ export default function ArticlesPage() {
   const [research, setResearch] = useState<ArticleResearchSummary | null>(null);
   const [intentAnalysis, setIntentAnalysis] = useState('');
 
-  const [selectedTitle, setSelectedTitle] = useState('');
-  const [keywordChips, setKeywordChips] = useState<ResearchKeywordChip[]>([]);
+  // Keyword step
   const [selectedKeyword, setSelectedKeyword] = useState('');
   const [keywordLocked, setKeywordLocked] = useState(false);
-  const [serpDataAvailable, setSerpDataAvailable] = useState(false);
 
+  // Title step
+  const [titleCards, setTitleCards] = useState<ResearchTitleCard[]>([]);
+  const [selectedTitle, setSelectedTitle] = useState('');
+
+  // Slug
   const [slug, setSlug] = useState('');
-  const [outline, setOutline] = useState<ArticleOutlineSection[]>([]);
-  const [article, setArticle] = useState<Article | null>(null);
 
+  // SEO Data + Outline
+  const [seoData, setSeoData] = useState<ArticleAutoSeoData | null>(null);
+  const [outline, setOutline] = useState<ArticleOutlineSection[]>([]);
+
+  // Article
+  const [article, setArticle] = useState<Article | null>(null);
+  const [generationStage, setGenerationStage] = useState('');
+
+  // UI state
   const [phase, setPhase] = useState<Phase>('idle');
   const [working, setWorking] = useState<Working>(null);
-  const [generationStage, setGenerationStage] = useState('');
   const [notice, setNotice] = useState<{ kind: NoticeKind; text: string } | null>(null);
 
-  // ── Saved articles ─────────────────────────────────────────────────────────
+  // Saved articles
   const [articles, setArticles] = useState<Article[]>([]);
   const [loadingArticles, setLoadingArticles] = useState(true);
 
-  // ── Derived ────────────────────────────────────────────────────────────────
-  const hasTitle = selectedTitle.trim().length > 0;
-  const hasKeyword = selectedKeyword.trim().length > 0 && keywordLocked;
-  const hasSlug = slug.trim().length > 0;
+  // ── Derived ─────────────────────────────────────────────────────────────────
+  const hasKeyword = Boolean(selectedKeyword.trim() && keywordLocked);
+  const hasTitle = Boolean(selectedTitle.trim());
+  const hasSlug = Boolean(slug.trim());
   const hasOutline = outline.length > 0;
-  const canGenerate = hasTitle && hasKeyword && hasSlug && hasOutline && !article;
+  const hasSeoData = Boolean(seoData);
+  const canGenerate = hasKeyword && hasTitle && hasSlug && hasOutline && hasSeoData && !article;
 
-  const duplicateKeyword = useMemo(() =>
-    Boolean(selectedKeyword.trim() && articles.some((a) =>
-      (a.seoData.keywords ?? []).some((k) => k.toLowerCase() === selectedKeyword.trim().toLowerCase())
-    )),
-    [articles, selectedKeyword],
+  const duplicateKeyword = Boolean(
+    selectedKeyword.trim() &&
+    articles.some((a) => (a.seoData.keywords ?? []).some((k) => k.toLowerCase() === selectedKeyword.trim().toLowerCase()))
   );
 
-  // ── Load saved articles ────────────────────────────────────────────────────
+  // ── Load saved articles ─────────────────────────────────────────────────────
   const loadArticles = useCallback(async () => {
     setLoadingArticles(true);
     try {
@@ -634,7 +664,7 @@ export default function ArticlesPage() {
 
   useEffect(() => { void loadArticles(); }, [loadArticles]);
 
-  // ── Debounced topic suggestions ────────────────────────────────────────────
+  // ── Debounced topic suggestions ─────────────────────────────────────────────
   useEffect(() => {
     const trimmed = topic.trim();
     if (trimmed.length < 3 || phase !== 'idle') {
@@ -666,7 +696,7 @@ export default function ArticlesPage() {
     return () => clearTimeout(timer);
   }, [topic, phase]);
 
-  // ── Actions ────────────────────────────────────────────────────────────────
+  // ── Actions ─────────────────────────────────────────────────────────────────
 
   const runResearch = async (topicOverride?: string) => {
     const researchTopic = (topicOverride ?? topic).trim();
@@ -675,11 +705,13 @@ export default function ArticlesPage() {
     setNotice(null);
     setPhase('researching');
     setResearch(null);
-    setSelectedTitle('');
-    setKeywordChips([]);
+    setIntentAnalysis('');
     setSelectedKeyword('');
     setKeywordLocked(false);
+    setTitleCards([]);
+    setSelectedTitle('');
     setSlug('');
+    setSeoData(null);
     setOutline([]);
     setArticle(null);
     try {
@@ -692,7 +724,7 @@ export default function ArticlesPage() {
       if (!res.ok) throw new Error(data.error ?? 'Research failed.');
       setResearch(data.summary as ArticleResearchSummary);
       setIntentAnalysis(data.intentAnalysis ?? '');
-      setPhase('titles');
+      setPhase('selecting-keyword');
     } catch (err) {
       setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Research failed. Please try again.' });
       setPhase('idle');
@@ -701,61 +733,60 @@ export default function ArticlesPage() {
     }
   };
 
-  const selectTitle = async (card: ResearchTitleCard) => {
-    setSelectedTitle(card.title);
-    setSlug(slugify(card.title));
-    setKeywordChips([]);
-    setSelectedKeyword('');
-    setKeywordLocked(false);
+  const selectKeyword = async (chip: ResearchKeywordChip) => {
+    setSelectedKeyword(chip.keyword);
+    setKeywordLocked(true);
+    setTitleCards([]);
+    setSelectedTitle('');
+    setSlug('');
+    setSeoData(null);
     setOutline([]);
     setArticle(null);
     setNotice(null);
-    setPhase('loading-keywords');
-    setWorking('keywords');
+    setPhase('loading-titles');
+    setWorking('titles');
     try {
-      const res = await fetch('/api/admin/articles/suggest', {
+      const res = await fetch('/api/admin/articles/titles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: 'keywords', title: card.title, researchSummary: research }),
+        body: JSON.stringify({ keyword: chip.keyword, researchSummary: research }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setNotice({ kind: 'info', text: 'Live keyword data unavailable.' });
-        setPhase('titles');
-        return;
-      }
-      setKeywordChips(Array.isArray(data.keywordChips) ? data.keywordChips : []);
-      setSerpDataAvailable(Boolean(data.serpDataAvailable));
+      if (!res.ok) throw new Error(data.error ?? 'Title generation failed.');
+      setTitleCards(Array.isArray(data.titleCards) ? data.titleCards : []);
+      setPhase('selecting-title');
+    } catch (err) {
+      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Title generation failed. Please try again.' });
       setPhase('selecting-keyword');
-    } catch {
-      setNotice({ kind: 'info', text: 'Live keyword data unavailable.' });
-      setPhase('titles');
+      setKeywordLocked(false);
     } finally {
       setWorking(null);
     }
   };
 
-  const selectKeyword = async (chip: ResearchKeywordChip) => {
-    setSelectedKeyword(chip.keyword);
-    setKeywordLocked(true);
-    setNotice(null);
+  const selectTitle = async (card: ResearchTitleCard) => {
+    setSelectedTitle(card.title);
+    setSlug(slugify(card.title));
+    setSeoData(null);
     setOutline([]);
     setArticle(null);
-    setPhase('loading-outline');
-    setWorking('outline');
+    setNotice(null);
+    setPhase('loading-content');
+    setWorking('content');
     try {
       const res = await fetch('/api/admin/articles/outline', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: selectedTitle, keyword: chip.keyword, researchSummary: research }),
+        body: JSON.stringify({ title: card.title, keyword: selectedKeyword, researchSummary: research }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Outline generation failed.');
+      if (!res.ok) throw new Error(data.error ?? 'Content generation failed.');
+      setSeoData(data.seoData ?? null);
       setOutline(Array.isArray(data.outline) ? data.outline : []);
       setPhase('editing-outline');
     } catch (err) {
-      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Outline generation failed.' });
-      setPhase('selecting-keyword');
+      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'SEO data and outline generation failed.' });
+      setPhase('selecting-title');
     } finally {
       setWorking(null);
     }
@@ -802,7 +833,6 @@ export default function ArticlesPage() {
     }, 12000);
 
     try {
-      // Map outline sections to the generate endpoint format
       const outlineForGenerate = outline.map((s) => ({
         heading: s.heading,
         level: s.type === 'h3' ? 'h3' : 'h2',
@@ -814,21 +844,15 @@ export default function ArticlesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           keyword: selectedKeyword.trim(),
-          primaryKeyword: selectedKeyword.trim(),
-          secondaryKeywords: research?.relatedSearches?.slice(0, 5) ?? [],
+          primaryKeyword: seoData?.focusKeyword ?? selectedKeyword.trim(),
+          secondaryKeywords: seoData?.secondaryKeywords ?? research?.relatedSearches?.slice(0, 5) ?? [],
           selectedTitle: selectedTitle.trim(),
-          intentAnalysis,
+          intentAnalysis: seoData?.userIntent ?? intentAnalysis,
           outline: outlineForGenerate,
           metaTitle: selectedTitle.trim(),
           metaDescription: '',
           urlSlug: slug.trim(),
-          lockedKeywords: [selectedKeyword.trim()],
-          ...(research?.titleCards?.find((c) => c.title === selectedTitle) && {
-            opportunityScore: research.titleCards.find((c) => c.title === selectedTitle)?.opportunityScore,
-            searchVolume: research.titleCards.find((c) => c.title === selectedTitle)?.searchVolumeLabel,
-            competition: research.titleCards.find((c) => c.title === selectedTitle)?.competition,
-            trend: research.titleCards.find((c) => c.title === selectedTitle)?.trend,
-          }),
+          lockedKeywords: [selectedKeyword.trim(), ...(seoData?.secondaryKeywords?.slice(0, 3) ?? [])],
         }),
       });
       const data = await res.json();
@@ -855,8 +879,7 @@ export default function ArticlesPage() {
     }
     setWorking(action);
     setNotice(null);
-    const nextStatus: Article['status'] =
-      action === 'publish' ? 'published' : action === 'review' ? 'pending_review' : 'draft';
+    const nextStatus: Article['status'] = action === 'publish' ? 'published' : action === 'review' ? 'pending_review' : 'draft';
     try {
       const res = await fetch(`/api/admin/articles/${article.id}`, {
         method: 'PATCH',
@@ -869,7 +892,7 @@ export default function ArticlesPage() {
           seoData: {
             ...article.seoData,
             title: selectedTitle,
-            keywords: [selectedKeyword.trim()],
+            keywords: [selectedKeyword.trim(), ...(seoData?.secondaryKeywords?.slice(0, 4) ?? [])],
             canonicalUrl: `/blog/${slug}`,
           },
         }),
@@ -903,12 +926,12 @@ export default function ArticlesPage() {
     setLoadingTopics(false);
     setResearch(null);
     setIntentAnalysis('');
-    setSelectedTitle('');
-    setKeywordChips([]);
     setSelectedKeyword('');
     setKeywordLocked(false);
-    setSerpDataAvailable(false);
+    setTitleCards([]);
+    setSelectedTitle('');
     setSlug('');
+    setSeoData(null);
     setOutline([]);
     setArticle(null);
     setPhase('idle');
@@ -917,12 +940,12 @@ export default function ArticlesPage() {
     setNotice(null);
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // ── Phase helpers ────────────────────────────────────────────────────────────
+  const isAfterKeyword = ['loading-titles', 'selecting-title', 'loading-content', 'editing-outline', 'generating', 'done'].includes(phase);
+  const isAfterTitle = ['loading-content', 'editing-outline', 'generating', 'done'].includes(phase);
+  const isAfterContent = ['editing-outline', 'generating', 'done'].includes(phase);
 
-  const keywordsLocked = !hasTitle;
-  const slugLocked = !hasTitle;
-  const outlineLocked = !hasKeyword;
-  const generateLocked = !hasTitle || !hasKeyword || !hasSlug || !hasOutline;
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 pb-16">
@@ -931,17 +954,14 @@ export default function ArticlesPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-blue-500">Content Studio</p>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">AI Articles Manager 2.0</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Smart AI Article Workflow</h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
-            Research → AI analysis → SEO title → Keyword → Outline → Article
+            Topic → Keywords → Title → SEO Data → Outline → Article
           </p>
         </div>
-        <button
-          type="button"
-          onClick={reset}
+        <button type="button" onClick={reset}
           className="inline-flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
-          style={{ borderColor: 'var(--border)' }}
-        >
+          style={{ borderColor: 'var(--border)' }}>
           <X className="h-4 w-4" /> New article
         </button>
       </div>
@@ -949,17 +969,20 @@ export default function ArticlesPage() {
       {/* Global notice */}
       {notice && <Notice kind={notice.kind}>{notice.text}</Notice>}
 
-      {/* ── Step 1 — Live Research + Titles ── */}
-      <section className="rounded-2xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+      {/* ──────────────────────────────────────────────────────────────────────
+          STEP 1 — Research Topic
+      ────────────────────────────────────────────────────────────────────── */}
+      <section className="rounded-2xl border" style={{ borderColor: phase === 'idle' || phase === 'researching' ? 'var(--blue-500, #3b82f6)' : 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
         <div className="flex items-start gap-3 border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-xs font-bold text-blue-500">1</span>
+          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${phase === 'idle' || phase === 'researching' ? 'bg-blue-500 text-white' : 'bg-blue-500/10 text-blue-500'}`}>1</span>
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Live Research + Article Title</h2>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Research Topic</h2>
             <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-              Enter a topic. The system researches Google, PAA, trends, Reddit — then AI generates 5 title opportunities.
+              Enter a broad topic. The system researches Google, PAA, trends, Reddit — then identifies the 5 strongest keyword opportunities.
             </p>
           </div>
           {phase === 'researching' && <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-blue-500" />}
+          {research && phase !== 'idle' && phase !== 'researching' && <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-500" />}
         </div>
         <div className="p-5 space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -974,7 +997,7 @@ export default function ArticlesPage() {
                     if (phase !== 'idle') reset();
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !working) void runResearch(); }}
-                  placeholder="Start typing a topic — suggestions appear automatically…"
+                  placeholder="e.g. Mortgage, BMI, Tax, Loan, Salary, Insurance…"
                   className={inputCls}
                   style={inputStyle}
                   disabled={phase === 'researching'}
@@ -986,7 +1009,7 @@ export default function ArticlesPage() {
             </div>
             <PrimaryButton
               onClick={() => void runResearch()}
-              disabled={working !== null || !topic.trim()}
+              disabled={working !== null || !topic.trim() || phase === 'researching'}
               loading={working === 'research'}
             >
               {working !== 'research' && <Search className="h-4 w-4" />}
@@ -994,11 +1017,11 @@ export default function ArticlesPage() {
             </PrimaryButton>
           </div>
 
-          {/* Topic suggestion cards */}
+          {/* Topic suggestions */}
           {phase === 'idle' && topicSuggestions.length > 0 && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                5 Topic Opportunities — click one to start the full workflow automatically
+                5 Topic Opportunities — click one to start automatically
               </p>
               <div className="space-y-2">
                 {topicSuggestions.map((suggestion, i) => (
@@ -1013,18 +1036,13 @@ export default function ArticlesPage() {
             </div>
           )}
 
-          {/* Research loading stages */}
+          {/* Research in progress */}
           {phase === 'researching' && (
-            <div className="flex items-center gap-3 rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-sm text-blue-600 dark:text-blue-400">
-              <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-              <span>Searching Google, collecting PAA, analyzing trends, running AI analysis…</span>
-            </div>
+            <LoadingPulse message="Searching Google, collecting PAA questions, analyzing trends, running AI analysis…" />
           )}
 
           {/* Research summary */}
-          {research && phase !== 'researching' && (
-            <ResearchSummary research={research} />
-          )}
+          {research && phase !== 'researching' && <ResearchSummary research={research} />}
 
           {/* Intent analysis */}
           {intentAnalysis && phase !== 'researching' && (
@@ -1033,218 +1051,224 @@ export default function ArticlesPage() {
               <p className="text-sm text-[var(--text-secondary)]">{intentAnalysis}</p>
             </div>
           )}
-
-          {/* Title cards */}
-          {research && research.titleCards.length > 0 && phase !== 'researching' && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                  5 AI-Generated Title Opportunities
-                  {!research.serpDataAvailable && (
-                    <span className="ml-2 font-normal not-italic text-amber-600">— live metrics unavailable (add SerpAPI key in Settings)</span>
-                  )}
-                </p>
-              </div>
-              <div className="space-y-2">
-                {research.titleCards.map((card, i) => (
-                  <TitleCardItem
-                    key={i}
-                    card={card}
-                    selected={selectedTitle === card.title}
-                    onClick={() => { if (working === null) void selectTitle(card); }}
-                  />
-                ))}
-              </div>
-              {working === 'keywords' && (
-                <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-500" />
-                  Loading keyword suggestions…
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Selected title display */}
-          {selectedTitle && phase !== 'researching' && (
-            <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 px-4 py-3">
-              <p className="mb-1 text-xs font-bold uppercase tracking-wider text-emerald-600">Selected Title</p>
-              <p className="text-sm font-semibold text-[var(--text-primary)]">{selectedTitle}</p>
-            </div>
-          )}
         </div>
       </section>
 
-      {/* ── Step 2 — Focus Keyword ── */}
+      {/* ──────────────────────────────────────────────────────────────────────
+          STEP 2 — Keyword Suggestions
+      ────────────────────────────────────────────────────────────────────── */}
       <StepCard
         number="2"
-        title="Focus Keyword"
-        description="Select the keyword this article targets. Locked after selection to prevent duplicates."
-        locked={keywordsLocked}
+        title="Keyword Suggestions"
+        description="5 strongest keywords ranked by search volume, competition, trend and opportunity. Select one to generate title suggestions."
+        locked={!research || phase === 'researching'}
+        active={phase === 'selecting-keyword'}
       >
-        {keywordChips.length > 0 && !keywordLocked && (
-          <div className="mb-4 space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-              5 Keyword Suggestions — click to select
-              {!serpDataAvailable && (
-                <span className="ml-2 font-normal text-amber-600">live metrics unavailable</span>
-              )}
-            </p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {keywordChips.map((chip, i) => (
-                <KeywordChipItem
+        {/* Loading titles */}
+        {phase === 'loading-titles' && (
+          <LoadingPulse message="Keyword selected — generating 5 optimised title suggestions…" />
+        )}
+
+        {/* Keyword chips */}
+        {research && research.keywordChips.length > 0 && phase !== 'researching' && (
+          <div className="space-y-3">
+            {!research.serpDataAvailable && (
+              <p className="text-xs text-amber-600">
+                Live metrics unavailable — add a SerpAPI key in Settings for real search volume data.
+              </p>
+            )}
+            <div className="space-y-2">
+              {research.keywordChips.map((chip, i) => (
+                <KeywordChipCard
                   key={i}
                   chip={chip}
                   selected={selectedKeyword === chip.keyword}
-                  onClick={() => { if (working === null && !keywordLocked) void selectKeyword(chip); }}
+                  onClick={() => {
+                    if (working !== null) return;
+                    if (keywordLocked && selectedKeyword === chip.keyword) return;
+                    // Allow re-selection if not already loading
+                    if (isAfterKeyword) {
+                      // Reset downstream state
+                      setTitleCards([]);
+                      setSelectedTitle('');
+                      setSlug('');
+                      setSeoData(null);
+                      setOutline([]);
+                      setArticle(null);
+                    }
+                    void selectKeyword(chip);
+                  }}
                 />
               ))}
             </div>
-          </div>
-        )}
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">Focus Keyword</label>
-            <div className="relative">
-              <input
-                value={selectedKeyword}
-                readOnly={keywordLocked}
-                onChange={(e) => setSelectedKeyword(e.target.value)}
-                placeholder={hasTitle ? 'Select a suggestion above or type a keyword' : 'Select a title first'}
-                className={`${inputCls} ${keywordLocked ? 'pr-10' : ''}`}
-                style={inputStyle}
-                disabled={!hasTitle}
-              />
-              {keywordLocked && <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />}
-            </div>
-          </div>
-          {keywordLocked ? (
-            <GhostButton onClick={() => { setKeywordLocked(false); setOutline([]); setPhase('selecting-keyword'); }}>
-              Change keyword
-            </GhostButton>
-          ) : (
-            <PrimaryButton
-              onClick={() => {
-                if (selectedKeyword.trim()) void selectKeyword({ keyword: selectedKeyword.trim(), searchVolumeLabel: null, competition: null, trend: null });
-              }}
-              disabled={working !== null || !hasTitle || !selectedKeyword.trim()}
-              loading={working === 'outline'}
-            >
-              {working !== 'outline' && <Check className="h-4 w-4" />}
-              Use Keyword
-            </PrimaryButton>
-          )}
-        </div>
-
-        {duplicateKeyword && (
-          <p className="mt-3 flex items-center gap-2 text-xs text-amber-500">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            This keyword already exists in another saved article.
-          </p>
-        )}
-
-        {working === 'outline' && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-[var(--text-muted)]">
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-500" />
-            Generating article outline from research data…
+            {/* Selected keyword badge */}
+            {selectedKeyword && keywordLocked && (
+              <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5 px-4 py-2.5">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                <span className="text-xs text-[var(--text-muted)]">Selected keyword:</span>
+                <span className="text-sm font-semibold text-[var(--text-primary)]">{selectedKeyword}</span>
+                {phase === 'selecting-keyword' || phase === 'selecting-title' ? (
+                  <button
+                    type="button"
+                    onClick={() => { setKeywordLocked(false); setTitleCards([]); setSelectedTitle(''); setSlug(''); setSeoData(null); setOutline([]); setArticle(null); setPhase('selecting-keyword'); }}
+                    className="ml-auto text-xs text-[var(--text-muted)] hover:text-blue-500 transition"
+                  >
+                    Change
+                  </button>
+                ) : null}
+              </div>
+            )}
           </div>
         )}
       </StepCard>
 
-      {/* ── Step 3 — SEO Slug ── */}
+      {/* ──────────────────────────────────────────────────────────────────────
+          STEP 3 — Title Suggestions
+      ────────────────────────────────────────────────────────────────────── */}
       <StepCard
         number="3"
-        title="SEO Slug"
-        description="Auto-generated from the title. Edit directly or let AI tighten it."
-        locked={slugLocked}
+        title="Title Suggestions"
+        description="5 SEO-optimised titles based on your selected keyword. Select one to auto-fill the title and slug."
+        locked={!hasKeyword || phase === 'loading-titles' || phase === 'selecting-keyword'}
+        active={phase === 'selecting-title'}
       >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label className="mb-2 block text-xs font-semibold text-[var(--text-secondary)]">
-              Slug <span className="font-normal text-[var(--text-muted)]">→ /blog/{slug || 'your-slug'}</span>
-            </label>
-            <div className="flex items-center gap-2">
-              <span className="hidden shrink-0 text-sm text-[var(--text-muted)] sm:inline">/blog/</span>
-              <input
-                value={slug}
-                onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'))}
-                placeholder="your-article-slug"
-                className={`${inputCls} font-mono`}
-                style={inputStyle}
-                disabled={!hasTitle}
-              />
+        {/* Loading content */}
+        {phase === 'loading-content' && (
+          <LoadingPulse message="Title selected — generating SEO data and content outline…" />
+        )}
+
+        {/* Title cards */}
+        {titleCards.length > 0 && !['loading-titles', 'researching', 'selecting-keyword'].includes(phase) && (
+          <div className="space-y-3">
+            <div className="space-y-2">
+              {titleCards.map((card, i) => (
+                <TitleCardItem
+                  key={i}
+                  card={card}
+                  selected={selectedTitle === card.title}
+                  onClick={() => {
+                    if (working !== null) return;
+                    if (isAfterTitle) {
+                      setSeoData(null);
+                      setOutline([]);
+                      setArticle(null);
+                    }
+                    void selectTitle(card);
+                  }}
+                />
+              ))}
             </div>
+
+            {/* Selected title + slug */}
+            {selectedTitle && (
+              <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 px-4 py-3 space-y-2">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-[var(--text-muted)] mb-0.5">Selected title</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">{selectedTitle}</p>
+                  </div>
+                </div>
+                {/* Slug */}
+                <div className="pt-1 border-t" style={{ borderColor: 'var(--border)' }}>
+                  <label className="mb-1.5 block text-xs font-semibold text-[var(--text-muted)]">
+                    SEO Slug → /blog/{slug || 'your-slug'}
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      value={slug}
+                      onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'))}
+                      placeholder="url-slug"
+                      className={`${inputCls} font-mono flex-1`}
+                      style={inputStyle}
+                    />
+                    <GhostButton onClick={() => void improveSlug()} disabled={working !== null || !hasTitle} loading={working === 'slug'}>
+                      {working !== 'slug' && <Wand2 className="h-4 w-4" />}
+                      AI Slug
+                    </GhostButton>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <GhostButton
-            onClick={() => void improveSlug()}
-            disabled={working !== null || !hasTitle}
-            loading={working === 'slug'}
-          >
-            {working !== 'slug' && <Wand2 className="h-4 w-4" />}
-            AI Improve
-          </GhostButton>
-        </div>
+        )}
+
+        {/* Empty state */}
+        {titleCards.length === 0 && hasKeyword && !['loading-titles', 'loading-content', 'selecting-keyword'].includes(phase) && (
+          <p className="text-sm text-[var(--text-muted)] text-center py-4">Select a keyword above to generate title suggestions.</p>
+        )}
       </StepCard>
 
-      {/* ── Step 4 — Article Outline ── */}
+      {/* ──────────────────────────────────────────────────────────────────────
+          STEP 4 — SEO Data
+      ────────────────────────────────────────────────────────────────────── */}
       <StepCard
         number="4"
-        title="Article Outline"
-        description="AI-generated from research data. Edit headings, reorder sections, add or remove as needed."
-        locked={outlineLocked}
+        title="SEO Data"
+        description="Automatically generated keyword strategy: focus keyword, secondary, long-tail, semantic, entity keywords, user intent, audience and content angle."
+        locked={!isAfterTitle || phase === 'loading-content'}
+        active={isAfterContent && !seoData === false && phase === 'editing-outline'}
       >
-        {phase === 'loading-outline' && (
-          <div className="flex items-center gap-3 rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3 text-sm text-blue-600">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Generating outline from PAA questions and research signals…
-          </div>
+        {phase === 'loading-content' && (
+          <LoadingPulse message="Generating SEO data and content outline from research signals…" />
         )}
-
-        {outline.length > 0 && (
-          <OutlineEditor outline={outline} onChange={setOutline} />
-        )}
-
-        {outline.length === 0 && !outlineLocked && phase !== 'loading-outline' && (
-          <div
-            className="rounded-xl border border-dashed p-5 text-center text-sm text-[var(--text-muted)]"
-            style={{ borderColor: 'var(--border)' }}
-          >
-            Select a keyword above to auto-generate the outline from research data.
-          </div>
-        )}
+        {seoData ? (
+          <SeoDataPanel seoData={seoData} />
+        ) : isAfterTitle && phase !== 'loading-content' ? (
+          <p className="text-sm text-[var(--text-muted)] text-center py-4">Select a title above to auto-generate SEO data.</p>
+        ) : null}
       </StepCard>
 
-      {/* ── Step 5 — Generate Article ── */}
+      {/* ──────────────────────────────────────────────────────────────────────
+          STEP 5 — Content Outline
+      ────────────────────────────────────────────────────────────────────── */}
       <StepCard
         number="5"
+        title="Content Outline"
+        description="AI-generated from research data. Edit headings, reorder sections, add or remove as needed."
+        locked={!isAfterContent || phase === 'loading-content'}
+        active={phase === 'editing-outline' && outline.length > 0}
+      >
+        {phase === 'loading-content' && (
+          <LoadingPulse message="Building content outline from PAA questions and research signals…" />
+        )}
+        {outline.length > 0 ? (
+          <OutlineEditor outline={outline} onChange={setOutline} />
+        ) : isAfterTitle && phase !== 'loading-content' ? (
+          <p className="text-sm text-[var(--text-muted)] text-center py-4">Select a title above to auto-generate the outline.</p>
+        ) : null}
+      </StepCard>
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          STEP 6 — Generate Article
+      ────────────────────────────────────────────────────────────────────── */}
+      <StepCard
+        number="6"
         title="Generate Article"
-        description="Generates a complete human-first article following the outline. Edit the HTML before publishing."
-        locked={generateLocked && !article}
+        description="Generates a complete, human-first SEO article following the outline. Edit before publishing."
+        locked={!canGenerate && !article}
+        active={phase === 'generating'}
       >
         {!article ? (
           <div className="space-y-4">
-            <div
-              className="rounded-xl border border-dashed p-5 text-sm text-[var(--text-muted)]"
-              style={{ borderColor: 'var(--border)' }}
-            >
+            <div className="rounded-xl border border-dashed p-5 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
               <div className="mb-2 flex items-center gap-2 font-semibold text-[var(--text-secondary)]">
-                <FileText className="h-4 w-4 text-blue-500" />
-                What gets generated
+                <FileText className="h-4 w-4 text-blue-500" /> What gets generated
               </div>
               <p>
-                Key Takeaways · Table of Contents · H2/H3 sections · Step-by-Step Guide ·
-                Examples · FAQ · Pros & Cons · Common Mistakes · Internal Links ·
-                Related Calculators · CTA · References · Reading Time ·
-                Meta Title · Meta Description · OpenGraph · JSON-LD Schema
+                Key Takeaways · Hook · Introduction · Reading Time · Table of Contents ·
+                H2/H3 sections · Step-by-Step Guide · Examples · FAQ · Pros & Cons ·
+                Common Mistakes · Tips · Best Practices · Related Calculators · Summary ·
+                Conclusion · CTA · References · Meta Title · Meta Description ·
+                OpenGraph · Twitter Cards · JSON-LD · Article Schema · FAQ Schema
               </p>
             </div>
 
             {generationStage && <Notice kind="info">{generationStage}</Notice>}
 
             {duplicateKeyword && (
-              <Notice kind="error">
-                Duplicate keyword — choose a different focus keyword before generating.
-              </Notice>
+              <Notice kind="error">Duplicate keyword — choose a different focus keyword before generating.</Notice>
             )}
 
             <div className="flex flex-wrap items-center gap-3">
@@ -1258,9 +1282,7 @@ export default function ArticlesPage() {
                 {working === 'generate' ? 'Generating article…' : 'Generate Article'}
               </button>
               {!canGenerate && (
-                <p className="text-xs text-[var(--text-muted)]">
-                  Complete all steps above to unlock.
-                </p>
+                <p className="text-xs text-[var(--text-muted)]">Complete all steps above to unlock.</p>
               )}
             </div>
           </div>
@@ -1271,12 +1293,8 @@ export default function ArticlesPage() {
               <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusBadge(article.status)}`}>
                 {statusLabel(article.status)}
               </span>
-              {article.wordCount && (
-                <span className="text-xs text-[var(--text-muted)]">{article.wordCount.toLocaleString()} words</span>
-              )}
-              {article.readingTime && (
-                <span className="text-xs text-[var(--text-muted)]">{article.readingTime} min read</span>
-              )}
+              {article.wordCount && <span className="text-xs text-[var(--text-muted)]">{article.wordCount.toLocaleString()} words</span>}
+              {article.readingTime && <span className="text-xs text-[var(--text-muted)]">{article.readingTime} min read</span>}
               <span className="ml-auto text-xs text-[var(--text-muted)]">HTML — editable</span>
             </div>
 
@@ -1330,116 +1348,96 @@ export default function ArticlesPage() {
               </div>
             )}
 
-            {/* Publication workflow */}
-            <div
-              className="flex flex-wrap items-center gap-2 rounded-xl border p-4"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-input)' }}
-            >
-              <div className="mr-1 flex-1">
-                <p className="text-xs font-semibold text-[var(--text-secondary)]">Publication workflow</p>
-                <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                  Draft → Pending Review → Published. Never auto-published.
-                  {article.status === 'pending_review' && ' Ready to publish.'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => void saveWorkflow('draft')}
-                disabled={working !== null}
-                className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:opacity-50"
+            {/* Workflow actions */}
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href={`/admin/articles/${article.id}`}
+                className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
                 style={{ borderColor: 'var(--border)' }}
               >
-                {working === 'draft' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                Save Draft
-              </button>
-              <button
-                type="button"
-                onClick={() => void saveWorkflow('review')}
-                disabled={working !== null}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-400 disabled:opacity-50"
+                <FileText className="h-4 w-4" /> Open in Editor
+              </Link>
+              <a
+                href={`/blog/${article.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-emerald-500 hover:text-emerald-500"
+                style={{ borderColor: 'var(--border)' }}
               >
-                {working === 'review' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                Send to Review
-              </button>
-              <button
-                type="button"
-                onClick={() => void saveWorkflow('publish')}
-                disabled={working !== null || article.status !== 'pending_review'}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                {working === 'publish' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Globe className="h-4 w-4" />}
-                Publish
-              </button>
+                <Globe className="h-4 w-4" /> Preview
+              </a>
+              {article.status === 'draft' && (
+                <button
+                  type="button"
+                  onClick={() => void saveWorkflow('review')}
+                  disabled={working !== null}
+                  className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 px-4 py-2.5 text-sm font-semibold text-amber-500 transition hover:bg-amber-500/10 disabled:opacity-50"
+                >
+                  {working === 'review' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {working === 'review' ? 'Sending…' : 'Send to Review'}
+                </button>
+              )}
+              {article.status === 'pending_review' && (
+                <button
+                  type="button"
+                  onClick={() => void saveWorkflow('publish')}
+                  disabled={working !== null}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
+                >
+                  {working === 'publish' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                  {working === 'publish' ? 'Publishing…' : 'Publish'}
+                </button>
+              )}
             </div>
           </div>
         )}
       </StepCard>
 
-      {/* ── Saved Articles ── */}
-      <section className="rounded-2xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
-        <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
-          <div>
-            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Saved Articles</h2>
-            <p className="mt-0.5 text-xs text-[var(--text-muted)]">All articles · Draft → Pending Review → Published</p>
+      {/* ──────────────────────────────────────────────────────────────────────
+          Saved Articles
+      ────────────────────────────────────────────────────────────────────── */}
+      {(articles.length > 0 || loadingArticles) && (
+        <section className="rounded-2xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+          <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">
+              Saved Articles {articles.length > 0 && <span className="ml-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-xs text-blue-500">{articles.length}</span>}
+            </h2>
+            <button type="button" onClick={() => void loadArticles()} disabled={loadingArticles}
+              className="rounded-lg p-1.5 text-[var(--text-muted)] transition hover:text-blue-500 disabled:opacity-50">
+              <RefreshCw className={`h-4 w-4 ${loadingArticles ? 'animate-spin' : ''}`} />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => void loadArticles()}
-            className="rounded-lg border p-2 text-[var(--text-muted)] transition hover:border-blue-500 hover:text-blue-500"
-            style={{ borderColor: 'var(--border)' }}
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${loadingArticles ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-
-        <div className="p-5">
-          {loadingArticles ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-            </div>
-          ) : articles.length === 0 ? (
-            <div className="rounded-xl border border-dashed py-8 text-center text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
-              No articles yet. Run the research flow above to create your first article.
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {articles.map((a) => (
-                <div
-                  key={a.id}
-                  className="flex items-start justify-between gap-3 rounded-xl border p-3.5 transition hover:border-blue-400/40"
-                  style={{ borderColor: 'var(--border)' }}
-                >
+          <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
+            {loadingArticles ? (
+              <div className="flex items-center justify-center gap-2 py-8 text-sm text-[var(--text-muted)]">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+              </div>
+            ) : (
+              articles.map((art) => (
+                <div key={art.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[var(--bg-card-hover)] transition">
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusBadge(a.status)}`}>
-                        {statusLabel(a.status)}
-                      </span>
-                      <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{a.title}</p>
-                    </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span className="font-mono text-xs text-[var(--text-muted)]">/blog/{a.slug}</span>
-                      {a.wordCount && <span className="text-xs text-[var(--text-muted)]">{a.wordCount.toLocaleString()} words</span>}
-                      {a.readingTime && <span className="text-xs text-[var(--text-muted)]">{a.readingTime} min</span>}
-                      {a.seoData.keywords?.[0] && (
-                        <span className="rounded-full border px-2 py-0.5 text-[10px] text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
-                          {a.seoData.keywords[0]}
-                        </span>
-                      )}
+                    <Link href={`/admin/articles/${art.id}`} className="text-sm font-semibold text-[var(--text-primary)] hover:text-blue-500 transition line-clamp-1">
+                      {art.title}
+                    </Link>
+                    <div className="mt-0.5 flex items-center gap-3 text-xs text-[var(--text-muted)]">
+                      <span className="font-mono">/blog/{art.slug}</span>
+                      {art.wordCount && <span>{art.wordCount.toLocaleString()} words</span>}
+                      {art.readingTime && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{art.readingTime} min</span>}
                     </div>
                   </div>
-                  <Link
-                    href={`/admin/articles/${a.id}`}
-                    className="shrink-0 rounded-lg border px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    Edit
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${statusBadge(art.status)}`}>
+                    {statusLabel(art.status)}
+                  </span>
+                  <Link href={`/admin/articles/${art.id}`}
+                    className="shrink-0 rounded-lg p-1.5 text-[var(--text-muted)] transition hover:text-blue-500">
+                    <FileText className="h-4 w-4" />
                   </Link>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+              ))
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

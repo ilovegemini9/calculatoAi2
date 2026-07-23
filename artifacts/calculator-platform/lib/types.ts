@@ -198,6 +198,19 @@ export interface ResearchKeywordChip {
   searchVolumeLabel: string | null;
   competition: 'Low' | 'Medium' | 'High' | null;
   trend: 'Rising' | 'Stable' | 'Declining' | null;
+  opportunityScore?: number | null;
+}
+
+export interface ArticleAutoSeoData {
+  focusKeyword: string;
+  secondaryKeywords: string[];
+  longTailKeywords: string[];
+  semanticKeywords: string[];
+  entityKeywords: string[];
+  userIntent: string;
+  searchIntent: string;
+  targetAudience: string;
+  contentAngle: string;
 }
 
 export interface ArticleOutlineSection {
@@ -222,7 +235,7 @@ export interface ArticleResearchSummary {
   organicResults: { title: string; link: string; snippet: string }[];
   featuredSnippet: { title: string; snippet: string } | null;
   trendingQueries: string[];
-  titleCards: ResearchTitleCard[];
+  keywordChips: ResearchKeywordChip[];
 }
 
 export type AiProvider = 'openrouter' | 'openai' | 'gemini' | 'anthropic';
