@@ -2,3 +2,4 @@
 - [OpenRouter model selection](openrouter-model-selection.md) — per-task free model picks (code vs article) chosen by live testing, not spec sheets; avoid "going away" models
 - [Calculator Factory architecture](calculator-factory.md) — two-stage AI generation (spec then tests); calculators saved inactive, enable blocked until tests pass
 - [AI settings security](ai-settings-security.md) — provider keys are encrypted at rest and only masked configuration reaches admin clients
+- [Article suggestions live-data rule](article-suggestions-live-data.md) — never fabricate keyword metrics; configured AI models need fallback chains because model names can become stale

@@ -1,109 +1,40 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import {
-  Search,
-  Plus,
-  Pencil,
-  Trash2,
-  Eye,
-  RefreshCw,
-  ChevronRight,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Tag,
-  Clock,
-  BookOpen,
-  FileText,
-  CheckCircle,
   AlertCircle,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  FileText,
+  Lightbulb,
+  Loader2,
+  Lock,
+  Pencil,
+  RefreshCw,
+  Send,
+  Sparkles,
+  Wand2,
   X,
-  BarChart2,
+  XCircle,
   Zap,
 } from 'lucide-react';
 import type { Article } from '@/lib/types';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+type SuggestionKind = 'titles' | 'keywords' | 'slug';
+type WorkflowAction = 'draft' | 'review' | 'publish';
 
-interface Opportunity {
-  keyword: string;
-  type: string;
-  searchIntent: string;
-  opportunityScore: number;
-  searchVolume: string;
-  competition: string;
-  difficulty: number;
-  trend: string;
-  estimatedCtr: string;
-  titles: string[];
-  primaryKeyword: string;
-  secondaryKeywords: string[];
-  intentAnalysis: string;
-  outline: { heading: string; level: string; subpoints: string[] }[];
-  metaTitle: string;
-  metaDescription: string;
-  urlSlug: string;
-}
+const inputClass =
+  'w-full rounded-xl border px-3.5 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15';
+const inputStyle = {
+  borderColor: 'var(--border)',
+  backgroundColor: 'var(--bg-input)',
+  color: 'var(--text-primary)',
+};
 
-type View = 'list' | 'research' | 'configure' | 'generating' | 'done';
-type StatusFilter = 'all' | 'draft' | 'pending_review' | 'published';
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function scoreColor(score: number) {
-  if (score >= 70) return 'text-emerald-500';
-  if (score >= 40) return 'text-amber-500';
-  return 'text-red-500';
-}
-
-function scoreBar(score: number) {
-  const color = score >= 70 ? 'bg-emerald-500' : score >= 40 ? 'bg-amber-500' : 'bg-red-400';
-  return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 rounded-full" style={{ backgroundColor: 'var(--bg-card-hover)' }}>
-        <div className={`h-1.5 rounded-full ${color}`} style={{ width: `${score}%` }} />
-      </div>
-      <span className={`text-xs font-bold w-7 text-right ${scoreColor(score)}`}>{score}</span>
-    </div>
-  );
-}
-
-function TrendIcon({ trend }: { trend: string }) {
-  if (trend === 'rising') return <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />;
-  if (trend === 'declining') return <TrendingDown className="w-3.5 h-3.5 text-red-400" />;
-  return <Minus className="w-3.5 h-3.5 text-[var(--text-muted)]" />;
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, string> = {
-    draft: 'bg-zinc-500/15 text-zinc-400',
-    pending_review: 'bg-amber-500/15 text-amber-400',
-    published: 'bg-emerald-500/15 text-emerald-400',
-  };
-  const label: Record<string, string> = {
-    draft: 'Draft',
-    pending_review: 'Pending Review',
-    published: 'Published',
-  };
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${map[status] ?? ''}`}>
-      {label[status] ?? status}
-    </span>
-  );
-}
-
-function CompBadge({ level }: { level: string }) {
-  const map: Record<string, string> = {
-    low: 'text-emerald-400',
-    medium: 'text-amber-400',
-    high: 'text-red-400',
-  };
-  return <span className={`text-xs font-semibold capitalize ${map[level] ?? ''}`}>{level}</span>;
-}
-
-function slugify(text: string) {
-  return text
+function slugify(value: string) {
+  return value
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
@@ -111,947 +42,621 @@ function slugify(text: string) {
     .replace(/(^-|-$)/g, '');
 }
 
-function formatDate(iso: string) {
-  try {
-    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch {
-    return iso;
-  }
+function statusLabel(status: Article['status']) {
+  return status === 'pending_review' ? 'Pending Review' : status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+function statusClass(status: Article['status']) {
+  return status === 'published'
+    ? 'bg-emerald-500/10 text-emerald-500'
+    : status === 'pending_review'
+      ? 'bg-amber-500/10 text-amber-500'
+      : 'bg-slate-500/10 text-[var(--text-muted)]';
+}
+
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-semibold text-[var(--text-secondary)]">{label}</span>
+      {hint && <span className="mb-2 block text-xs text-[var(--text-muted)]">{hint}</span>}
+      {children}
+    </label>
+  );
+}
+
+function Section({
+  step,
+  title,
+  description,
+  locked = false,
+  children,
+}: {
+  step: string;
+  title: string;
+  description: string;
+  locked?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className={`rounded-2xl border ${locked ? 'opacity-60' : ''}`}
+      style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+    >
+      <div className="flex items-start gap-3 border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
+        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-xs font-bold text-blue-500">
+          {step}
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-[var(--text-primary)]">{title}</h2>
+          <p className="mt-0.5 text-xs text-[var(--text-muted)]">{description}</p>
+        </div>
+        {locked && <Lock className="ml-auto mt-1 h-4 w-4 shrink-0 text-[var(--text-muted)]" />}
+      </div>
+      <div className="p-5">{children}</div>
+    </section>
+  );
+}
+
+function Notice({
+  type,
+  children,
+}: {
+  type: 'success' | 'error' | 'info';
+  children: React.ReactNode;
+}) {
+  const styles = {
+    success: 'border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    error: 'border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-400',
+    info: 'border-blue-500/25 bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  };
+  const Icon = type === 'success' ? CheckCircle2 : type === 'error' ? XCircle : Lightbulb;
+  return (
+    <div className={`flex items-start gap-2 rounded-xl border px-4 py-3 text-sm ${styles[type]}`}>
+      <Icon className="mt-0.5 h-4 w-4 shrink-0" />
+      <span>{children}</span>
+    </div>
+  );
+}
 
 export default function ArticlesPage() {
-  // ── List state
   const [articles, setArticles] = useState<Article[]>([]);
-  const [loadingList, setLoadingList] = useState(true);
-  const [listError, setListError] = useState('');
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [deleteId, setDeleteId] = useState('');
-  const [deleting, setDeleting] = useState(false);
-
-  // ── Workflow state
-  const [view, setView] = useState<View>('list');
-
-  // ── Research state
-  const [researchQuery, setResearchQuery] = useState('');
-  const [researching, setResearching] = useState(false);
-  const [researchError, setResearchError] = useState('');
-  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-
-  // ── Configure state
-  const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
-  const [selectedTitle, setSelectedTitle] = useState('');
+  const [loadingArticles, setLoadingArticles] = useState(true);
+  const [title, setTitle] = useState('');
+  const [titleSuggestions, setTitleSuggestions] = useState<string[]>([]);
+  const [keywordSuggestions, setKeywordSuggestions] = useState<string[]>([]);
+  const [focusKeyword, setFocusKeyword] = useState('');
+  const [keywordLocked, setKeywordLocked] = useState(false);
   const [slug, setSlug] = useState('');
-  const [relatedKeywords, setRelatedKeywords] = useState<string[]>([]);
-  const [newKeyword, setNewKeyword] = useState('');
-  const [duplicateWarning, setDuplicateWarning] = useState('');
-
-  // ── Generate state
-  const [generating, setGenerating] = useState(false);
-  const [genError, setGenError] = useState('');
-  const [generatedArticle, setGeneratedArticle] = useState<Article | null>(null);
-  const [genStage, setGenStage] = useState('');
-
-  // ─── Load articles list ─────────────────────────────────────────────────────
+  const [article, setArticle] = useState<Article | null>(null);
+  const [working, setWorking] = useState<SuggestionKind | 'generate' | WorkflowAction | null>(null);
+  const [notice, setNotice] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [generationStage, setGenerationStage] = useState('');
 
   const loadArticles = useCallback(async () => {
-    setLoadingList(true);
-    setListError('');
+    setLoadingArticles(true);
     try {
-      const res = await fetch('/api/admin/blog');
-      if (!res.ok) throw new Error('Failed to load articles');
-      const data = await res.json();
+      const response = await fetch('/api/admin/blog', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Unable to load saved articles.');
+      const data = await response.json();
       setArticles(Array.isArray(data) ? data : []);
-    } catch (e: unknown) {
-      setListError(e instanceof Error ? e.message : 'Load failed');
+    } catch (error) {
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to load saved articles.' });
     } finally {
-      setLoadingList(false);
+      setLoadingArticles(false);
     }
   }, []);
 
-  useEffect(() => { loadArticles(); }, [loadArticles]);
+  useEffect(() => {
+    void loadArticles();
+  }, [loadArticles]);
 
-  // ─── Keyword research ───────────────────────────────────────────────────────
+  const duplicateKeyword = useMemo(
+    () =>
+      Boolean(
+        focusKeyword.trim() &&
+          articles.some((item) =>
+            (item.seoData.keywords ?? []).some(
+              (keyword) => keyword.toLowerCase() === focusKeyword.trim().toLowerCase(),
+            ),
+          ),
+      ),
+    [articles, focusKeyword],
+  );
 
-  const handleResearch = async () => {
-    if (!researchQuery.trim()) return;
-    setResearching(true);
-    setResearchError('');
-    setOpportunities([]);
+  const requestSuggestions = async (kind: SuggestionKind) => {
+    if (!title.trim()) {
+      setNotice({ type: 'info', text: 'Enter a topic or working title first.' });
+      return;
+    }
+    setWorking(kind);
+    setNotice(null);
+    if (kind === 'titles') setTitleSuggestions([]);
+    if (kind === 'keywords') setKeywordSuggestions([]);
     try {
-      const res = await fetch('/api/admin/articles/keywords', {
+      const response = await fetch('/api/admin/articles/suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: researchQuery.trim() }),
+        body: JSON.stringify({ kind, title: title.trim() }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Research failed');
-      setOpportunities(data.opportunities || []);
-    } catch (e: unknown) {
-      setResearchError(e instanceof Error ? e.message : 'Research failed');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Live suggestions unavailable.');
+      if (kind === 'titles') setTitleSuggestions(data.suggestions ?? []);
+      if (kind === 'keywords') setKeywordSuggestions(data.suggestions ?? []);
+    } catch (error) {
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Live suggestions unavailable.' });
     } finally {
-      setResearching(false);
+      setWorking(null);
     }
   };
 
-  // ─── Select opportunity → configure ────────────────────────────────────────
-
-  const selectOpportunity = (opp: Opportunity) => {
-    setSelectedOpp(opp);
-    const defaultTitle = opp.titles[0] || opp.keyword;
-    setSelectedTitle(defaultTitle);
-    setSlug(opp.urlSlug || slugify(defaultTitle));
-    setRelatedKeywords([...opp.secondaryKeywords]);
-    setDuplicateWarning('');
-    // Check duplicates against existing
-    const existingKws = articles.flatMap((a) => a.seoData.keywords);
-    if (existingKws.some((k) => k.toLowerCase() === opp.keyword.toLowerCase())) {
-      setDuplicateWarning(`⚠️ Keyword "${opp.keyword}" already exists in another article.`);
-    }
-    setView('configure');
+  const chooseTitle = (value: string) => {
+    setTitle(value);
+    setSlug(slugify(value));
+    setFocusKeyword('');
+    setKeywordLocked(false);
+    setKeywordSuggestions([]);
+    setArticle(null);
   };
 
-  // ─── Generate article ───────────────────────────────────────────────────────
+  const chooseKeyword = (value: string) => {
+    setFocusKeyword(value);
+    setKeywordLocked(true);
+    setNotice(null);
+  };
 
-  const handleGenerate = async () => {
-    if (!selectedOpp || !selectedTitle.trim()) return;
-    setGenerating(true);
-    setGenError('');
-    setView('generating');
-    setGenStage('Sending request to AI...');
-
-    const stages = [
-      'Analyzing keyword opportunities...',
-      'Building article outline...',
-      'Writing article content...',
-      'Generating FAQ & How-To sections...',
-      'Building comparison tables...',
-      'Injecting internal links & calculator references...',
-      'Generating schemas (Article, FAQ, HowTo)...',
-      'Building Table of Contents...',
-      'Calculating reading time...',
-      'Finalizing and saving...',
-    ];
-    let stageIdx = 0;
-    const stageInterval = setInterval(() => {
-      stageIdx = Math.min(stageIdx + 1, stages.length - 1);
-      setGenStage(stages[stageIdx]);
-    }, 8000);
-
+  const improveSlug = async () => {
+    if (!title.trim()) return;
+    setWorking('slug');
+    setNotice(null);
     try {
-      const res = await fetch('/api/admin/articles/generate', {
+      const response = await fetch('/api/admin/articles/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'slug', title: title.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to improve slug.');
+      setSlug(data.slug);
+    } catch (error) {
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to improve slug.' });
+    } finally {
+      setWorking(null);
+    }
+  };
+
+  const generateArticle = async () => {
+    if (!title.trim() || !focusKeyword.trim() || !slug.trim() || duplicateKeyword) return;
+    setWorking('generate');
+    setNotice(null);
+    setGenerationStage('Preparing the article brief…');
+    const stages = [
+      'Preparing the article brief…',
+      'Writing the introduction and key takeaways…',
+      'Building sections, examples, and comparisons…',
+      'Adding FAQ, How-To, links, and structured data…',
+      'Saving the article as a draft…',
+    ];
+    let stageIndex = 0;
+    const interval = window.setInterval(() => {
+      stageIndex = Math.min(stageIndex + 1, stages.length - 1);
+      setGenerationStage(stages[stageIndex]);
+    }, 9000);
+    try {
+      const response = await fetch('/api/admin/articles/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          keyword: selectedOpp.keyword,
-          primaryKeyword: selectedOpp.primaryKeyword,
-          secondaryKeywords: relatedKeywords,
-          selectedTitle: selectedTitle.trim(),
-          intentAnalysis: selectedOpp.intentAnalysis,
-          outline: selectedOpp.outline,
-          metaTitle: selectedOpp.metaTitle,
-          metaDescription: selectedOpp.metaDescription,
-          urlSlug: slug,
-          lockedKeywords: [],
-          opportunityScore: selectedOpp.opportunityScore,
-          searchVolume: selectedOpp.searchVolume,
-          competition: selectedOpp.competition,
-          difficulty: selectedOpp.difficulty,
-          trend: selectedOpp.trend,
-          estimatedCtr: selectedOpp.estimatedCtr,
+          keyword: focusKeyword.trim(),
+          primaryKeyword: focusKeyword.trim(),
+          secondaryKeywords: [],
+          selectedTitle: title.trim(),
+          intentAnalysis: 'Informational search intent based on live search suggestions.',
+          outline: [],
+          metaTitle: title.trim(),
+          metaDescription: '',
+          urlSlug: slug.trim(),
+          lockedKeywords: [focusKeyword.trim()],
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Generation failed');
-      setGeneratedArticle(data.article);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Article generation failed.');
+      setArticle(data.article);
       await loadArticles();
-      setView('done');
-    } catch (e: unknown) {
-      setGenError(e instanceof Error ? e.message : 'Generation failed');
-      setView('configure');
+      setNotice({ type: 'success', text: 'Article generated and saved as a draft. Review it before sending or publishing.' });
+    } catch (error) {
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Article generation failed.' });
     } finally {
-      clearInterval(stageInterval);
-      setGenerating(false);
+      window.clearInterval(interval);
+      setWorking(null);
+      setGenerationStage('');
     }
   };
 
-  // ─── Delete article ──────────────────────────────────────────────────────────
-
-  const handleDelete = async (id: string) => {
-    setDeleting(true);
+  const saveWorkflow = async (action: WorkflowAction) => {
+    if (!article) return;
+    if (action === 'publish' && article.status !== 'pending_review') {
+      setNotice({ type: 'info', text: 'Send the article to review before publishing.' });
+      return;
+    }
+    setWorking(action);
+    setNotice(null);
+    const nextStatus: Article['status'] =
+      action === 'publish' ? 'published' : action === 'review' ? 'pending_review' : 'draft';
     try {
-      const res = await fetch(`/api/admin/articles/${id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const d = await res.json();
-        throw new Error(d.error || 'Delete failed');
-      }
-      setArticles((prev) => prev.filter((a) => a.id !== id));
+      const response = await fetch(`/api/admin/articles/${article.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          slug,
+          content: article.content,
+          status: nextStatus,
+          seoData: {
+            ...article.seoData,
+            title,
+            keywords: [focusKeyword.trim()],
+            canonicalUrl: `/blog/${slug}`,
+          },
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to save article.');
+      setArticle(data.article);
+      await loadArticles();
+      setNotice({
+        type: 'success',
+        text:
+          action === 'publish'
+            ? 'Article published.'
+            : action === 'review'
+              ? 'Article sent to review.'
+              : 'Draft saved.',
+      });
+    } catch (error) {
+      setNotice({ type: 'error', text: error instanceof Error ? error.message : 'Unable to save article.' });
     } finally {
-      setDeleting(false);
-      setDeleteId('');
+      setWorking(null);
     }
   };
 
-  // ─── Computed ────────────────────────────────────────────────────────────────
-
-  const filtered = articles.filter((a) => {
-    const matchesStatus = statusFilter === 'all' || a.status === statusFilter;
-    const matchesSearch =
-      !search ||
-      a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.seoData.keywords.some((k) => k.toLowerCase().includes(search.toLowerCase()));
-    return matchesStatus && matchesSearch;
-  });
-
-  const stats = {
-    total: articles.length,
-    draft: articles.filter((a) => a.status === 'draft').length,
-    pending: articles.filter((a) => a.status === 'pending_review').length,
-    published: articles.filter((a) => a.status === 'published').length,
+  const resetComposer = () => {
+    setTitle('');
+    setTitleSuggestions([]);
+    setKeywordSuggestions([]);
+    setFocusKeyword('');
+    setKeywordLocked(false);
+    setSlug('');
+    setArticle(null);
+    setNotice(null);
   };
 
-  // ─── Reset ───────────────────────────────────────────────────────────────────
-
-  const resetWorkflow = () => {
-    setView('list');
-    setSelectedOpp(null);
-    setOpportunities([]);
-    setResearchQuery('');
-    setResearchError('');
-    setGenError('');
-    setGeneratedArticle(null);
-    setGenStage('');
-  };
-
-  // ─── Render ───────────────────────────────────────────────────────────────────
+  const canGenerate = Boolean(title.trim() && focusKeyword.trim() && slug.trim() && !duplicateKeyword);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-5xl space-y-6 pb-12">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-primary)]">AI Articles Manager</h1>
-          <p className="text-sm text-[var(--text-muted)] mt-0.5">
-            Research keywords, generate SEO-optimised articles, and manage content.
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">
+            <Sparkles className="h-3.5 w-3.5" />
+            Content studio
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">AI Articles Manager</h1>
+          <p className="mt-1 max-w-2xl text-sm text-[var(--text-muted)]">
+            Build one useful article at a time with live search-informed suggestions and a deliberate review workflow.
           </p>
         </div>
-        {view === 'list' && (
-          <button
-            onClick={() => { setView('research'); setResearchError(''); }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            New Article
-          </button>
-        )}
-        {view !== 'list' && (
-          <button
-            onClick={resetWorkflow}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition"
-          >
-            <X className="w-3.5 h-3.5" />
-            Back to List
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={resetComposer}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <X className="h-4 w-4" />
+          New article
+        </button>
       </div>
 
-      {/* ── Stats row ── */}
-      {view === 'list' && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { label: 'Total Articles', value: stats.total, icon: <BookOpen className="w-4 h-4" /> },
-            { label: 'Draft', value: stats.draft, icon: <FileText className="w-4 h-4" /> },
-            { label: 'Pending Review', value: stats.pending, icon: <AlertCircle className="w-4 h-4" /> },
-            { label: 'Published', value: stats.published, icon: <CheckCircle className="w-4 h-4" /> },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className="rounded-xl border p-4 flex flex-col gap-2"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                  {s.label}
-                </span>
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-secondary)]"
-                  style={{ backgroundColor: 'var(--bg-card-hover)' }}
-                >
-                  {s.icon}
-                </div>
-              </div>
-              <p className="text-2xl font-bold text-[var(--text-primary)]">{s.value}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      {notice && <Notice type={notice.type}>{notice.text}</Notice>}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW: LIST
-      ═══════════════════════════════════════════════════════════════════════ */}
-      {view === 'list' && (
-        <div
-          className="rounded-xl border overflow-hidden"
-          style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+      <div className="space-y-4">
+        <Section
+          step="1"
+          title="Article title"
+          description="Start with a topic or working title, then use live search suggestions to sharpen it."
         >
-          {/* Toolbar */}
-          <div
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-3 px-5 py-3 border-b"
-            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}
-          >
-            <div className="relative flex-1 w-full sm:max-w-xs">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--text-muted)]" />
+          <div className="flex flex-col gap-3 md:flex-row md:items-end">
+            <Field label="Article Title" hint="Use a topic seed when you want AI to suggest titles.">
               <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search articles…"
-                className="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                style={{ borderColor: 'var(--border)' }}
+                value={title}
+                onChange={(event) => {
+                  setTitle(event.target.value);
+                  if (!article) setSlug(slugify(event.target.value));
+                }}
+                placeholder="e.g. mortgage calculator for first-time buyers"
+                className={inputClass}
+                style={inputStyle}
               />
+            </Field>
+            <button
+              type="button"
+              onClick={() => void requestSuggestions('titles')}
+              disabled={working !== null || !title.trim()}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {working === 'titles' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              AI Suggest Titles
+            </button>
+          </div>
+          {titleSuggestions.length > 0 && (
+            <div className="mt-5 space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Live-informed suggestions</p>
+                <span className="text-xs text-[var(--text-muted)]">Click one to use it</span>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {titleSuggestions.map((suggestion) => (
+                  <button
+                    type="button"
+                    key={suggestion}
+                    onClick={() => chooseTitle(suggestion)}
+                    className="group flex items-center justify-between gap-3 rounded-xl border p-3 text-left text-sm text-[var(--text-primary)] transition hover:border-blue-500 hover:bg-blue-500/5"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <span>{suggestion}</span>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              {(['all', 'draft', 'pending_review', 'published'] as StatusFilter[]).map((s) => (
+          )}
+        </Section>
+
+        <Section
+          step="2"
+          title="Focus keyword"
+          description="Choose one focused phrase. It is locked after selection to prevent accidental duplicates."
+          locked={!title.trim()}
+        >
+          <div className="flex flex-col gap-3 md:flex-row md:items-end">
+            <Field label="Focus Keyword">
+              <div className="relative">
+                <input
+                  value={focusKeyword}
+                  readOnly={keywordLocked}
+                  onChange={(event) => setFocusKeyword(event.target.value)}
+                  placeholder={title.trim() ? 'Select a keyword or enter one' : 'Select a title first'}
+                  className={`${inputClass} ${keywordLocked ? 'pr-10' : ''}`}
+                  style={inputStyle}
+                  disabled={!title.trim()}
+                />
+                {keywordLocked && <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />}
+              </div>
+            </Field>
+            {keywordLocked ? (
+              <button
+                type="button"
+                onClick={() => setKeywordLocked(false)}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                Change keyword
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void requestSuggestions('keywords')}
+                disabled={working !== null || !title.trim()}
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {working === 'keywords' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                AI Suggest Keywords
+              </button>
+            )}
+          </div>
+          {duplicateKeyword && (
+            <p className="mt-3 flex items-center gap-2 text-xs text-amber-500">
+              <AlertCircle className="h-4 w-4" />
+              This keyword is already assigned to a saved article. Choose a different keyword.
+            </p>
+          )}
+          {keywordSuggestions.length > 0 && !keywordLocked && (
+            <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {keywordSuggestions.map((suggestion) => (
                 <button
-                  key={s}
-                  onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition capitalize ${
-                    statusFilter === s
-                      ? 'bg-blue-600 text-white'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)]'
-                  }`}
+                  type="button"
+                  key={suggestion}
+                  onClick={() => chooseKeyword(suggestion)}
+                  className="flex items-center gap-2 rounded-xl border px-3 py-2.5 text-left text-sm text-[var(--text-primary)] transition hover:border-blue-500 hover:bg-blue-500/5"
+                  style={{ borderColor: 'var(--border)' }}
                 >
-                  {s === 'all' ? 'All' : s === 'pending_review' ? 'Pending' : s.charAt(0).toUpperCase() + s.slice(1)}
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                  {suggestion}
                 </button>
               ))}
             </div>
-            <button
-              onClick={loadArticles}
-              className="ml-auto p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition"
-              title="Refresh"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Table */}
-          {loadingList ? (
-            <div className="flex items-center justify-center py-16 text-[var(--text-muted)] text-sm">
-              <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading articles…
-            </div>
-          ) : listError ? (
-            <div className="flex items-center justify-center py-16 text-red-400 text-sm gap-2">
-              <AlertCircle className="w-4 h-4" /> {listError}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <FileText className="w-10 h-10 text-[var(--text-muted)] opacity-40" />
-              <p className="text-sm text-[var(--text-muted)]">
-                {articles.length === 0 ? 'No articles yet. Generate your first article above.' : 'No articles match your filter.'}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)', backgroundColor: 'var(--bg-card-hover)' }}>
-                    {['Title', 'Status', 'Keywords', 'Reading Time', 'Words', 'Created', 'Actions'].map((h) => (
-                      <th
-                        key={h}
-                        className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] whitespace-nowrap"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((article) => (
-                    <tr
-                      key={article.id}
-                      className="hover:bg-[var(--bg-card-hover)] transition-colors"
-                      style={{ borderBottom: '1px solid var(--border)' }}
-                    >
-                      <td className="px-4 py-3.5 max-w-xs">
-                        <div className="font-medium text-[var(--text-primary)] truncate">{article.title}</div>
-                        <div className="text-xs text-[var(--text-muted)] font-mono truncate mt-0.5">
-                          /blog/{article.slug}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <StatusBadge status={article.status} />
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex flex-wrap gap-1 max-w-[200px]">
-                          {(article.seoData.keywords || []).slice(0, 3).map((k) => (
-                            <span
-                              key={k}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-blue-600/10 text-blue-400"
-                            >
-                              <Tag className="w-2.5 h-2.5" /> {k}
-                            </span>
-                          ))}
-                          {(article.seoData.keywords || []).length > 3 && (
-                            <span className="text-xs text-[var(--text-muted)]">
-                              +{(article.seoData.keywords || []).length - 3}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-[var(--text-muted)]">
-                        {article.readingTime ? (
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {article.readingTime} min
-                          </span>
-                        ) : '—'}
-                      </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-[var(--text-muted)]">
-                        {article.wordCount ? article.wordCount.toLocaleString() : '—'}
-                      </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-xs text-[var(--text-muted)]">
-                        {formatDate(article.createdAt)}
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-1">
-                          <a
-                            href={`/admin/articles/${article.id}`}
-                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-blue-400 hover:bg-blue-600/10 transition"
-                            title="Edit"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </a>
-                          <a
-                            href={`/blog/${article.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-emerald-400 hover:bg-emerald-600/10 transition"
-                            title="View"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </a>
-                          <button
-                            onClick={() => setDeleteId(article.id)}
-                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-400 hover:bg-red-600/10 transition"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           )}
-        </div>
-      )}
+        </Section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW: KEYWORD RESEARCH
-      ═══════════════════════════════════════════════════════════════════════ */}
-      {view === 'research' && (
-        <div className="space-y-5">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-            <span className="text-blue-400 font-medium">1. Keyword Research</span>
-            <ChevronRight className="w-3 h-3" />
-            <span>2. Configure</span>
-            <ChevronRight className="w-3 h-3" />
-            <span>3. Generate</span>
-          </div>
-
-          {/* Search box */}
-          <div
-            className="rounded-xl border p-5"
-            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-          >
-            <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">Search Keyword Opportunities</p>
-            <p className="text-xs text-[var(--text-muted)] mb-4">
-              Enter a topic or niche. Live keyword data will be retrieved and scored by AI.
-            </p>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
-                <input
-                  value={researchQuery}
-                  onChange={(e) => setResearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleResearch()}
-                  placeholder="e.g. mortgage calculator, BMI, loan interest…"
-                  className="w-full pl-10 pr-3 py-2 text-sm rounded-xl border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  style={{ borderColor: 'var(--border)' }}
-                />
-              </div>
-              <button
-                onClick={handleResearch}
-                disabled={researching || !researchQuery.trim()}
-                className="px-5 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
-              >
-                {researching ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                {researching ? 'Searching…' : 'Find Opportunities'}
-              </button>
-            </div>
-            {researchError && (
-              <p className="mt-3 text-sm text-red-400 flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" /> {researchError}
-              </p>
-            )}
-          </div>
-
-          {/* Results table */}
-          {opportunities.length > 0 && (
-            <div
-              className="rounded-xl border overflow-hidden"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-            >
-              <div
-                className="px-5 py-3 border-b flex items-center justify-between"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}
-              >
-                <p className="text-sm font-semibold text-[var(--text-primary)]">
-                  {opportunities.length} Keyword Opportunities
-                </p>
-                <span className="text-xs text-[var(--text-muted)]">Click a row to continue</span>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--border)', backgroundColor: 'var(--bg-card-hover)' }}>
-                      {[
-                        'Keyword',
-                        'Search Volume',
-                        'Competition',
-                        'SEO Difficulty',
-                        'Opportunity Score',
-                        'Trend',
-                        'Est. CTR',
-                        '',
-                      ].map((h) => (
-                        <th
-                          key={h}
-                          className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] whitespace-nowrap"
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {opportunities.map((opp, i) => (
-                      <tr
-                        key={i}
-                        className="hover:bg-[var(--bg-card-hover)] transition-colors cursor-pointer"
-                        style={{ borderBottom: '1px solid var(--border)' }}
-                        onClick={() => selectOpportunity(opp)}
-                      >
-                        <td className="px-4 py-3.5">
-                          <div className="font-medium text-[var(--text-primary)]">{opp.keyword}</div>
-                          <div className="text-xs text-[var(--text-muted)] mt-0.5 flex items-center gap-1">
-                            <BarChart2 className="w-3 h-3" /> {opp.searchIntent}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap text-[var(--text-primary)] font-mono text-xs">
-                          {opp.searchVolume}
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap">
-                          <CompBadge level={opp.competition} />
-                        </td>
-                        <td className="px-4 py-3.5 min-w-[130px]">{scoreBar(opp.difficulty)}</td>
-                        <td className="px-4 py-3.5 min-w-[130px]">{scoreBar(opp.opportunityScore)}</td>
-                        <td className="px-4 py-3.5 whitespace-nowrap">
-                          <div className="flex items-center gap-1">
-                            <TrendIcon trend={opp.trend} />
-                            <span className="text-xs capitalize text-[var(--text-muted)]">{opp.trend}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap text-xs font-semibold text-emerald-400">
-                          {opp.estimatedCtr}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); selectOpportunity(opp); }}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition whitespace-nowrap"
-                          >
-                            Select →
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW: CONFIGURE
-      ═══════════════════════════════════════════════════════════════════════ */}
-      {view === 'configure' && selectedOpp && (
-        <div className="space-y-5">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-            <button onClick={() => setView('research')} className="hover:text-blue-400 transition">
-              1. Keyword Research
-            </button>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-blue-400 font-medium">2. Configure</span>
-            <ChevronRight className="w-3 h-3" />
-            <span>3. Generate</span>
-          </div>
-
-          {/* Opportunity summary card */}
-          <div
-            className="rounded-xl border p-5"
-            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-          >
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div>
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{selectedOpp.keyword}</p>
-                <p className="text-xs text-[var(--text-muted)] mt-0.5">{selectedOpp.intentAnalysis}</p>
-              </div>
-              <div className="flex items-center gap-4 flex-wrap">
-                <div className="text-center">
-                  <div className={`text-lg font-bold ${scoreColor(selectedOpp.opportunityScore)}`}>
-                    {selectedOpp.opportunityScore}
-                  </div>
-                  <div className="text-xs text-[var(--text-muted)]">Opportunity</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-[var(--text-primary)]">{selectedOpp.searchVolume}</div>
-                  <div className="text-xs text-[var(--text-muted)]">Monthly Searches</div>
-                </div>
-                <div className="text-center">
-                  <div className={`text-lg font-bold ${scoreColor(100 - selectedOpp.difficulty)}`}>
-                    {selectedOpp.difficulty}
-                  </div>
-                  <div className="text-xs text-[var(--text-muted)]">SEO Difficulty</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-emerald-400">{selectedOpp.estimatedCtr}</div>
-                  <div className="text-xs text-[var(--text-muted)]">Est. CTR</div>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center gap-1 justify-center">
-                    <TrendIcon trend={selectedOpp.trend} />
-                    <span className="text-sm font-bold capitalize text-[var(--text-primary)]">{selectedOpp.trend}</span>
-                  </div>
-                  <div className="text-xs text-[var(--text-muted)]">Trend</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {duplicateWarning && (
-            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-400">
-              {duplicateWarning}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {/* Title selection */}
-            <div
-              className="rounded-xl border p-5 space-y-3"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-            >
-              <p className="text-sm font-semibold text-[var(--text-primary)]">Select or Write a Title</p>
-              <div className="space-y-2">
-                {selectedOpp.titles.map((t) => (
-                  <label key={t} className="flex items-start gap-2.5 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="title"
-                      value={t}
-                      checked={selectedTitle === t}
-                      onChange={() => {
-                        setSelectedTitle(t);
-                        setSlug(slugify(t));
-                      }}
-                      className="mt-0.5 accent-blue-600"
-                    />
-                    <span
-                      className={`text-sm ${
-                        selectedTitle === t
-                          ? 'text-[var(--text-primary)] font-medium'
-                          : 'text-[var(--text-muted)] group-hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      {t}
-                    </span>
-                  </label>
-                ))}
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[var(--text-muted)] block mb-1.5">
-                  Or write a custom title:
-                </label>
-                <input
-                  value={selectedTitle}
-                  onChange={(e) => {
-                    setSelectedTitle(e.target.value);
-                    setSlug(slugify(e.target.value));
-                  }}
-                  placeholder="Custom title…"
-                  className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  style={{ borderColor: 'var(--border)' }}
-                />
-              </div>
-            </div>
-
-            {/* Slug & Keywords */}
-            <div className="space-y-5">
-              <div
-                className="rounded-xl border p-5 space-y-3"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-              >
-                <p className="text-sm font-semibold text-[var(--text-primary)]">URL Slug</p>
-                <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] mb-1">
-                  <span className="font-mono">/blog/</span>
-                </div>
+        <Section
+          step="3"
+          title="URL slug"
+          description="Generated from the title. Edit it directly or ask AI for a tighter SEO-friendly version."
+          locked={!title.trim()}
+        >
+          <div className="flex flex-col gap-3 md:flex-row md:items-end">
+            <Field label="Slug" hint="The article will be available at /blog/{slug || 'your-slug'}">
+              <div className="flex items-center gap-2">
+                <span className="hidden text-sm text-[var(--text-muted)] sm:inline">/blog/</span>
                 <input
                   value={slug}
-                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                  className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  style={{ borderColor: 'var(--border)' }}
+                  onChange={(event) => setSlug(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'))}
+                  placeholder="article-slug"
+                  className={`${inputClass} font-mono`}
+                  style={inputStyle}
+                  disabled={!title.trim()}
                 />
               </div>
-
-              <div
-                className="rounded-xl border p-5 space-y-3"
-                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-              >
-                <p className="text-sm font-semibold text-[var(--text-primary)]">Related Keywords</p>
-                <p className="text-xs text-[var(--text-muted)]">These will be integrated naturally into the article.</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {relatedKeywords.map((kw) => (
-                    <span
-                      key={kw}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-blue-600/10 text-blue-400 border border-blue-600/20"
-                    >
-                      {kw}
-                      <button
-                        onClick={() => setRelatedKeywords((prev) => prev.filter((k) => k !== kw))}
-                        className="hover:text-red-400 transition"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    value={newKeyword}
-                    onChange={(e) => setNewKeyword(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newKeyword.trim()) {
-                        const kw = newKeyword.trim().toLowerCase();
-                        if (!relatedKeywords.includes(kw)) setRelatedKeywords((prev) => [...prev, kw]);
-                        setNewKeyword('');
-                      }
-                    }}
-                    placeholder="Add keyword, press Enter…"
-                    className="flex-1 px-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    style={{ borderColor: 'var(--border)' }}
-                  />
-                  <button
-                    onClick={() => {
-                      const kw = newKeyword.trim().toLowerCase();
-                      if (kw && !relatedKeywords.includes(kw)) setRelatedKeywords((prev) => [...prev, kw]);
-                      setNewKeyword('');
-                    }}
-                    disabled={!newKeyword.trim()}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition"
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Article outline preview */}
-          {selectedOpp.outline.length > 0 && (
-            <div
-              className="rounded-xl border p-5"
-              style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-            >
-              <p className="text-sm font-semibold text-[var(--text-primary)] mb-3">Article Outline</p>
-              <div className="space-y-2">
-                {selectedOpp.outline.map((item, i) => (
-                  <div key={i} className={item.level === 'h3' ? 'ml-5' : ''}>
-                    <p className={`text-sm font-medium ${item.level === 'h2' ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
-                      {item.level === 'h2' ? '## ' : '### '}{item.heading}
-                    </p>
-                    {item.subpoints?.map((sp, j) => (
-                      <p key={j} className="text-xs text-[var(--text-muted)] ml-4 mt-0.5">· {sp}</p>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {genError && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" /> {genError}
-            </div>
-          )}
-
-          <div className="flex items-center gap-3">
+            </Field>
             <button
-              onClick={() => setView('research')}
-              className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] border transition"
+              type="button"
+              onClick={() => void improveSlug()}
+              disabled={working !== null || !title.trim()}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               style={{ borderColor: 'var(--border)' }}
             >
-              ← Back
-            </button>
-            <button
-              onClick={handleGenerate}
-              disabled={!selectedTitle.trim() || !slug.trim()}
-              className="px-6 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
-            >
-              <Zap className="w-4 h-4" />
-              Generate Article
+              {working === 'slug' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              AI Improve Slug
             </button>
           </div>
-        </div>
-      )}
+        </Section>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW: GENERATING
-      ═══════════════════════════════════════════════════════════════════════ */}
-      {view === 'generating' && (
-        <div
-          className="rounded-xl border p-10 flex flex-col items-center gap-6"
-          style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+        <Section
+          step="4"
+          title="Article"
+          description="Generate a complete SEO and AI-search-ready article, then edit the content before saving."
+          locked={!canGenerate}
         >
-          <div className="w-16 h-16 rounded-2xl bg-blue-600/10 flex items-center justify-center">
-            <Zap className="w-8 h-8 text-blue-400 animate-pulse" />
-          </div>
-          <div className="text-center">
-            <p className="text-base font-semibold text-[var(--text-primary)]">Generating Article</p>
-            <p className="text-sm text-[var(--text-muted)] mt-1">This takes about 60–120 seconds. Please wait…</p>
-          </div>
-          <div className="w-full max-w-md space-y-3">
-            <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
-              <span>{genStage}</span>
+          {!article ? (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-dashed p-5 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
+                <div className="mb-2 flex items-center gap-2 font-semibold text-[var(--text-secondary)]">
+                  <FileText className="h-4 w-4 text-blue-500" />
+                  Ready when your title, keyword, and slug are set
+                </div>
+                <p>
+                  The generated article includes introduction, table of contents, H2/H3 sections, FAQ, How-To, comparison content, examples, internal links, related calculators, CTA, conclusion, references, reading time, metadata, OpenGraph, and JSON-LD.
+                </p>
+              </div>
+              {generationStage && <Notice type="info">{generationStage}</Notice>}
+              <button
+                type="button"
+                onClick={() => void generateArticle()}
+                disabled={working !== null || !canGenerate}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {working === 'generate' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                {working === 'generate' ? 'Generating article…' : 'Generate Article'}
+              </button>
+              {!canGenerate && <p className="text-xs text-[var(--text-muted)]">Select a title, focus keyword, and slug to enable generation.</p>}
             </div>
-            <div className="w-full h-2 rounded-full" style={{ backgroundColor: 'var(--bg-card-hover)' }}>
-              <div
-                className="h-2 rounded-full bg-blue-600 transition-all duration-[8000ms]"
-                style={{ width: generating ? '85%' : '100%' }}
+          ) : (
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(article.status)}`}>
+                    {statusLabel(article.status)}
+                  </span>
+                  <span className="text-xs text-[var(--text-muted)]">
+                    {article.wordCount ? `${article.wordCount.toLocaleString()} words` : 'Editable draft'}
+                  </span>
+                </div>
+                <span className="text-xs text-[var(--text-muted)]">HTML content</span>
+              </div>
+              <textarea
+                value={article.content}
+                onChange={(event) => setArticle({ ...article, content: event.target.value })}
+                rows={24}
+                className={`${inputClass} resize-y font-mono text-xs leading-relaxed`}
+                style={inputStyle}
+                aria-label="Article content"
               />
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-3 w-full max-w-md text-center text-xs text-[var(--text-muted)]">
-            {['Content', 'FAQ + HowTo', 'Schemas', 'TOC', 'Links', 'Reading Time'].map((s) => (
-              <div key={s} className="flex items-center gap-1 justify-center">
-                <CheckCircle className="w-3 h-3 text-blue-400" />
-                <span>{s}</span>
+              <div className="flex flex-wrap items-center gap-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
+                <button
+                  type="button"
+                  onClick={() => void saveWorkflow('draft')}
+                  disabled={working !== null}
+                  className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:opacity-50"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  {working === 'draft' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                  Save Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void saveWorkflow('review')}
+                  disabled={working !== null}
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-400 disabled:opacity-50"
+                >
+                  {working === 'review' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  Send to Review
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void saveWorkflow('publish')}
+                  disabled={working !== null || article.status !== 'pending_review'}
+                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {working === 'publish' ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                  Publish
+                </button>
+                <span className="ml-auto text-xs text-[var(--text-muted)]">
+                  {article.status === 'pending_review' ? 'Ready for explicit publishing.' : 'Publishing unlocks after review.'}
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
+          )}
+        </Section>
+      </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW: DONE
-      ═══════════════════════════════════════════════════════════════════════ */}
-      {view === 'done' && generatedArticle && (
-        <div className="space-y-5">
-          <div
-            className="rounded-xl border p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4"
-            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+      <section className="rounded-2xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+        <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Saved articles</h2>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">Open an article to edit its full SEO, schema, FAQ, and How-To fields.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void loadArticles()}
+            className="rounded-lg p-2 text-[var(--text-muted)] transition hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]"
+            title="Refresh saved articles"
           >
-            <div className="w-12 h-12 rounded-xl bg-emerald-600/10 flex items-center justify-center flex-shrink-0">
-              <CheckCircle className="w-6 h-6 text-emerald-400" />
+            <RefreshCw className={`h-4 w-4 ${loadingArticles ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+        <div className="space-y-2 p-5">
+          {loadingArticles ? (
+            <div className="flex items-center gap-2 py-6 text-sm text-[var(--text-muted)]">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading saved articles…
             </div>
-            <div className="flex-1">
-              <p className="font-semibold text-[var(--text-primary)]">Article Generated Successfully</p>
-              <p className="text-sm text-[var(--text-muted)] mt-0.5">
-                Saved as <StatusBadge status={generatedArticle.status} />. Open the editor to review and edit all sections before publishing.
-              </p>
-              <div className="flex flex-wrap gap-4 mt-3 text-xs text-[var(--text-muted)]">
-                {generatedArticle.wordCount && (
-                  <span className="flex items-center gap-1"><FileText className="w-3 h-3" /> {generatedArticle.wordCount.toLocaleString()} words</span>
-                )}
-                {generatedArticle.readingTime && (
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {generatedArticle.readingTime} min read</span>
-                )}
-                {generatedArticle.faqItems && (
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-400" /> {generatedArticle.faqItems.length} FAQ pairs</span>
-                )}
-                {generatedArticle.howToSteps && generatedArticle.howToSteps.length > 0 && (
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-400" /> How-To section</span>
-                )}
-                {generatedArticle.tableOfContents && (
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-400" /> Table of Contents</span>
-                )}
-                {generatedArticle.schemaFaq && (
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-400" /> FAQ Schema</span>
-                )}
-                {generatedArticle.schemaHowTo && (
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-400" /> HowTo Schema</span>
-                )}
-              </div>
+          ) : articles.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-6 text-center text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
+              No saved articles yet.
             </div>
-            <div className="flex gap-2">
-              <a
-                href={`/admin/articles/${generatedArticle.id}`}
-                className="px-4 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition inline-flex items-center gap-2"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-                Open Editor
-              </a>
-              <button
-                onClick={resetWorkflow}
-                className="px-4 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] border transition"
+          ) : (
+            articles.map((savedArticle) => (
+              <div
+                key={savedArticle.id}
+                className="flex flex-col gap-3 rounded-xl border p-4 transition hover:border-blue-500/50 sm:flex-row sm:items-center sm:justify-between"
                 style={{ borderColor: 'var(--border)' }}
               >
-                Back to List
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Delete confirmation modal ─────────────────────────────────────────── */}
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div
-            className="rounded-2xl border p-6 w-full max-w-sm shadow-2xl space-y-4"
-            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-red-400" />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{savedArticle.title}</p>
+                  <p className="mt-1 truncate font-mono text-xs text-[var(--text-muted)]">/blog/{savedArticle.slug}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-3">
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(savedArticle.status)}`}>
+                    {statusLabel(savedArticle.status)}
+                  </span>
+                  <Link
+                    href={`/admin/articles/${savedArticle.id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-500 hover:text-blue-400"
+                  >
+                    <Pencil className="h-3.5 w-3.5" /> Edit
+                  </Link>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold text-[var(--text-primary)]">Delete Article?</p>
-                <p className="text-xs text-[var(--text-muted)]">This action cannot be undone.</p>
-              </div>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button
-                onClick={() => setDeleteId('')}
-                className="flex-1 px-3 py-2 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] border hover:bg-[var(--bg-card-hover)] transition"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deleteId)}
-                disabled={deleting}
-                className="flex-1 px-3 py-2 rounded-xl text-sm font-semibold bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 transition"
-              >
-                {deleting ? 'Deleting…' : 'Delete'}
-              </button>
-            </div>
-          </div>
+            ))
+          )}
         </div>
-      )}
+      </section>
     </div>
   );
 }

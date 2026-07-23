@@ -92,39 +92,9 @@ export async function POST(req: Request) {
       ...new Set([...baseAC, ...howToAC, ...guideAC, ...calculatorAC, ...bestAC, ...freeAC]),
     ].slice(0, 28);
 
-    // If no AI key, return basic suggestions without scoring
+    // Never invent metrics when a scoring provider is unavailable.
     if (!orKey) {
-      const fallbackOpportunities = rawSuggestions.slice(0, 8).map((kw, i) => ({
-        keyword: kw,
-        type: 'article',
-        searchIntent: 'informational' as const,
-        opportunityScore: Math.max(30, 80 - i * 6),
-        searchVolume: ['1K-10K', '500-1K', '100-500', '10K-100K'][i % 4],
-        competition: ['low', 'medium', 'high'][i % 3],
-        difficulty: Math.min(90, 20 + i * 9),
-        trend: ['rising', 'stable', 'declining'][i % 3],
-        estimatedCtr: `${(8 - i * 0.5).toFixed(1)}%`,
-        titles: [
-          `${kw} – Complete Guide`,
-          `How to Use ${kw}: Step-by-Step`,
-          `${kw}: Everything You Need to Know`,
-          `Top Tips for ${kw}`,
-          `${kw}: Beginner to Expert`,
-        ],
-        primaryKeyword: kw,
-        secondaryKeywords: rawSuggestions.filter((s) => s !== kw).slice(0, 5),
-        intentAnalysis: `Users searching for "${kw}" want practical, actionable information.`,
-        outline: [
-          { heading: `What Is ${kw}?`, level: 'h2', subpoints: ['Definition', 'Why it matters'] },
-          { heading: `How to Calculate ${kw}`, level: 'h2', subpoints: ['The formula', 'Step-by-step example'] },
-          { heading: 'Common Mistakes', level: 'h2', subpoints: ['Mistake 1', 'Mistake 2'] },
-          { heading: 'FAQ', level: 'h2', subpoints: ['Common questions'] },
-        ],
-        metaTitle: `${kw} – Free Online Guide & Calculator`,
-        metaDescription: `Learn everything about ${kw}. Step-by-step guide, formula, and free calculator tool. Get accurate results instantly.`,
-        urlSlug: kw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      }));
-      return NextResponse.json({ opportunities: fallbackOpportunities, rawSuggestions, relatedSearches, query });
+      return NextResponse.json({ error: 'Live keyword data unavailable.' }, { status: 503 });
     }
 
     const systemPrompt = `You are a Senior SEO Strategist specializing in calculator, finance, health, and utility content websites. Analyze real Google search data and produce actionable, scored keyword opportunities for article creation.
