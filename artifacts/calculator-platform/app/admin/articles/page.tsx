@@ -3,12 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
-  AlertCircle,
   ArrowDown,
   ArrowRight,
   ArrowUp,
   BarChart2,
-  BookOpen,
   Brain,
   Check,
   CheckCircle2,
@@ -28,7 +26,6 @@ import {
   Sparkles,
   Tag,
   Target,
-  Trash2,
   TrendingDown,
   TrendingUp,
   Users,
@@ -148,17 +145,6 @@ function StepCard({ number, title, description, locked, active, children }: {
   );
 }
 
-function PrimaryButton({ onClick, disabled, loading, children }: {
-  onClick: () => void; disabled?: boolean; loading?: boolean; children: React.ReactNode;
-}) {
-  return (
-    <button type="button" onClick={onClick} disabled={disabled || loading}
-      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50">
-      {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-      {children}
-    </button>
-  );
-}
 
 function GhostButton({ onClick, disabled, loading, children }: {
   onClick: () => void; disabled?: boolean; loading?: boolean; children: React.ReactNode;
@@ -503,7 +489,7 @@ function OutlineEditor({ outline, onChange }: { outline: ArticleOutlineSection[]
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleExpanded = (id: string) => {
-    setExpandedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+    setExpandedIds((prev) => { const next = new Set(prev); if (next.has(id)) { next.delete(id); } else { next.add(id); } return next; });
   };
   const updateSection = (id: string, patch: Partial<ArticleOutlineSection>) => {
     onChange(outline.map((s) => s.id === id ? { ...s, ...patch } : s));
