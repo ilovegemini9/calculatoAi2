@@ -2,7 +2,7 @@
   "version": 2,
   "installCommand": "pnpm install",
   "buildCommand": "pnpm --filter @workspace/calculator-platform run build",
-  "outputDirectory": "artifacts/calculator-platform/.next",
+  "outputDirectory": ".next",
   "headers": [
     {
       "source": "/(.*)",
