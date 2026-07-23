@@ -1,6 +1,6 @@
-import { Settings } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Bot, Settings } from 'lucide-react';
 import { ContentCard } from '@/components/admin/Card';
-import { EmptyState } from '@/components/admin/EmptyState';
 
 export const metadata = { title: 'Settings — Admin' };
 
@@ -9,42 +9,23 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-[var(--text-primary)]">Settings</h1>
-        <p className="text-sm text-[var(--text-muted)] mt-0.5">
-          Platform configuration and preferences.
-        </p>
+        <p className="mt-0.5 text-sm text-[var(--text-muted)]">Platform configuration and preferences.</p>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <ContentCard title="AI Settings" description="Configure server-side AI providers, budgets, and usage tracking." action={<Bot className="h-4 w-4 text-blue-500" />}>
+        <Link href="/admin/settings/ai" className="flex items-center justify-between gap-4 rounded-lg border p-4 transition hover:border-blue-500/50 hover:bg-blue-500/5" style={{ borderColor: 'var(--border)' }}>
+          <span>
+            <span className="block text-sm font-semibold text-[var(--text-primary)]">AI Provider Settings</span>
+            <span className="mt-1 block text-xs text-[var(--text-muted)]">OpenRouter, OpenAI, Gemini, and Anthropic</span>
+          </span>
+          <ArrowRight className="h-4 w-4 text-blue-500" />
+        </Link>
+      </ContentCard>
+      <div className="grid gap-4 lg:grid-cols-2">
         <ContentCard title="General" description="Basic platform settings.">
-          <EmptyState
-            icon={<Settings className="w-5 h-5" />}
-            title="No settings configured"
-            description="Platform configuration options will appear here."
-          />
+          <div className="flex items-center gap-3 rounded-lg border p-4 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}><Settings className="h-4 w-4" /> General settings are managed by the platform.</div>
         </ContentCard>
-
         <ContentCard title="Security" description="Authentication and access control.">
-          <EmptyState
-            icon={<Settings className="w-5 h-5" />}
-            title="No settings configured"
-            description="Security settings will appear here."
-          />
-        </ContentCard>
-
-        <ContentCard title="Integrations" description="Third-party service connections.">
-          <EmptyState
-            icon={<Settings className="w-5 h-5" />}
-            title="No integrations connected"
-            description="Connected services will appear here."
-          />
-        </ContentCard>
-
-        <ContentCard title="Notifications" description="Alert and notification preferences.">
-          <EmptyState
-            icon={<Settings className="w-5 h-5" />}
-            title="No settings configured"
-            description="Notification preferences will appear here."
-          />
+          <div className="flex items-center gap-3 rounded-lg border p-4 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}><Settings className="h-4 w-4" /> Admin access is protected by the existing session layer.</div>
         </ContentCard>
       </div>
     </div>

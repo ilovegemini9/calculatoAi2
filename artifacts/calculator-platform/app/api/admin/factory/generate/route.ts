@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { verifySession } from '@/lib/session';
+import { getAiProviderKey, getAiSettings, getProviderModels } from '@/lib/ai';
 import { GoogleGenAI, Type } from '@google/genai';
 import { validateGeneratedCode } from '@/lib/security';
 import { CALCULATORS } from '@/config/calculators';
@@ -38,8 +39,7 @@ async function callOpenRouter(
   return data.choices?.[0]?.message?.content ?? '';
 }
 
-async function tryOpenRouter(orKey: string, prompt: string, systemInstruction: string): Promise<string> {
-  const models = ['poolside/laguna-xs-2.1', 'google/gemma-4-31b-it:free', 'google/gemma-4-26b-a4b:free'];
+async function tryOpenRouter(orKey: string, prompt: string, systemInstruction: string, models: string[]): Promise<string> {
   let lastErr = '';
   for (const model of models) {
     try {
@@ -133,7 +133,13 @@ export async function POST(req: Request) {
     if (!prompt) return NextResponse.json({ error: 'Description prompt is required' }, { status: 400 });
 
     const db = getDb();
-    const orKey = db.settings.openrouterApiKey || process.env.OPENROUTER_API_KEY || '';
+    const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
+    const orKey = getAiProviderKey(aiSettings, 'openrouter') || process.env.OPENROUTER_API_KEY || '';
+    const openRouterModels = getProviderModels(aiSettings, 'openrouter', [
+      'poolside/laguna-xs-2.1',
+      'google/gemma-4-31b-it:free',
+      'google/gemma-4-26b-a4b:free',
+    ]);
 
     // Existing calculator slugs for internal link suggestions
     const existingSlugs = CALCULATORS.map((c) => c.slug).join(', ');
@@ -199,7 +205,7 @@ Return this exact JSON shape:
     let fullSpec: FullSpec | null = null;
 
     if (orKey) {
-      const raw = await tryOpenRouter(orKey, stage1Prompt, stage1System);
+      const raw = await tryOpenRouter(orKey, stage1Prompt, stage1System, openRouterModels);
       fullSpec = parseJson<FullSpec>(raw);
     } else {
       const ai = getGeminiClient();
@@ -314,7 +320,7 @@ Return this exact JSON:
 
     try {
       if (orKey) {
-        const raw = await tryOpenRouter(orKey, stage2Prompt, stage2System);
+        const raw = await tryOpenRouter(orKey, stage2Prompt, stage2System, openRouterModels);
         testsSpec = parseJson<GeneratedTests>(raw);
       } else {
         const ai = getGeminiClient();

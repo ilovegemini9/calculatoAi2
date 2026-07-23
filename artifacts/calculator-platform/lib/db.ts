@@ -5,6 +5,7 @@ import type { AppSchema, SystemSettings } from './types';
 import { DEFAULT_SEO_SETTINGS, getSeoSettings } from './seo';
 import { DEFAULT_ADS_SETTINGS, getAdsSettings } from './ads';
 import { DEFAULT_VERIFICATION_SETTINGS, getVerificationSettings } from './verification';
+import { DEFAULT_AI_SETTINGS, getAiSettings } from './ai';
 
 // On read-only hosts (e.g. Vercel serverless), fall back to /tmp which is always writable.
 // Note: /tmp is ephemeral on serverless — data resets between cold starts.
@@ -21,6 +22,7 @@ const DEFAULT_SETTINGS: SystemSettings = {
   seo: DEFAULT_SEO_SETTINGS,
   ads: DEFAULT_ADS_SETTINGS,
   verification: DEFAULT_VERIFICATION_SETTINGS,
+  ai: DEFAULT_AI_SETTINGS,
   featureFlags: {
     aiEnabled: true,
     maintenanceMode: false,
@@ -80,14 +82,20 @@ export function getDb(): AppSchema {
     db.articleVersions = db.articleVersions || [];
     db.redirects = db.redirects || [];
     db.analytics = db.analytics || [];
+    const legacyOpenRouterKey = db.settings?.openrouterApiKey || '';
     db.settings = {
       ...DEFAULT_SETTINGS,
       ...db.settings,
       seo: getSeoSettings(db.settings?.seo),
       ads: getAdsSettings(db.settings?.ads),
       verification: getVerificationSettings(db.settings?.verification),
+      ai: getAiSettings(db.settings?.ai, legacyOpenRouterKey),
       featureFlags: { ...DEFAULT_SETTINGS.featureFlags, ...db.settings.featureFlags },
     };
+    if (legacyOpenRouterKey) {
+      db.settings.openrouterApiKey = '';
+      fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf-8');
+    }
     db.logs = db.logs || [];
     db.backups = db.backups || [];
     

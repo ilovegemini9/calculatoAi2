@@ -167,10 +167,40 @@ export interface SystemSettings {
   seo: SeoSettings;
   ads: AdsSettings;
   verification: VerificationSettings;
+  ai: AiSettings;
   featureFlags: {
     aiEnabled: boolean;
     maintenanceMode: boolean;
   };
+}
+
+export type AiProvider = 'openrouter' | 'openai' | 'gemini' | 'anthropic';
+
+export interface AiProviderSettings {
+  enabled: boolean;
+  apiKeyEncrypted: string;
+  defaultModel: string;
+  fallbackModel: string;
+  temperature: number;
+  maxTokens: number;
+  dailyBudget: number;
+  monthlyBudget: number;
+}
+
+export interface AiUsageCounters {
+  dailyRequests: number;
+  monthlyRequests: number;
+  dailyTokens: number;
+  monthlyTokens: number;
+  lastDay: string;
+  lastMonth: string;
+  cacheVersion: number;
+}
+
+export interface AiSettings {
+  activeProvider: AiProvider;
+  providers: Record<AiProvider, AiProviderSettings>;
+  usage: AiUsageCounters;
 }
 
 export interface SeoSettings {

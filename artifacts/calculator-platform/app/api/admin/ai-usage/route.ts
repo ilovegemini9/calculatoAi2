@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
 import { getDb } from '@/lib/db';
+import { getAiProviderKey, getAiSettings, resetUsagePeriodIfNeeded } from '@/lib/ai';
 
 export async function GET() {
   const isAuth = await verifySession();
@@ -30,7 +31,8 @@ export async function GET() {
   const generatedThisWeek = calcs.filter((c) => c.createdAt >= sevenDaysAgo).length;
 
   // ── Provider detection ────────────────────────────────────────────────────
-  const hasOpenRouterKey = Boolean(db.settings.openrouterApiKey?.trim());
+  const ai = resetUsagePeriodIfNeeded(getAiSettings(db.settings.ai, db.settings.openrouterApiKey));
+  const hasOpenRouterKey = Boolean(getAiProviderKey(ai, 'openrouter'));
   const hasGeminiEnv     = Boolean(process.env.GEMINI_API_KEY);
   const hasOpenRouterEnv = Boolean(process.env.OPENROUTER_API_KEY);
 

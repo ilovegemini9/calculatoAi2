@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { verifySession } from '@/lib/session';
+import { getAiProviderKey, getAiSettings, getProviderModels } from '@/lib/ai';
 
 // ── Google Autocomplete ───────────────────────────────────────────────────────
 async function fetchAutocomplete(query: string): Promise<string[]> {
@@ -91,7 +92,7 @@ export async function POST(req: Request) {
 
     const db = getDb();
     const orKey =
-      db.settings.openrouterApiKey ||
+      getAiProviderKey(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter') ||
       process.env.OPENROUTER_API_KEY ||
       (process.env.OPENAI_API_KEY?.startsWith('sk-or-') ? process.env.OPENAI_API_KEY : '') ||
       '';
@@ -170,11 +171,11 @@ Identify the 8 best opportunities — mix of calculator tools and articles. Retu
   ]
 }`;
 
-    const contentModels = [
+    const contentModels = getProviderModels(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter', [
       'google/gemma-4-31b-it:free',
       'google/gemma-4-26b-a4b:free',
       'nvidia/nemotron-3-ultra-550b-a55b:free',
-    ];
+    ]);
 
     let rawText = '';
     let lastErr = '';

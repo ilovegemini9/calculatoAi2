@@ -13,6 +13,7 @@ import {
   Users,
   ScrollText,
   Settings,
+  Bot,
   X,
   LogOut,
 } from 'lucide-react';
@@ -29,6 +30,7 @@ const NAV_ITEMS = [
   { href: '/admin/users',         label: 'Users',               icon: Users },
   { href: '/admin/logs',          label: 'Logs',                icon: ScrollText },
   { href: '/admin/settings',      label: 'Settings',            icon: Settings },
+  { href: '/admin/settings/ai',   label: 'AI Settings',         icon: Bot },
 ] as const;
 
 interface SidebarProps {

@@ -3,6 +3,7 @@ import { getDb, saveDb } from '@/lib/db';
 import { verifySession } from '@/lib/session';
 import { CALCULATORS } from '@/config/calculators';
 import type { Article } from '@/lib/types';
+import { getAiProviderKey, getAiSettings, getProviderModels } from '@/lib/ai';
 
 async function callOpenRouter(
   apiKey: string,
@@ -239,7 +240,7 @@ export async function POST(req: Request) {
 
     const db = getDb();
     const orKey =
-      db.settings.openrouterApiKey ||
+      getAiProviderKey(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter') ||
       process.env.OPENROUTER_API_KEY ||
       (process.env.OPENAI_API_KEY?.startsWith('sk-or-') ? process.env.OPENAI_API_KEY : undefined) ||
       '';
@@ -315,12 +316,12 @@ CRITICAL STYLE RULES:
 - Start directly with the Key Takeaways box — no preamble.
 - Be specific: include real numbers, percentages, or examples where relevant.`;
 
-    const articleModels = [
+    const articleModels = getProviderModels(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter', [
       'nvidia/nemotron-3-ultra-550b-a55b:free',
       'google/gemma-4-31b-it:free',
       'nvidia/nemotron-3-super-120b-a12b:free',
       'nvidia/nemotron-3-nano-30b-a3b:free',
-    ];
+    ]);
 
     let content = '';
     let lastErr = '';
