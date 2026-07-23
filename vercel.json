@@ -1,8 +1,8 @@
 {
   "version": 2,
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter @workspace/calculator-platform run build",
-  "outputDirectory": ".next",
+  "buildCommand": "pnpm --filter @workspace/calculator-platform run build && pnpm --filter @workspace/api-server run build:vercel",
+  "outputDirectory": "artifacts/calculator-platform/.next",
   "headers": [
     {
       "source": "/(.*)",
