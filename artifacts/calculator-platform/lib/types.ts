@@ -164,9 +164,52 @@ export interface SystemSettings {
   adsenseEnabled: boolean;
   adsenseCode: string;
   analyticsCode: string;
+  seo: SeoSettings;
   featureFlags: {
     aiEnabled: boolean;
     maintenanceMode: boolean;
+  };
+}
+
+export interface SeoSettings {
+  metaTitle: string;
+  metaDescription: string;
+  canonicalUrl: string;
+  openGraph: {
+    title: string;
+    description: string;
+    image: string;
+    type: 'website' | 'article';
+  };
+  twitter: {
+    card: 'summary' | 'summary_large_image';
+    title: string;
+    description: string;
+    image: string;
+  };
+  jsonLd: string;
+  sitemap: {
+    enabled: boolean;
+    includeStaticPages: boolean;
+    includeCalculators: boolean;
+    customUrls: string[];
+  };
+  robots: {
+    enabled: boolean;
+    content: string;
+  };
+  rss: {
+    enabled: boolean;
+    title: string;
+    description: string;
+  };
+  llmsTxt: {
+    enabled: boolean;
+    content: string;
+  };
+  googleSearchConsole: {
+    propertyUrl: string;
+    verificationCode: string;
   };
 }
 

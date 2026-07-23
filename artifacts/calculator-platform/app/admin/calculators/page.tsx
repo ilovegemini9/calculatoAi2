@@ -527,7 +527,7 @@ export default function CalculatorsPage() {
             ) : calculators.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <Zap className="w-10 h-10 text-[var(--text-muted)] opacity-40" />
-                <p className="text-sm text-[var(--text-muted)]">No calculators yet. Click "New Calculator" to generate your first one.</p>
+                <p className="text-sm text-[var(--text-muted)]">No calculators yet. Click &quot;New Calculator&quot; to generate your first one.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">

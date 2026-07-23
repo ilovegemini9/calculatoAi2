@@ -1,55 +1,65 @@
 import type { MetadataRoute } from 'next';
 import { siteConfig } from '@/config/site';
 import { CALCULATORS } from '@/config/calculators';
+import { getDb } from '@/lib/db';
+import { getSeoSettings } from '@/lib/seo';
+
+export const revalidate = 0;
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const seo = getSeoSettings(getDb().settings.seo);
+  const baseUrl = seo.canonicalUrl || siteConfig.url;
   const now = new Date().toISOString();
 
-  const staticPages: MetadataRoute.Sitemap = [
+  const staticPages: MetadataRoute.Sitemap = seo.sitemap.includeStaticPages ? [
     {
-      url: siteConfig.url,
+       url: baseUrl,
       lastModified: now,
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
-      url: `${siteConfig.url}/sitemap`,
+       url: `${baseUrl}/sitemap`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.3,
     },
     {
-      url: `${siteConfig.url}/about`,
+       url: `${baseUrl}/about`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: `${siteConfig.url}/privacy`,
+       url: `${baseUrl}/privacy`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.3,
     },
     {
-      url: `${siteConfig.url}/terms`,
+       url: `${baseUrl}/terms`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.3,
     },
     {
-      url: `${siteConfig.url}/contact`,
+       url: `${baseUrl}/contact`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.4,
     },
-  ];
+  ] : [];
 
-  const calculatorPages: MetadataRoute.Sitemap = CALCULATORS.map((calc) => ({
-    url: `${siteConfig.url}/${calc.slug}-calculator`,
+  const calculatorPages: MetadataRoute.Sitemap = seo.sitemap.includeCalculators ? CALCULATORS.map((calc) => ({
+     url: `${baseUrl}/${calc.slug}-calculator`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.9,
-  }));
+  })) : [];
 
-  return [...staticPages, ...calculatorPages];
+  const customPages: MetadataRoute.Sitemap = seo.sitemap.customUrls
+    .filter((url) => url.trim())
+    .map((url) => ({ url: url.trim(), lastModified: now, changeFrequency: 'weekly' as const, priority: 0.5 }));
+
+  return seo.sitemap.enabled ? [...staticPages, ...calculatorPages, ...customPages] : [];
 }

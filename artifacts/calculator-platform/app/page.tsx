@@ -4,22 +4,30 @@ import { siteConfig } from '@/config/site';
 import { CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS } from '@/config/calculators';
 import { organizationSchema, websiteSchema } from '@/lib/schemas';
 import { getDb } from '@/lib/db';
+import { getSeoSettings } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Free Online Calculators for Finance, Math, Health & More',
-  description: siteConfig.description,
-  keywords: siteConfig.keywords,
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    type: 'website',
-    url: siteConfig.url,
-    title: 'Free Online Calculators for Finance, Math, Health & More',
-    description: siteConfig.description,
-    images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = getSeoSettings(getDb().settings.seo);
+  return {
+    title: seo.metaTitle,
+    description: seo.metaDescription,
+    keywords: siteConfig.keywords,
+    alternates: { canonical: seo.canonicalUrl || '/' },
+    openGraph: {
+      type: seo.openGraph.type,
+      url: seo.canonicalUrl || siteConfig.url,
+      title: seo.openGraph.title,
+      description: seo.openGraph.description,
+      images: [{ url: seo.openGraph.image, width: 1200, height: 630, alt: seo.openGraph.title }],
+    },
+    twitter: {
+      card: seo.twitter.card,
+      title: seo.twitter.title,
+      description: seo.twitter.description,
+      images: [seo.twitter.image],
+    },
+  };
+}
 
 const TRUST_ITEMS = [
   {
