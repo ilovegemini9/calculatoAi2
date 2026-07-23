@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   distDir: process.env.NODE_ENV === 'development' ? '/tmp/.next-calculator' : '.next',
 
   // Allow Replit's proxied dev domain for cross-origin HMR/RSC requests
-  allowedDevOrigins: ['*.replit.dev', '*.spock.replit.dev', '*.repl.co'],
+  allowedDevOrigins: ['*.replit.dev', '*.spock.replit.dev', '*.riker.replit.dev', '*.repl.co'],
 
   // Experimental features
   experimental: {
