@@ -631,8 +631,9 @@ export default function ArticlesPage() {
   const hasTitle = Boolean(selectedTitle.trim());
   const hasSlug = Boolean(slug.trim());
   const hasOutline = outline.length > 0;
-  const hasSeoData = Boolean(seoData);
-  const canGenerate = hasKeyword && hasTitle && hasSlug && hasOutline && hasSeoData && !article;
+  // Generate is unlocked as soon as keyword + title + slug are ready.
+  // Outline and SEO data are fetched automatically inside generateArticle().
+  const canGenerate = hasKeyword && hasTitle && hasSlug && !article;
 
   const duplicateKeyword = Boolean(
     selectedKeyword.trim() &&
@@ -752,32 +753,16 @@ export default function ArticlesPage() {
     }
   };
 
-  const selectTitle = async (card: ResearchTitleCard) => {
+  // Selecting a title is now instantaneous — outline + SEO data are
+  // generated automatically when the admin clicks "Generate Article".
+  const selectTitle = (card: ResearchTitleCard) => {
     setSelectedTitle(card.title);
     setSlug(slugify(card.title));
     setSeoData(null);
     setOutline([]);
     setArticle(null);
     setNotice(null);
-    setPhase('loading-content');
-    setWorking('content');
-    try {
-      const res = await fetch('/api/admin/articles/outline', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: card.title, keyword: selectedKeyword, researchSummary: research }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Content generation failed.');
-      setSeoData(data.seoData ?? null);
-      setOutline(Array.isArray(data.outline) ? data.outline : []);
-      setPhase('editing-outline');
-    } catch (err) {
-      setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'SEO data and outline generation failed.' });
-      setPhase('selecting-title');
-    } finally {
-      setWorking(null);
-    }
+    setPhase('editing-outline');
   };
 
   const improveSlug = async () => {
@@ -806,46 +791,65 @@ export default function ArticlesPage() {
     setPhase('generating');
     setNotice(null);
 
-    const stages = [
-      'Preparing article brief…',
-      'Writing introduction and key takeaways…',
-      'Building main sections, examples and comparisons…',
-      'Adding FAQ, How-To, internal links and schema…',
-      'Saving draft…',
-    ];
-    let idx = 0;
-    setGenerationStage(stages[0]);
-    const timer = window.setInterval(() => {
-      idx = Math.min(idx + 1, stages.length - 1);
-      setGenerationStage(stages[idx]);
-    }, 12000);
-
     try {
-      const outlineForGenerate = outline.map((s) => ({
+      // ── Stage 1: Generate outline + SEO strategy (automatic, no admin action) ──
+      let activeSeoData = seoData;
+      let activeOutline = outline;
+
+      if (!activeOutline.length || !activeSeoData) {
+        setGenerationStage('Analysing keyword and building content strategy…');
+        const outlineRes = await fetch('/api/admin/articles/outline', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: selectedTitle.trim(),
+            keyword: selectedKeyword.trim(),
+            researchSummary: research,
+          }),
+        });
+        const outlineData = await outlineRes.json() as {
+          seoData?: ArticleAutoSeoData;
+          outline?: ArticleOutlineSection[];
+          error?: string;
+        };
+        if (!outlineRes.ok) throw new Error(outlineData.error ?? 'Content strategy generation failed.');
+        activeSeoData = outlineData.seoData ?? null;
+        activeOutline = Array.isArray(outlineData.outline) ? outlineData.outline : [];
+        setSeoData(activeSeoData);
+        setOutline(activeOutline);
+      }
+
+      // ── Stage 2: Write the article ─────────────────────────────────────────
+      setGenerationStage('Writing article — introduction, sections, FAQ, schema…');
+
+      const outlineForGenerate = activeOutline.map((s) => ({
         heading: s.heading,
         level: s.type === 'h3' ? 'h3' : 'h2',
         subpoints: s.subpoints,
       }));
 
-      const res = await fetch('/api/admin/articles/generate', {
+      const genRes = await fetch('/api/admin/articles/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           keyword: selectedKeyword.trim(),
-          primaryKeyword: seoData?.focusKeyword ?? selectedKeyword.trim(),
-          secondaryKeywords: seoData?.secondaryKeywords ?? research?.relatedSearches?.slice(0, 5) ?? [],
+          primaryKeyword: activeSeoData?.focusKeyword ?? selectedKeyword.trim(),
+          secondaryKeywords: activeSeoData?.secondaryKeywords ?? research?.relatedSearches?.slice(0, 5) ?? [],
           selectedTitle: selectedTitle.trim(),
-          intentAnalysis: seoData?.userIntent ?? intentAnalysis,
+          intentAnalysis: activeSeoData?.userIntent ?? intentAnalysis,
           outline: outlineForGenerate,
           metaTitle: selectedTitle.trim(),
           metaDescription: '',
           urlSlug: slug.trim(),
-          lockedKeywords: [selectedKeyword.trim(), ...(seoData?.secondaryKeywords?.slice(0, 3) ?? [])],
+          lockedKeywords: [selectedKeyword.trim(), ...(activeSeoData?.secondaryKeywords?.slice(0, 3) ?? [])],
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Article generation failed.');
-      setArticle(data.article);
+      const genData = await genRes.json() as { article?: Article; error?: string };
+      if (!genRes.ok) throw new Error(genData.error ?? 'Article generation failed.');
+
+      // ── Stage 3: Persist + refresh ─────────────────────────────────────────
+      setGenerationStage('Saving draft to database…');
+      setArticle(genData.article as Article);
       setPhase('done');
       await loadArticles();
       setNotice({ kind: 'success', text: 'Article saved as draft. Review and edit before publishing.' });
@@ -853,7 +857,6 @@ export default function ArticlesPage() {
       setNotice({ kind: 'error', text: err instanceof Error ? err.message : 'Article generation failed.' });
       setPhase('editing-outline');
     } finally {
-      window.clearInterval(timer);
       setWorking(null);
       setGenerationStage('');
     }
@@ -924,9 +927,8 @@ export default function ArticlesPage() {
   };
 
   // ── Phase helpers ────────────────────────────────────────────────────────────
-  const isAfterKeyword = ['loading-titles', 'selecting-title', 'loading-content', 'editing-outline', 'generating', 'done'].includes(phase);
-  const isAfterTitle = ['loading-content', 'editing-outline', 'generating', 'done'].includes(phase);
-  const isAfterContent = ['editing-outline', 'generating', 'done'].includes(phase);
+  // Title selection now goes directly to 'editing-outline' (no loading-content step)
+  const isAfterTitle = ['editing-outline', 'generating', 'done'].includes(phase);
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -1106,11 +1108,6 @@ export default function ArticlesPage() {
         locked={!hasKeyword || phase === 'loading-titles' || phase === 'selecting-keyword'}
         active={phase === 'selecting-title'}
       >
-        {/* Loading content */}
-        {phase === 'loading-content' && (
-          <LoadingPulse message="Title selected — generating SEO data and content outline…" />
-        )}
-
         {/* Title cards */}
         {titleCards.length > 0 && !['loading-titles', 'researching', 'selecting-keyword'].includes(phase) && (
           <div className="space-y-3">
@@ -1122,12 +1119,7 @@ export default function ArticlesPage() {
                   selected={selectedTitle === card.title}
                   onClick={() => {
                     if (working !== null) return;
-                    if (isAfterTitle) {
-                      setSeoData(null);
-                      setOutline([]);
-                      setArticle(null);
-                    }
-                    void selectTitle(card);
+                    selectTitle(card);
                   }}
                 />
               ))}
@@ -1171,7 +1163,7 @@ export default function ArticlesPage() {
         )}
 
         {/* Empty state */}
-        {titleCards.length === 0 && hasKeyword && !['loading-titles', 'loading-content', 'selecting-keyword'].includes(phase) && (
+        {titleCards.length === 0 && hasKeyword && !['loading-titles', 'selecting-keyword'].includes(phase) && (
           <p className="text-sm text-[var(--text-muted)] text-center py-4">Select a keyword above to generate title suggestions.</p>
         )}
       </StepCard>
@@ -1182,17 +1174,19 @@ export default function ArticlesPage() {
       <StepCard
         number="4"
         title="SEO Data"
-        description="Automatically generated keyword strategy: focus keyword, secondary, long-tail, semantic, entity keywords, user intent, audience and content angle."
-        locked={!isAfterTitle || phase === 'loading-content'}
-        active={isAfterContent && !seoData === false && phase === 'editing-outline'}
+        description="Auto-generated when you click Generate Article — focus keyword, secondary keywords, user intent, audience and content angle."
+        locked={!isAfterTitle}
+        active={phase === 'generating' && !seoData}
       >
-        {phase === 'loading-content' && (
-          <LoadingPulse message="Generating SEO data and content outline from research signals…" />
-        )}
-        {seoData ? (
+        {phase === 'generating' && !seoData ? (
+          <LoadingPulse message="Building keyword strategy from research signals…" />
+        ) : seoData ? (
           <SeoDataPanel seoData={seoData} />
-        ) : isAfterTitle && phase !== 'loading-content' ? (
-          <p className="text-sm text-[var(--text-muted)] text-center py-4">Select a title above to auto-generate SEO data.</p>
+        ) : isAfterTitle ? (
+          <div className="flex items-center gap-2 rounded-xl border border-dashed p-4 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
+            <Zap className="h-4 w-4 shrink-0 text-blue-400" />
+            Generated automatically when you click <strong className="text-[var(--text-secondary)]">Generate Article</strong>.
+          </div>
         ) : null}
       </StepCard>
 
@@ -1202,17 +1196,19 @@ export default function ArticlesPage() {
       <StepCard
         number="5"
         title="Content Outline"
-        description="AI-generated from research data. Edit headings, reorder sections, add or remove as needed."
-        locked={!isAfterContent || phase === 'loading-content'}
-        active={phase === 'editing-outline' && outline.length > 0}
+        description="Auto-generated when you click Generate Article — H2/H3 sections, FAQ, How-To, Comparison, Pros & Cons and more."
+        locked={!isAfterTitle}
+        active={phase === 'generating' && !hasOutline}
       >
-        {phase === 'loading-content' && (
+        {phase === 'generating' && !hasOutline ? (
           <LoadingPulse message="Building content outline from PAA questions and research signals…" />
-        )}
-        {outline.length > 0 ? (
+        ) : outline.length > 0 ? (
           <OutlineEditor outline={outline} onChange={setOutline} />
-        ) : isAfterTitle && phase !== 'loading-content' ? (
-          <p className="text-sm text-[var(--text-muted)] text-center py-4">Select a title above to auto-generate the outline.</p>
+        ) : isAfterTitle ? (
+          <div className="flex items-center gap-2 rounded-xl border border-dashed p-4 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
+            <Zap className="h-4 w-4 shrink-0 text-blue-400" />
+            Generated automatically when you click <strong className="text-[var(--text-secondary)]">Generate Article</strong>.
+          </div>
         ) : null}
       </StepCard>
 
@@ -1258,7 +1254,9 @@ export default function ArticlesPage() {
                 {working === 'generate' ? 'Generating article…' : 'Generate Article'}
               </button>
               {!canGenerate && (
-                <p className="text-xs text-[var(--text-muted)]">Complete all steps above to unlock.</p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  {!hasKeyword ? 'Select a focus keyword to unlock.' : !hasTitle ? 'Select a title to unlock.' : !hasSlug ? 'A URL slug is required.' : ''}
+                </p>
               )}
             </div>
           </div>
