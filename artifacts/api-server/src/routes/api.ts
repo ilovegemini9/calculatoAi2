@@ -723,21 +723,40 @@ async function generateArticleInBackground(
     task.progress = 10;
     logEvent('ai_generation', `[Stage 1] SEO planning for "${calculatorName}" with Nemotron-3-Super`);
 
-    const plannerPrompt = `Act as an expert SEO Strategist. Analyze the topic and create an ultra-optimized SEO brief.
+    const plannerPrompt = `Act as an expert SEO Strategist and Content Architect. Analyze the topic and create a comprehensive content brief.
 
 Topic: ${calculatorName}
 Target Keywords: ${keywordsStr}
 Target Audience: General users seeking practical calculation tools
+
+MANDATORY CONTENT SECTIONS — the outline MUST include sections in this order:
+1. Hook (opening scenario/statement — maps to Introduction)
+2. Executive Summary (key takeaways)
+3. Introduction (context and preview)
+4. Core explanation (What Is X / How X Works) — use H2 + H3 sub-sections as needed
+5. Step-by-Step Guide (numbered steps for using the tool or applying the concept)
+6. Practical Examples (2-4 real-world worked examples with numbers)
+7. Helpful Tips (specific, expert-level tips)
+8. Best Practices (what experts do that beginners skip)
+9. Common Mistakes (specific mistakes and how to avoid them)
+10. FAQ (6-8 real search queries with conversational answers)
+11. Pros & Cons — ONLY include if the topic genuinely involves a decision or tradeoff
+12. Comparison Table — ONLY include if comparing multiple options adds clear reader value
+13. References (credible sources, formulas, standards)
+14. Conclusion (key takeaway summary)
+15. Call To Action (clear next step for the reader)
 
 Output a clean, valid JSON object with exactly these keys:
 {
   "meta_title_suggestion": "A compelling SEO-friendly title under 60 characters",
   "search_intent": "Brief analysis of search intent (informational, transactional, etc.)",
   "semantic_entities": ["10 related semantic terms to include naturally"],
+  "include_pros_cons": true or false,
+  "include_comparison_table": true or false,
   "outline": [
     {
-      "heading": "H2 or H3 heading optimized with keywords",
-      "key_points": ["specific points, data, or arguments to cover"],
+      "heading": "H2 or H3 heading — reader benefit first, keyword second",
+      "key_points": ["specific points, data, examples, or arguments to cover"],
       "target_keywords": ["1-2 specific keywords for this section"]
     }
   ]
@@ -789,23 +808,83 @@ Do NOT write the article. Only output the JSON brief. No surrounding text.`;
     task.stage = 'Phase 2/3: Drafting article with premium, human-like copywriting style (Nemotron-3-Ultra)...';
     logEvent('ai_generation', `[Stage 2] Writing article with Nemotron-3-Ultra`);
 
-    const writerPrompt = `Act as a professional, high-end copywriter and journalist. Write a deeply engaging, authoritative article based on this SEO brief.
+    const writerPrompt = `Act as a professional, high-end copywriter and journalist. Write a comprehensive, reader-first article based on this SEO brief.
 
 SEO Brief (JSON): ${JSON.stringify(step1Json)}
 
-CRITICAL STYLE RULES:
+CRITICAL PRIORITY: Help the reader first. SEO is secondary. Every section must deliver genuine value.
+
+ABSOLUTE STYLE RULES — non-negotiable:
 - Write like an expert human author. NO robotic structures, no predictable formulas.
-- ABSOLUTELY BANNED: "In today's digital age", "delve", "tapestry", "nestled", "testament", "moreover", "furthermore", "in conclusion" as a heading.
+- BANNED PHRASES: "In today's digital age", "delve", "tapestry", "nestled", "testament", "moreover", "furthermore", "utilize", "leverage", "comprehensive", "in conclusion" (as a heading), "it's worth noting", "it's important to note".
 - Use varied sentence lengths. Short punchy sentences. Longer analytical ones. Mix both naturally.
-- Hook the reader. Conversational yet authoritative.
+- Use specific numbers, real dollar amounts, realistic percentages throughout — never placeholders like [value].
+- Write in Markdown. Use clear paragraphs, bullets where useful, **bold key terms**.
+
+MANDATORY ARTICLE STRUCTURE — follow this order exactly:
+
+[Hook — 2-3 punchy sentences BEFORE any heading. Open with a real scenario, surprising fact, or bold statement that makes the reader feel "this is exactly what I needed." No definition. No "In today's world."]
+
+## Executive Summary
+- [Bullet: most important takeaway #1]
+- [Bullet: most important takeaway #2]
+- [Bullet: most important takeaway #3]
+- [Bullet: most important takeaway #4 — add a 5th if truly needed]
+
+## Introduction
+[2-3 paragraphs expanding the hook. Establish why this topic matters to THIS specific reader. Preview what the article covers without being a table of contents.]
+
+## [H2: Core concept — What Is X / How X Works — tailor heading to topic]
+### [H3 sub-sections as needed — break down complex sub-topics]
+[Practical context. Common misconceptions. Why this matters. Specific examples.]
+
+## Step-by-Step Guide
+### Step 1: [Action-oriented title]
+[Clear instruction]
+### Step 2: [Action-oriented title]
+[Clear instruction]
+[Continue for all necessary steps — typically 4-7 steps]
+
+## Practical Examples
+[3 different worked examples using real numbers, different user situations and contexts. Show full calculations or applications. Make each example feel like a different person's story.]
+
+## Helpful Tips
+[6-8 specific, expert-level tips most people don't know. Not generic. Not obvious. Each tip should save the reader time or prevent a real mistake.]
+
+## Best Practices
+[5-7 practices that separate experts from beginners. Concrete, specific, actionable. Explain WHY each one matters.]
+
+## Common Mistakes
+[5-7 specific mistakes. Name the mistake clearly. Explain the consequence. Show how to avoid it. Real examples.]
+
+## Frequently Asked Questions
+
+**[Question — phrased exactly as someone would type it into Google, 8-15 words]**
+[Answer — 2-4 sentences, conversational, with a real example or specific number. Never vague.]
+
+[Include 6-8 Q&As covering the most searched questions for this topic]
+
+${step1Json.include_pros_cons ? `## Pros & Cons
+[Present as two clear columns or two short lists. Honest, balanced assessment. Only the most meaningful pros and cons — not an exhaustive list.]
+
+` : ''}${step1Json.include_comparison_table ? `## Comparison
+[Only include a table if it genuinely helps the reader choose or understand. Label columns clearly. Keep it compact — max 6 rows.]
+
+` : ''}## References
+[List 3-6 credible sources: formulas, standards bodies, research, institutions, or authoritative websites relevant to this topic. Format: - Source Name — brief note on what it covers]
+
+## Conclusion
+[3-4 sentences. Summarize the single most important takeaway. Reinforce the reader's ability to act on what they've learned. No filler. No "In conclusion".]
+
+## Take Action
+[1-2 sentences. Clear, natural next step for the reader. What should they do RIGHT NOW with what they've learned? Reference the calculator or tool directly.]
 
 Instructions:
-1. Write the full article body following the outline step-by-step.
+1. Follow the outline from the SEO brief for section content, but the structure above is the law.
 2. Seamlessly integrate semantic_entities and target_keywords naturally — never force them.
-3. Write in Markdown: clear paragraphs, bullets where useful, bold key terms.
-4. Target 1500–2000 words. Include at least one worked example and one FAQ section.
-5. Do NOT output HTML tags or meta descriptions. Focus on pure editorial quality.
-6. Start directly with the first paragraph — no preamble or "Here is the article:" opener.`;
+3. Target 2000–2500 words. Quality over quantity — never pad sections.
+4. Do NOT output HTML tags or meta descriptions. Pure Markdown only.
+5. Start directly with the Hook — no preamble, no "Here is the article:" opener.`;
 
     let step2Markdown = '';
 
@@ -830,7 +909,7 @@ Instructions:
     task.stage = 'Phase 3/3: Applying HTML semantic markup and technical SEO optimization (Nemotron-3-Nano)...';
     logEvent('ai_generation', `[Stage 3] SEO optimization with Nemotron-3-Nano`);
 
-    const optimizerPrompt = `Act as a technical SEO Developer and Editor. Refine the article draft and output final, ready-to-publish content.
+    const optimizerPrompt = `Act as a technical SEO Developer and Editor. Refine the article draft and output final, ready-to-publish HTML content.
 
 Draft (Markdown): ${step2Markdown.slice(0, 6000)}
 SEO Brief: ${JSON.stringify({ meta_title_suggestion: step1Json.meta_title_suggestion, semantic_entities: step1Json.semantic_entities })}
@@ -840,12 +919,18 @@ CRITICAL STYLE RULES:
 - Meta description must sound like a human marketer, not a bot.
 
 Instructions:
-1. Convert Markdown to clean semantic HTML5: use <h2>, <h3>, <p>, <strong>, <ul>, <li>. No <html>/<head>/<body>.
+1. Convert Markdown to clean semantic HTML5: use <h2>, <h3>, <p>, <strong>, <ul>, <li>, <ol>, <table>, <blockquote>. No <html>/<head>/<body>.
 2. Ensure primary keywords appear in the first 100 words and in at least two headings.
-3. Add a "Key Takeaways" box at the top: <div class="seo-summary-box"><h3>Key Takeaways</h3><ul>...</ul></div>
-4. At the very top of output, add a JSON metadata comment block:
+3. Add id attributes to all <h2> and <h3> tags for anchor navigation (slugify the heading text).
+4. Immediately after the opening hook paragraph, insert a Table of Contents:
+   <nav class="article-toc"><h3>Table of Contents</h3><ol><li><a href="#section-id">Section Title</a></li>...</ol></nav>
+5. Keep the Executive Summary section (from the draft) as-is — do NOT replace it with the TOC or a Key Takeaways box.
+6. Format Step-by-Step Guide sections as <ol> with <li> items. Format Tips, Best Practices, Common Mistakes as <ul>.
+7. If a Pros & Cons section exists: render as two side-by-side <ul> lists inside <div class="pros-cons-grid">.
+8. If a Comparison Table exists: render as a proper <table> with <thead> and <tbody>.
+9. At the very top of output, add a JSON metadata comment block:
    <!-- META: {"finalTitle": "...", "metaDescription": "150-160 chars, punchy CTA", "urlSlug": "..."} -->
-5. Output ONLY the metadata comment + clean HTML. No conversational intro.`;
+10. Output ONLY the metadata comment + clean HTML. No conversational intro or explanation.`;
 
     let step3Output = '';
 
@@ -1191,50 +1276,90 @@ WRITING STYLE for FAQ answers and howToUse steps:
 
   // ── PASS 3: SEO article (plain markdown text — NOT JSON) ─────────────────────
   // Returned as raw text to avoid JSON escaping corruption of long markdown.
-  const ARTICLE_PROMPT = `You are a professional content writer with deep expertise in the subject of "${spec.trim()}". Write a comprehensive, authoritative guide for a calculator page on a popular calculator website.
+  const ARTICLE_PROMPT = `You are a professional content writer and subject-matter expert on "${spec.trim()}". Write a comprehensive, reader-first guide for a calculator page. Your primary job is to help the visitor — SEO is secondary.
 
-CRITICAL WRITING RULES — these are non-negotiable:
-1. Write as a real human expert. A financial advisor, doctor, or subject-matter specialist depending on the topic.
-2. Start with a specific real-world scenario or hook — NOT a definition or "In today's world".
-3. Use specific numbers, real dollar amounts, percentages throughout — never placeholders like [value].
+ABSOLUTE WRITING RULES — non-negotiable:
+1. Write as a real human expert: a financial advisor, doctor, or specialist depending on the topic.
+2. Start with a HOOK — a real scenario, surprising fact, or bold statement. NOT a definition. NOT "In today's world".
+3. Use specific numbers, real dollar amounts, realistic percentages throughout — NEVER placeholders like [value].
 4. Vary sentence length naturally: short punchy sentences alternate with longer explanatory ones.
-5. Zero AI clichés: never write "It's important to note", "In conclusion", "Furthermore", "Moreover", "Utilize", "Leverage", "Delve into", "Comprehensive", "In today's fast-paced".
+5. BANNED PHRASES: "It's important to note", "In conclusion" (as heading), "Furthermore", "Moreover", "Utilize", "Leverage", "Delve into", "Comprehensive", "In today's fast-paced", "Tapestry", "Testament", "It's worth noting".
 6. The article must read as if written by a person, not generated by AI.
+7. Never generate a section just to fill space. Every section must earn its place.
 
-Write a 2000+ word markdown article with these exact sections:
-# [H1: Primary keyword, compelling and specific]
+Write a 2000–2500 word markdown article with this EXACT structure:
 
-[Opening paragraph: Start with a real scenario, not a definition. Make the reader feel seen.]
+# [H1: Primary keyword — compelling and specific, max 70 characters]
 
-## What Is [Calculator Type] — And Why Most People Get It Wrong
-[Practical context. Common misconceptions. Why this matters. Specific examples.]
+[Hook — 2-3 punchy sentences BEFORE any H2. Open with a real scenario or bold statement. Make the reader feel "this is exactly what I needed."]
 
-## The [Calculator Name] Formula Explained
-[Name the formula. Define every variable in plain English. Work through one complete example step-by-step with real numbers. Show the actual arithmetic.]
+## Executive Summary
+- [Most important takeaway #1 — specific, actionable]
+- [Most important takeaway #2]
+- [Most important takeaway #3]
+- [Most important takeaway #4]
 
-## How to Use This Calculator
-[Walk through each input field. Explain what to enter, what realistic values look like, and what to watch for. Then explain how to read each output.]
+## Introduction
+[2-3 paragraphs. Expand the hook. Establish why this matters to THIS specific reader. Preview the article without being a table of contents.]
 
-## Three Real-World Examples
-[Three different scenarios with full calculations worked out. Different contexts — different types of users with different situations.]
+## [H2: Core concept — What Is X / How X Works — tailor heading to topic]
+### [H3 sub-topics as needed]
+[Practical context. Common misconceptions. Why it matters. Specific examples with real numbers.]
 
-## Tips for Getting the Most Accurate Results
-[Practical insider advice. Specific to this calculator type. What most people overlook.]
+## Step-by-Step Guide
+### Step 1: [Action-oriented title]
+[Clear, specific instruction]
+### Step 2: [Action-oriented title]
+[Clear, specific instruction]
+[4-7 steps total — enough to be thorough, not so many it's overwhelming]
 
-## Common Mistakes (And How to Avoid Them)
-[4-6 specific mistakes. Explain why each one matters and what goes wrong. Specific and practical.]
+## Practical Examples
+[3 fully worked examples. Real numbers, different user situations. Each example = a different type of person with a different scenario. Show all calculations.]
+
+## Helpful Tips
+- [Specific tip #1 — something most people overlook]
+- [Specific tip #2]
+- [6-8 tips total — expert-level, not obvious advice]
+
+## Best Practices
+- [Best practice #1 — what experts do that beginners skip]
+- [5-7 practices total — concrete, specific, with a why]
+
+## Common Mistakes
+### [Mistake #1: Clear name for the mistake]
+[What goes wrong and how to avoid it]
+### [Repeat for 5-7 total mistakes]
 
 ## Frequently Asked Questions
 
-**[Question]**
-[Answer — 2-4 sentences, conversational, with a real example or number]
+**[Question phrased exactly as someone types it into Google — 8-15 words]**
+[Answer — 2-4 sentences, conversational, with a real example or number. Never vague.]
 
-[Include 6-8 Q&As covering the most searched questions for this topic]
+[6-8 Q&As total covering the most-searched questions for this topic]
 
-## Related Calculators
-[Brief natural mention of 2-3 related calculators that complement this one]
+[CONDITIONAL — only include if the topic involves a genuine decision or tradeoff:]
+## Pros & Cons
+**Pros**
+- [Pro #1]
+**Cons**
+- [Con #1]
+[Only include this section if it genuinely helps the reader. Skip it for pure how-to topics.]
 
-Output only the markdown article — no JSON wrapper, no introduction, no explanation. Start directly with the # heading.`;
+[CONDITIONAL — only include if comparing multiple real options adds clear reader value:]
+## Comparison
+[A compact markdown table comparing 3-6 options. Label columns clearly. Skip if not relevant.]
+
+## References
+- [Source 1 — what it covers, e.g. "IRS Publication 936 — mortgage interest deduction rules"]
+- [3-6 credible sources: formulas, standards bodies, research, authoritative websites]
+
+## Conclusion
+[3-4 sentences. Single most important takeaway. Reinforce the reader's ability to act. No "In conclusion". No filler.]
+
+## Take Action
+[1-2 sentences. Clear, natural next step. What should the reader do RIGHT NOW? Reference the calculator directly.]
+
+Output only the markdown — no JSON wrapper, no introduction, no explanation. Start directly with the # heading.`;
 
   try {
     let logicParsed: any = {};
