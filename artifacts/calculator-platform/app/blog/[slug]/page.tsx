@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Clock, Calendar, ArrowLeft, ExternalLink, BookOpen } from 'lucide-react';
+import { Clock, Calendar, ArrowLeft, BookOpen, Calculator, ChevronRight } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import { siteConfig } from '@/config/site';
 import { getSeoSettings } from '@/lib/seo';
@@ -369,6 +369,60 @@ export default async function BlogArticlePage({ params }: Props) {
                   </>
                 )}
               </div>
+
+              {/* ── Related Calculator card ──────────────────────────────── */}
+              {article.suggestedCalculator && (
+                <div
+                  className="rounded-xl border p-4 space-y-3"
+                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+                >
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                    <Calculator className="h-3.5 w-3.5" /> Related Calculator
+                  </p>
+                  <Link
+                    href={`/${article.suggestedCalculator.slug}`}
+                    className="block group"
+                  >
+                    <p className="text-sm font-semibold text-blue-400 group-hover:text-blue-300 transition leading-snug">
+                      {article.suggestedCalculator.name}
+                    </p>
+                    {article.suggestedCalculator.description && (
+                      <p className="mt-1 text-xs text-[var(--text-muted)] leading-relaxed line-clamp-3">
+                        {article.suggestedCalculator.description}
+                      </p>
+                    )}
+                    <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue-400 group-hover:gap-2 transition-all">
+                      Use calculator <ChevronRight className="h-3 w-3" />
+                    </span>
+                  </Link>
+                </div>
+              )}
+
+              {/* ── Related Articles card ────────────────────────────────── */}
+              {article.relatedArticles && article.relatedArticles.length > 0 && (
+                <div
+                  className="rounded-xl border p-4 space-y-3"
+                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}
+                >
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5" /> Related Articles
+                  </p>
+                  <ul className="space-y-3">
+                    {article.relatedArticles.map((ra) => (
+                      <li key={ra.articleId}>
+                        <Link
+                          href={`/blog/${ra.slug}`}
+                          className="group block"
+                        >
+                          <p className="text-xs font-medium text-[var(--text-secondary)] group-hover:text-blue-400 transition leading-snug line-clamp-2">
+                            {ra.title}
+                          </p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
             </div>
           </aside>

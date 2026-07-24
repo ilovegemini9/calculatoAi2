@@ -28,7 +28,7 @@ import {
   AlignLeft,
   BarChart2,
 } from 'lucide-react';
-import type { Article } from '@/lib/types';
+import type { Article, SuggestedCalculator, RelatedArticle, InternalLinkSuggestion } from '@/lib/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -189,6 +189,10 @@ export default function ArticleEditorPage() {
   const [relatedCalculators, setRelatedCalculators] = useState<string[]>([]);
   const [relatedKeywords, setRelatedKeywords] = useState<string[]>([]);
   const [tableOfContents, setTableOfContents] = useState('');
+  // Related Content Engine state (Phase 8)
+  const [suggestedCalculator, setSuggestedCalculator] = useState<SuggestedCalculator | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<RelatedArticle[]>([]);
+  const [internalLinkSuggestions, setInternalLinkSuggestions] = useState<InternalLinkSuggestion[]>([]);
   // SEO Engine state
   const [ogImage, setOgImage] = useState('');
   const [twitterCard, setTwitterCard] = useState<'summary' | 'summary_large_image'>('summary_large_image');
@@ -234,6 +238,10 @@ export default function ArticleEditorPage() {
       setRelatedCalculators(data.relatedCalculators || []);
       setRelatedKeywords(data.relatedKeywords || []);
       setTableOfContents(data.tableOfContents || '');
+      // Related Content Engine
+      setSuggestedCalculator(data.suggestedCalculator ?? null);
+      setRelatedArticles(data.relatedArticles || []);
+      setInternalLinkSuggestions(data.internalLinkSuggestions || []);
       // SEO Engine fields
       setOgImage(data.ogImage || '');
       setTwitterCard(data.twitterCard || 'summary_large_image');
@@ -279,6 +287,10 @@ export default function ArticleEditorPage() {
         relatedCalculators,
         relatedKeywords,
         tableOfContents,
+        // Related Content Engine
+        suggestedCalculator,
+        relatedArticles,
+        internalLinkSuggestions,
         ogImage,
         twitterCard,
         headingHierarchy,
@@ -1171,41 +1183,222 @@ export default function ArticleEditorPage() {
 
           {/* ── RELATED ── */}
           {activeTab === 'related' && (
-            <div className="space-y-5">
-              <Field label="Related Calculators" hint="Slug names of related calculators, one per line">
+            <div className="space-y-6">
+
+              {/* ── Suggested Calculator ──────────────────────────────────── */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                    <Link2 className="w-3.5 h-3.5" /> Suggested Calculator
+                  </p>
+                  <span className="text-xs text-[var(--text-muted)]">Auto-detected · editable</span>
+                </div>
+
+                {suggestedCalculator ? (
+                  <div
+                    className="rounded-xl border p-4 space-y-3"
+                    style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-blue-400">{suggestedCalculator.name}</p>
+                        <p className="text-xs text-[var(--text-muted)] font-mono">/{suggestedCalculator.slug}</p>
+                        {suggestedCalculator.description && (
+                          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{suggestedCalculator.description}</p>
+                        )}
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-emerald-500/15 text-emerald-400 capitalize">
+                          {suggestedCalculator.category}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => setSuggestedCalculator(null)}
+                        className="text-xs text-red-400 hover:text-red-300 transition shrink-0 px-2 py-1 rounded border border-red-500/20 hover:bg-red-500/10"
+                      >
+                        Remove
+                      </button>
+                    </div>
+
+                    {/* Override fields */}
+                    <div className="pt-2 border-t space-y-2" style={{ borderColor: 'var(--border)' }}>
+                      <p className="text-xs text-[var(--text-muted)]">Override name or description:</p>
+                      <input
+                        value={suggestedCalculator.name}
+                        onChange={(e) => setSuggestedCalculator({ ...suggestedCalculator, name: e.target.value })}
+                        placeholder="Calculator name"
+                        className="w-full px-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        style={{ borderColor: 'var(--border)' }}
+                      />
+                      <textarea
+                        value={suggestedCalculator.description}
+                        onChange={(e) => setSuggestedCalculator({ ...suggestedCalculator, description: e.target.value })}
+                        rows={2}
+                        placeholder="Short description shown in the card"
+                        className="w-full px-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                        style={{ borderColor: 'var(--border)' }}
+                      />
+                      <input
+                        value={suggestedCalculator.slug}
+                        onChange={(e) => setSuggestedCalculator({ ...suggestedCalculator, slug: e.target.value })}
+                        placeholder="calculator-slug"
+                        className="w-full px-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                        style={{ borderColor: 'var(--border)' }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="rounded-xl border border-dashed p-5 text-center space-y-2"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <p className="text-xs text-[var(--text-muted)]">No calculator matched. Add one manually:</p>
+                    <button
+                      onClick={() => setSuggestedCalculator({
+                        calculatorId: '', slug: '', name: '', description: '', category: '',
+                      })}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
+                    >
+                      + Add Calculator
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Related Articles ──────────────────────────────────────── */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5" /> Related Articles
+                  </p>
+                  <button
+                    onClick={() => setRelatedArticles((prev) => [
+                      ...prev,
+                      { articleId: '', slug: '', title: '', description: '' },
+                    ])}
+                    className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
+                  >
+                    + Add
+                  </button>
+                </div>
+
+                {relatedArticles.length === 0 ? (
+                  <p className="text-xs text-[var(--text-muted)] italic">No related articles detected. Click Add to add one manually.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {relatedArticles.map((ra, i) => (
+                      <div
+                        key={i}
+                        className="rounded-xl border p-4 space-y-2"
+                        style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-[var(--text-muted)]">Article #{i + 1}</span>
+                          <button
+                            onClick={() => setRelatedArticles((prev) => prev.filter((_, j) => j !== i))}
+                            className="text-xs text-red-400 hover:text-red-300 transition"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <input
+                          value={ra.title}
+                          onChange={(e) => setRelatedArticles((prev) =>
+                            prev.map((x, j) => j === i ? { ...x, title: e.target.value } : x)
+                          )}
+                          placeholder="Article title"
+                          className="w-full px-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          style={{ borderColor: 'var(--border)' }}
+                        />
+                        <input
+                          value={ra.slug}
+                          onChange={(e) => setRelatedArticles((prev) =>
+                            prev.map((x, j) => j === i ? { ...x, slug: e.target.value } : x)
+                          )}
+                          placeholder="url-slug (without /blog/)"
+                          className="w-full px-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                          style={{ borderColor: 'var(--border)' }}
+                        />
+                        <textarea
+                          value={ra.description}
+                          onChange={(e) => setRelatedArticles((prev) =>
+                            prev.map((x, j) => j === i ? { ...x, description: e.target.value } : x)
+                          )}
+                          rows={2}
+                          placeholder="Short description (optional)"
+                          className="w-full px-3 py-1.5 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                          style={{ borderColor: 'var(--border)' }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ── Internal Link Suggestions ─────────────────────────────── */}
+              {internalLinkSuggestions.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                    <Link2 className="w-3.5 h-3.5" /> Internal Link Suggestions
+                    <span className="font-normal normal-case text-[var(--text-muted)]">— copy anchor text + URL into your content</span>
+                  </p>
+                  <div className="rounded-xl border divide-y" style={{ borderColor: 'var(--border)' }}>
+                    {internalLinkSuggestions.map((s, i) => (
+                      <div key={i} className="flex items-center gap-3 px-4 py-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                          s.targetType === 'calculator'
+                            ? 'bg-blue-500/15 text-blue-400'
+                            : 'bg-purple-500/15 text-purple-400'
+                        }`}>
+                          {s.targetType}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-[var(--text-primary)] truncate">{s.anchorText}</p>
+                          <p className="text-xs text-[var(--text-muted)] font-mono truncate">{s.targetSlug}</p>
+                        </div>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(
+                            `<a href="${s.targetSlug}">${s.anchorText}</a>`
+                          )}
+                          className="text-xs text-[var(--text-muted)] hover:text-blue-400 transition shrink-0 px-2 py-1 rounded border hover:border-blue-500/40"
+                          style={{ borderColor: 'var(--border)' }}
+                          title="Copy HTML link"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ── Legacy: Related Calculator Slugs ─────────────────────── */}
+              <div className="space-y-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">All Related Calculator Slugs</p>
+                <p className="text-xs text-[var(--text-muted)]">Raw slug list — one per line. The "Suggested Calculator" above populates this automatically.</p>
                 <Textarea
                   value={relatedCalculators.join('\n')}
                   onChange={(v) => setRelatedCalculators(v.split('\n').map((k) => k.trim()).filter(Boolean))}
-                  rows={6}
+                  rows={4}
                   placeholder="mortgage&#10;bmi&#10;loan"
                   mono
                 />
-              </Field>
-              {relatedCalculators.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {relatedCalculators.map((slug) => (
-                    <a
-                      key={slug}
-                      href={`/${slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-blue-600/10 text-blue-400 border border-blue-600/20 hover:bg-blue-600/20 transition"
-                    >
-                      <BookOpen className="w-2.5 h-2.5" />
-                      /{slug}
-                    </a>
-                  ))}
-                </div>
-              )}
-              <Field label="Table of Contents HTML" hint="Raw HTML for the table of contents block">
-                <Textarea
-                  value={tableOfContents}
-                  onChange={setTableOfContents}
-                  rows={8}
-                  mono
-                  placeholder='<nav class="toc-box">…</nav>'
-                />
-              </Field>
+                {relatedCalculators.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {relatedCalculators.map((slug) => (
+                      <a
+                        key={slug}
+                        href={`/${slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-blue-600/10 text-blue-400 border border-blue-600/20 hover:bg-blue-600/20 transition"
+                      >
+                        <BookOpen className="w-2.5 h-2.5" />
+                        /{slug}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
         </div>

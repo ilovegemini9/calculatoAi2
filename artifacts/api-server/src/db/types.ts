@@ -29,6 +29,28 @@ export interface Calculator {
   createdAt: string;
 }
 
+export interface SuggestedCalculator {
+  calculatorId: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: string;
+}
+
+export interface RelatedArticle {
+  articleId: string;
+  slug: string;
+  title: string;
+  description: string;
+}
+
+export interface InternalLinkSuggestion {
+  anchorText: string;
+  targetSlug: string;
+  targetTitle: string;
+  targetType: 'calculator' | 'article';
+}
+
 export interface Article {
   id: string;
   calculatorId: string;
@@ -44,6 +66,12 @@ export interface Article {
   };
   version: number;
   createdAt: string;
+  updatedAt?: string;
+  // Related Content Engine (Phase 8)
+  suggestedCalculator?: SuggestedCalculator | null;
+  relatedCalculators?: string[];
+  relatedArticles?: RelatedArticle[];
+  internalLinkSuggestions?: InternalLinkSuggestion[];
 }
 
 export interface ArticleVersion {

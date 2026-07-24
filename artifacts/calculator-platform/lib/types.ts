@@ -105,6 +105,30 @@ export interface ArticleKeywordData {
   estimatedCtr: string;
 }
 
+// ─── Related Content Engine types ────────────────────────────────────────────
+
+export interface SuggestedCalculator {
+  calculatorId: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: string;
+}
+
+export interface RelatedArticle {
+  articleId: string;
+  slug: string;
+  title: string;
+  description: string;
+}
+
+export interface InternalLinkSuggestion {
+  anchorText: string;
+  targetSlug: string;
+  targetTitle: string;
+  targetType: 'calculator' | 'article';
+}
+
 export interface Article {
   id: string;
   calculatorId: string;
@@ -140,6 +164,10 @@ export interface Article {
   ogImage?: string;
   twitterCard?: 'summary' | 'summary_large_image';
   headingHierarchy?: { level: 'h2' | 'h3'; text: string; id: string }[];
+  // Related Content Engine (Phase 8)
+  suggestedCalculator?: SuggestedCalculator | null;
+  relatedArticles?: RelatedArticle[];
+  internalLinkSuggestions?: InternalLinkSuggestion[];
 }
 
 export interface ArticleVersion {

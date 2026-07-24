@@ -695,6 +695,185 @@ router.post('/articles/generate-async', adminAuthMiddleware, (req: Request, res:
   res.json({ success: true, taskId });
 });
 
+// ─── Related Content Engine ───────────────────────────────────────────────────
+
+import type { SuggestedCalculator, RelatedArticle, InternalLinkSuggestion } from '../db/types.js';
+
+/** Jaccard-style keyword overlap score in [0, 1] */
+function keywordOverlapScore(setA: string[], setB: string[]): number {
+  if (!setA.length || !setB.length) return 0;
+  const a = new Set(setA.map((k) => k.toLowerCase().trim()));
+  const b = new Set(setB.map((k) => k.toLowerCase().trim()));
+  let overlap = 0;
+  for (const kw of a) {
+    if (b.has(kw)) {
+      overlap += 1;
+    } else {
+      // Partial word match (words > 3 chars)
+      const words = kw.split(/\s+/).filter((w) => w.length > 3);
+      for (const bkw of b) {
+        if (words.some((w) => bkw.includes(w))) { overlap += 0.3; break; }
+      }
+    }
+  }
+  const union = a.size + b.size - overlap;
+  return union > 0 ? overlap / union : 0;
+}
+
+/**
+ * Analyse the existing DB to find the best matching calculator, related
+ * articles, and internal link candidates for a newly generated article.
+ * Pure function — no AI calls, no side effects.
+ */
+function computeRelatedContent(
+  articleId: string,
+  calculatorId: string,
+  articleTitle: string,
+  articleKeywords: string[],
+  db: import('../db/types.js').AppSchema,
+): {
+  suggestedCalculator: SuggestedCalculator | null;
+  relatedArticles: RelatedArticle[];
+  internalLinkSuggestions: InternalLinkSuggestion[];
+} {
+  const activeCalcs = db.calculators.filter((c) => c.status === 'active');
+
+  // ── 1. Best matching calculator ───────────────────────────────────────────
+  let suggestedCalculator: SuggestedCalculator | null = null;
+
+  // Primary rule: the article's own calculatorId always wins if it exists
+  const ownCalc = activeCalcs.find((c) => c.id === calculatorId);
+  if (ownCalc) {
+    suggestedCalculator = {
+      calculatorId: ownCalc.id,
+      slug: ownCalc.slug,
+      name: ownCalc.name,
+      description: ownCalc.metadata.shortDescription || ownCalc.metadata.description,
+      category: ownCalc.category,
+    };
+  } else {
+    // Score-based fallback: only suggest if confidence is meaningful
+    let bestScore = 0.15; // minimum threshold — don't force irrelevant suggestions
+    for (const calc of activeCalcs) {
+      const calcKeywords = [...calc.metadata.keywords, calc.name.toLowerCase(), calc.category];
+      const score = keywordOverlapScore(articleKeywords, calcKeywords);
+      // Boost when calculator name appears in article title
+      const titleBoost = articleTitle.toLowerCase().includes(
+        calc.name.toLowerCase().split(' ')[0],
+      ) ? 0.2 : 0;
+      const total = score + titleBoost;
+      if (total > bestScore) {
+        bestScore = total;
+        suggestedCalculator = {
+          calculatorId: calc.id,
+          slug: calc.slug,
+          name: calc.name,
+          description: calc.metadata.shortDescription || calc.metadata.description,
+          category: calc.category,
+        };
+      }
+    }
+  }
+
+  // ── 2. Related articles ───────────────────────────────────────────────────
+  const otherArticles = db.articles.filter(
+    (a) => a.id !== articleId && a.status !== 'draft',
+  );
+  const scoredArticles = otherArticles
+    .map((a) => ({
+      article: a,
+      score: keywordOverlapScore(articleKeywords, a.seoData?.keywords ?? []),
+    }))
+    .filter((s) => s.score > 0.05)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  const relatedArticles: RelatedArticle[] = scoredArticles.map((s) => ({
+    articleId: s.article.id,
+    slug: s.article.slug,
+    title: s.article.title,
+    description: (s.article.seoData?.description ?? '').slice(0, 120),
+  }));
+
+  // ── 3. Internal link suggestions ──────────────────────────────────────────
+  const internalLinkSuggestions: InternalLinkSuggestion[] = [];
+
+  if (suggestedCalculator) {
+    internalLinkSuggestions.push({
+      anchorText: suggestedCalculator.name,
+      targetSlug: `/${suggestedCalculator.slug}`,
+      targetTitle: suggestedCalculator.name,
+      targetType: 'calculator',
+    });
+  }
+
+  // Up to 2 additional relevant calculators
+  const extraCalcs = activeCalcs
+    .filter((c) => c.id !== suggestedCalculator?.calculatorId)
+    .map((c) => ({
+      calc: c,
+      score: keywordOverlapScore(articleKeywords, [...c.metadata.keywords, c.name.toLowerCase()]),
+    }))
+    .filter((s) => s.score > 0.05)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 2);
+
+  for (const { calc } of extraCalcs) {
+    internalLinkSuggestions.push({
+      anchorText: calc.name,
+      targetSlug: `/${calc.slug}`,
+      targetTitle: calc.name,
+      targetType: 'calculator',
+    });
+  }
+
+  // Related article links
+  for (const ra of relatedArticles.slice(0, 2)) {
+    internalLinkSuggestions.push({
+      anchorText: ra.title,
+      targetSlug: `/blog/${ra.slug}`,
+      targetTitle: ra.title,
+      targetType: 'article',
+    });
+  }
+
+  return { suggestedCalculator, relatedArticles, internalLinkSuggestions };
+}
+
+/**
+ * Inject a "Related Calculator" card into article HTML.
+ * Inserts before the Conclusion / Take Action section, or before the last <h2>.
+ * If no good anchor is found, appends at the end.
+ */
+function injectCalculatorCard(html: string, calc: SuggestedCalculator): string {
+  const cardHtml = `
+<div class="related-calculator-box" style="border:1px solid var(--border,#e2e8f0);border-radius:0.75rem;padding:1.25rem 1.5rem;background:var(--bg-card,#f8fafc);margin:2rem 0;">
+  <p style="margin:0 0 0.375rem;font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#6b7280;">Related Calculator</p>
+  <a href="/${calc.slug}" style="font-size:1.0625rem;font-weight:700;color:#3b82f6;text-decoration:none;">${calc.name}</a>
+  <p style="margin:0.375rem 0 0.875rem;font-size:0.875rem;color:#64748b;line-height:1.6;">${calc.description}</p>
+  <a href="/${calc.slug}" style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.8125rem;font-weight:600;color:#fff;background:#3b82f6;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;">Try the ${calc.name} →</a>
+</div>`;
+
+  // Inject before the Conclusion or Take Action heading
+  const conclusionRe = /<h2[^>]*>[^<]*(?:conclusion|take action|final thoughts)[^<]*<\/h2>/i;
+  const conclusionMatch = html.match(conclusionRe);
+  if (conclusionMatch?.index !== undefined) {
+    return html.slice(0, conclusionMatch.index) + cardHtml + html.slice(conclusionMatch.index);
+  }
+
+  // Fallback: before the last <h2>
+  const allH2 = [...html.matchAll(/<h2[^>]*>/gi)];
+  const lastH2 = allH2.pop();
+  if (lastH2?.index !== undefined) {
+    return html.slice(0, lastH2.index) + cardHtml + html.slice(lastH2.index);
+  }
+
+  // Final fallback: append
+  return html + cardHtml;
+}
+
+// ─── End Related Content Engine ───────────────────────────────────────────────
+
 async function generateArticleInBackground(
   taskId: string,
   calculatorId: string,
@@ -968,21 +1147,45 @@ Instructions:
 
     const finalDB = getDB();
     const artId = `article_${Date.now()}`;
+    const articleKeywords = [calculatorName.toLowerCase(), ...keywords.slice(0, 6)];
+
+    // ── Related Content Engine ───────────────────────────────────────────────
+    const relatedContent = computeRelatedContent(
+      artId,
+      calculatorId,
+      finalTitle || title,
+      articleKeywords,
+      finalDB,
+    );
+
+    // Inject the calculator card into the HTML content (if a match was found)
+    let richContent = finalContent;
+    if (relatedContent.suggestedCalculator) {
+      richContent = injectCalculatorCard(finalContent, relatedContent.suggestedCalculator);
+    }
+
     const newArticle: Article = {
       id: artId,
       calculatorId,
       slug: urlSlug,
       title: finalTitle || title,
-      content: finalContent,
+      content: richContent,
       status: 'pending_review',
       seoData: {
         title: `${finalTitle || title} | Complete Guide`,
         description: metaDescription || finalContent.replace(/<[^>]+>/g, '').slice(0, 150),
-        keywords: [calculatorName.toLowerCase(), ...keywords.slice(0, 3)],
+        keywords: articleKeywords,
         canonicalUrl: `/${urlSlug}`,
       },
       version: 1,
       createdAt: new Date().toISOString(),
+      // Related Content Engine results
+      suggestedCalculator: relatedContent.suggestedCalculator,
+      relatedArticles: relatedContent.relatedArticles,
+      internalLinkSuggestions: relatedContent.internalLinkSuggestions,
+      relatedCalculators: relatedContent.suggestedCalculator
+        ? [relatedContent.suggestedCalculator.slug]
+        : [],
     };
 
     finalDB.articles.push(newArticle);
