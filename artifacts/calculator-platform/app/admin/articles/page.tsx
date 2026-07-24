@@ -186,50 +186,54 @@ function CompetitionBadge({ competition }: { competition: string | null }) {
 
 // ─── Keyword Chip Card ────────────────────────────────────────────────────────
 
-function KeywordChipCard({ chip, selected, onClick }: {
-  chip: ResearchKeywordChip; selected: boolean; onClick: () => void;
+function KeywordChipCard({ chip, selected, locked, onClick }: {
+  chip: ResearchKeywordChip; selected: boolean; locked: boolean; onClick: () => void;
 }) {
   const hasMetrics = chip.searchVolumeLabel || chip.competition || chip.trend;
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group w-full rounded-2xl border text-left transition ${selected
-        ? 'border-blue-500 bg-blue-500/5 shadow-sm shadow-blue-500/10'
-        : 'hover:border-blue-400/60 hover:bg-blue-500/3'
-        }`}
+      disabled={locked && !selected}
+      className={`group w-full rounded-xl border text-left transition-all duration-200 ${
+        selected
+          ? 'border-blue-500 bg-blue-500/8 shadow-md shadow-blue-500/10'
+          : locked
+          ? 'pointer-events-none opacity-35'
+          : 'hover:border-blue-400/60 hover:bg-blue-500/3'
+      }`}
       style={{ borderColor: selected ? undefined : 'var(--border)' }}
     >
-      <div className="p-4">
-        <div className="mb-3 flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className={`h-2 w-2 shrink-0 rounded-full ${selected ? 'bg-blue-500' : 'bg-blue-400/40'}`} />
-            <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{chip.keyword}</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <ScoreBadge score={chip.opportunityScore} />
-            {selected
-              ? <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white"><Check className="h-3 w-3" /> Selected</span>
-              : <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />}
-          </div>
-        </div>
-        {hasMetrics ? (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p className={`text-sm font-semibold truncate ${selected ? 'text-blue-600 dark:text-blue-400' : 'text-[var(--text-primary)]'}`}>
+            {chip.keyword}
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
             {chip.searchVolumeLabel && (
               <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                <Search className="h-3 w-3" /> {chip.searchVolumeLabel}
+                <Search className="h-3 w-3" />{chip.searchVolumeLabel}
               </span>
             )}
             <CompetitionBadge competition={chip.competition} />
             {chip.trend && (
               <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                <TrendIcon trend={chip.trend} /> {chip.trend}
+                <TrendIcon trend={chip.trend} />{chip.trend}
               </span>
             )}
+            {!hasMetrics && (
+              <span className="text-xs italic text-[var(--text-muted)]">Live data unavailable</span>
+            )}
           </div>
-        ) : (
-          <p className="text-xs text-[var(--text-muted)] italic">Live search data unavailable.</p>
-        )}
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <ScoreBadge score={chip.opportunityScore} />
+          {selected
+            ? <span className="flex items-center gap-1.5 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+                <Check className="h-3 w-3" /> Selected
+              </span>
+            : <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />}
+        </div>
       </div>
     </button>
   );
@@ -1016,18 +1020,18 @@ export default function ArticlesPage() {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────
-          STEP 2 — Keyword Suggestions
+          STEP 2 — Focus Keywords
       ────────────────────────────────────────────────────────────────────── */}
       <StepCard
         number="2"
-        title="Keyword Suggestions"
-        description="5 strongest keywords ranked by search volume, competition, trend and opportunity. Select one to generate title suggestions."
+        title="Focus Keywords"
+        description="5 strongest focus keywords ranked by search volume, competition, opportunity score, and long-tail relevance. Select one to continue automatically."
         locked={!research || phase === 'researching'}
         active={phase === 'selecting-keyword'}
       >
         {/* Loading titles */}
         {phase === 'loading-titles' && (
-          <LoadingPulse message="Keyword selected — generating 5 optimised title suggestions…" />
+          <LoadingPulse message="Focus keyword locked — generating optimised title suggestions…" />
         )}
 
         {/* Keyword chips */}
@@ -1035,49 +1039,38 @@ export default function ArticlesPage() {
           <div className="space-y-3">
             {!research.serpDataAvailable && (
               <p className="text-xs text-amber-600">
-                Live metrics unavailable — add a SerpAPI key in Settings for real search volume data.
+                Live metrics unavailable — configure a SerpAPI key in Settings for real search volume data.
               </p>
             )}
-            <div className="space-y-2">
-              {research.keywordChips.map((chip, i) => (
-                <KeywordChipCard
-                  key={i}
-                  chip={chip}
-                  selected={selectedKeyword === chip.keyword}
-                  onClick={() => {
-                    if (working !== null) return;
-                    if (keywordLocked && selectedKeyword === chip.keyword) return;
-                    // Allow re-selection if not already loading
-                    if (isAfterKeyword) {
-                      // Reset downstream state
-                      setTitleCards([]);
-                      setSelectedTitle('');
-                      setSlug('');
-                      setSeoData(null);
-                      setOutline([]);
-                      setArticle(null);
-                    }
-                    void selectKeyword(chip);
-                  }}
-                />
-              ))}
-            </div>
 
-            {/* Selected keyword badge */}
+            {/* Chips — locked once selection made */}
+            {!keywordLocked && (
+              <div className="space-y-2">
+                {research.keywordChips.map((chip, i) => (
+                  <KeywordChipCard
+                    key={i}
+                    chip={chip}
+                    selected={selectedKeyword === chip.keyword}
+                    locked={false}
+                    onClick={() => {
+                      if (working !== null || keywordLocked) return;
+                      void selectKeyword(chip);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Locked Focus Keyword display */}
             {selectedKeyword && keywordLocked && (
-              <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5 px-4 py-2.5">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-                <span className="text-xs text-[var(--text-muted)]">Selected keyword:</span>
-                <span className="text-sm font-semibold text-[var(--text-primary)]">{selectedKeyword}</span>
-                {phase === 'selecting-keyword' || phase === 'selecting-title' ? (
-                  <button
-                    type="button"
-                    onClick={() => { setKeywordLocked(false); setTitleCards([]); setSelectedTitle(''); setSlug(''); setSeoData(null); setOutline([]); setArticle(null); setPhase('selecting-keyword'); }}
-                    className="ml-auto text-xs text-[var(--text-muted)] hover:text-blue-500 transition"
-                  >
-                    Change
-                  </button>
-                ) : null}
+              <div className="rounded-xl border border-blue-500 bg-blue-500/8 px-5 py-4 shadow-md shadow-blue-500/10">
+                <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-blue-500">Focus Keyword</p>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">{selectedKeyword}</p>
+                  <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white">
+                    <Lock className="h-3 w-3" /> Locked
+                  </span>
+                </div>
               </div>
             )}
           </div>
