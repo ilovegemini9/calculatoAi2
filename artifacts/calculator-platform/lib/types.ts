@@ -133,8 +133,13 @@ export interface Article {
   schemaFaq?: string;
   schemaArticle?: string;
   schemaHowTo?: string;
+  schemaBreadcrumb?: string;
   keywordData?: ArticleKeywordData;
   updatedAt?: string;
+  // SEO Engine fields
+  ogImage?: string;
+  twitterCard?: 'summary' | 'summary_large_image';
+  headingHierarchy?: { level: 'h2' | 'h3'; text: string; id: string }[];
 }
 
 export interface ArticleVersion {

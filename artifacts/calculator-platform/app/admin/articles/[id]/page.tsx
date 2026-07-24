@@ -18,12 +18,44 @@ import {
   ListOrdered,
   Globe,
   BookOpen,
+  Sparkles,
+  ChevronDown,
+  ChevronRight,
+  Hash,
+  Image as ImageIcon,
+  Twitter,
+  Heading1,
+  AlignLeft,
+  BarChart2,
 } from 'lucide-react';
 import type { Article } from '@/lib/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type TabKey = 'content' | 'seo' | 'opengraph' | 'schema' | 'faq' | 'howto' | 'related';
+type TabKey = 'content' | 'seo-engine' | 'seo' | 'opengraph' | 'schema' | 'faq' | 'howto' | 'related';
+
+interface SeoPackage {
+  seoTitle: string;
+  metaTitle: string;
+  metaDescription: string;
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  twitterCard: 'summary' | 'summary_large_image';
+  schemaArticle: string;
+  schemaFaq: string | null;
+  schemaBreadcrumb: string;
+  schemaHowTo: string | null;
+  readingTime: number;
+  wordCount: number;
+  lastUpdated: string;
+  tableOfContents: string;
+  h1: string;
+  headingHierarchy: { level: 'h2' | 'h3'; text: string; id: string }[];
+  focusKeyword: string;
+  aiUsed: boolean;
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -47,7 +79,8 @@ function StatusBadge({ status }: { status: string }) {
 
 const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { key: 'content', label: 'Content', icon: FileText },
-  { key: 'seo', label: 'SEO', icon: Tag },
+  { key: 'seo-engine', label: 'SEO Engine', icon: Sparkles },
+  { key: 'seo', label: 'Meta Tags', icon: Tag },
   { key: 'opengraph', label: 'OpenGraph', icon: Globe },
   { key: 'schema', label: 'Schema', icon: Code2 },
   { key: 'faq', label: 'FAQ', icon: HelpCircle },
@@ -156,6 +189,17 @@ export default function ArticleEditorPage() {
   const [relatedCalculators, setRelatedCalculators] = useState<string[]>([]);
   const [relatedKeywords, setRelatedKeywords] = useState<string[]>([]);
   const [tableOfContents, setTableOfContents] = useState('');
+  // SEO Engine state
+  const [ogImage, setOgImage] = useState('');
+  const [twitterCard, setTwitterCard] = useState<'summary' | 'summary_large_image'>('summary_large_image');
+  const [schemaBreadcrumb, setSchemaBreadcrumb] = useState('');
+  const [headingHierarchy, setHeadingHierarchy] = useState<{ level: 'h2' | 'h3'; text: string; id: string }[]>([]);
+  const [seoReadingTime, setSeoReadingTime] = useState<number | ''>('');
+  const [focusKeyword, setFocusKeyword] = useState('');
+  const [seoGenerating, setSeoGenerating] = useState(false);
+  const [seoGenError, setSeoGenError] = useState('');
+  const [seoGenSuccess, setSeoGenSuccess] = useState(false);
+  const [expandedSchemas, setExpandedSchemas] = useState<Record<string, boolean>>({});
 
   // ─── Load ──────────────────────────────────────────────────────────────────
 
@@ -190,6 +234,13 @@ export default function ArticleEditorPage() {
       setRelatedCalculators(data.relatedCalculators || []);
       setRelatedKeywords(data.relatedKeywords || []);
       setTableOfContents(data.tableOfContents || '');
+      // SEO Engine fields
+      setOgImage(data.ogImage || '');
+      setTwitterCard(data.twitterCard || 'summary_large_image');
+      setSchemaBreadcrumb(data.schemaBreadcrumb || '');
+      setHeadingHierarchy(data.headingHierarchy || []);
+      setSeoReadingTime(data.readingTime ?? '');
+      setFocusKeyword(data.keywordData?.keyword || data.seoData?.keywords?.[0] || '');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Load failed');
     } finally {
@@ -222,11 +273,16 @@ export default function ArticleEditorPage() {
         schemaFaq,
         schemaArticle,
         schemaHowTo,
+        schemaBreadcrumb,
         faqItems,
         howToSteps,
         relatedCalculators,
         relatedKeywords,
         tableOfContents,
+        ogImage,
+        twitterCard,
+        headingHierarchy,
+        ...(seoReadingTime !== '' ? { readingTime: Number(seoReadingTime) } : {}),
       };
       const res = await fetch(`/api/admin/articles/${id}`, {
         method: 'PATCH',
@@ -244,6 +300,47 @@ export default function ArticleEditorPage() {
       setSaving(false);
     }
   };
+
+  // ─── SEO Generate ─────────────────────────────────────────────────────────
+
+  const handleGenerateSeo = useCallback(async () => {
+    setSeoGenerating(true);
+    setSeoGenError('');
+    setSeoGenSuccess(false);
+    try {
+      const res = await fetch(`/api/admin/articles/${id}/generate-seo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ focusKeyword: focusKeyword.trim() }),
+      });
+      const data = await res.json() as { success?: boolean; seo?: SeoPackage; error?: string };
+      if (!res.ok || !data.success || !data.seo) {
+        throw new Error(data.error || 'Generation failed');
+      }
+      const seo = data.seo;
+      // Apply to editor state
+      setSeoTitle(seo.seoTitle);
+      setSeoDescription(seo.metaDescription);
+      setCanonicalUrl(seo.canonicalUrl);
+      setOgTitle(seo.ogTitle);
+      setOgDescription(seo.ogDescription);
+      setOgImage(seo.ogImage);
+      setTwitterCard(seo.twitterCard);
+      if (seo.schemaArticle) setSchemaArticle(seo.schemaArticle);
+      if (seo.schemaFaq) setSchemaFaq(seo.schemaFaq);
+      if (seo.schemaBreadcrumb) setSchemaBreadcrumb(seo.schemaBreadcrumb);
+      if (seo.schemaHowTo) setSchemaHowTo(seo.schemaHowTo);
+      setSeoReadingTime(seo.readingTime);
+      if (seo.tableOfContents) setTableOfContents(seo.tableOfContents);
+      setHeadingHierarchy(seo.headingHierarchy);
+      setSeoGenSuccess(true);
+      setTimeout(() => setSeoGenSuccess(false), 4000);
+    } catch (e: unknown) {
+      setSeoGenError(e instanceof Error ? e.message : 'Generation failed');
+    } finally {
+      setSeoGenerating(false);
+    }
+  }, [id, focusKeyword]);
 
   // ─── Loading / error states ─────────────────────────────────────────────────
 
@@ -431,6 +528,419 @@ export default function ArticleEditorPage() {
 
         {/* Tab content */}
         <div className="p-5 space-y-5">
+
+          {/* ── SEO ENGINE ── */}
+          {activeTab === 'seo-engine' && (
+            <div className="space-y-6">
+
+              {/* Generation panel */}
+              <div
+                className="rounded-xl border p-5 space-y-4"
+                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-blue-400" />
+                  <h2 className="text-sm font-semibold text-[var(--text-primary)]">Auto-Generate SEO Fields</h2>
+                </div>
+                <p className="text-xs text-[var(--text-muted)]">
+                  Enter your focus keyword and click Generate. All fields below will be populated from your article title, content, and keyword — no placeholder values.
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    value={focusKeyword}
+                    onChange={(e) => setFocusKeyword(e.target.value)}
+                    placeholder="Focus keyword (e.g. mortgage calculator)"
+                    className="flex-1 px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style={{ borderColor: 'var(--border)' }}
+                    onKeyDown={(e) => e.key === 'Enter' && !seoGenerating && handleGenerateSeo()}
+                  />
+                  <button
+                    onClick={handleGenerateSeo}
+                    disabled={seoGenerating || !focusKeyword.trim()}
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition whitespace-nowrap"
+                  >
+                    {seoGenerating
+                      ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Generating…</>
+                      : <><Sparkles className="w-3.5 h-3.5" /> Generate All</>}
+                  </button>
+                </div>
+                {seoGenError && (
+                  <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" /> {seoGenError}
+                  </div>
+                )}
+                {seoGenSuccess && (
+                  <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" /> All SEO fields generated. Review and edit below, then Save Changes.
+                  </div>
+                )}
+              </div>
+
+              {/* ── SECTION: Core Meta Tags ── */}
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5" /> Core Meta Tags
+                </p>
+              </div>
+
+              {/* H1 */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <Heading1 className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                  <label className="text-xs font-semibold text-[var(--text-primary)]">H1 — Article Heading</label>
+                  <span className="text-xs text-[var(--text-muted)] ml-auto">Derived from Title — edit in header</span>
+                </div>
+                <div
+                  className="w-full px-3 py-2 text-sm rounded-lg border text-[var(--text-muted)] select-none"
+                  style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}
+                >
+                  {title || <span className="italic opacity-50">No title set</span>}
+                </div>
+              </div>
+
+              {/* SEO Title */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-semibold text-[var(--text-primary)]">SEO Title</label>
+                  <span className={`text-xs ml-auto font-mono ${seoTitle.length > 60 ? 'text-amber-400' : seoTitle.length >= 50 ? 'text-emerald-400' : 'text-[var(--text-muted)]'}`}>
+                    {seoTitle.length}/60
+                  </span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)]">Target 50–60 characters. Include focus keyword near the start.</p>
+                <input
+                  value={seoTitle}
+                  onChange={(e) => setSeoTitle(e.target.value)}
+                  placeholder="SEO-optimized title for search results…"
+                  className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border)' }}
+                />
+                {/* SERP preview */}
+                <div className="rounded-lg border p-3 text-xs space-y-0.5" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}>
+                  <p className="text-[#1a0dab] font-medium truncate">{seoTitle || 'SEO Title'} | CalculatorFree</p>
+                  <p className="text-[#006621] font-mono truncate opacity-80">calculatorfree.com/blog/{slug}</p>
+                  <p className="text-[var(--text-muted)] line-clamp-2 leading-relaxed">{seoDescription || 'Meta description will appear here.'}</p>
+                </div>
+              </div>
+
+              {/* Meta Description */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-semibold text-[var(--text-primary)]">Meta Description</label>
+                  <span className={`text-xs ml-auto font-mono ${seoDescription.length > 155 ? 'text-amber-400' : seoDescription.length >= 140 ? 'text-emerald-400' : 'text-[var(--text-muted)]'}`}>
+                    {seoDescription.length}/155
+                  </span>
+                </div>
+                <p className="text-xs text-[var(--text-muted)]">Target 140–155 characters. Include focus keyword and a clear value prop.</p>
+                <textarea
+                  value={seoDescription}
+                  onChange={(e) => setSeoDescription(e.target.value)}
+                  rows={3}
+                  placeholder="Compelling meta description that includes focus keyword and drives clicks…"
+                  className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                  style={{ borderColor: 'var(--border)' }}
+                />
+              </div>
+
+              {/* Canonical URL */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <Link2 className="w-3.5 h-3.5 text-[var(--text-muted)]" /> Canonical URL
+                </label>
+                <input
+                  value={canonicalUrl}
+                  onChange={(e) => setCanonicalUrl(e.target.value)}
+                  placeholder="/blog/article-slug"
+                  className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  style={{ borderColor: 'var(--border)' }}
+                />
+              </div>
+
+              {/* ── SECTION: OpenGraph + Twitter ── */}
+              <div className="space-y-1 pt-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5" /> OpenGraph &amp; Twitter Card
+                </p>
+              </div>
+
+              {/* OG Preview */}
+              <div className="rounded-xl border overflow-hidden max-w-sm" style={{ borderColor: 'var(--border)' }}>
+                <div
+                  className="h-14 flex items-center justify-center gap-2 text-xs text-[var(--text-muted)]"
+                  style={{ backgroundColor: 'var(--bg-card-hover)' }}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  {ogImage ? <span className="font-mono truncate px-2 text-xs">{ogImage}</span> : 'OG Image'}
+                </div>
+                <div className="p-3 space-y-0.5" style={{ backgroundColor: 'var(--bg-card)' }}>
+                  <p className="text-xs text-[var(--text-muted)] font-mono truncate">calculatorfree.vercel.app</p>
+                  <p className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">{ogTitle || seoTitle || 'OG Title'}</p>
+                  <p className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">{ogDescription || seoDescription || 'OG Description'}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-semibold text-[var(--text-primary)]">OG Title</label>
+                    <span className={`text-xs ml-auto font-mono ${ogTitle.length > 80 ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>{ogTitle.length}/80</span>
+                  </div>
+                  <input
+                    value={ogTitle}
+                    onChange={(e) => setOgTitle(e.target.value)}
+                    placeholder="OpenGraph title for social sharing…"
+                    className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style={{ borderColor: 'var(--border)' }}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                    <Twitter className="w-3.5 h-3.5 text-[var(--text-muted)]" /> Twitter Card
+                  </label>
+                  <select
+                    value={twitterCard}
+                    onChange={(e) => setTwitterCard(e.target.value as 'summary' | 'summary_large_image')}
+                    className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <option value="summary_large_image">summary_large_image (large card)</option>
+                    <option value="summary">summary (small card)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-semibold text-[var(--text-primary)]">OG Description</label>
+                  <span className={`text-xs ml-auto font-mono ${ogDescription.length > 125 ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>{ogDescription.length}/125</span>
+                </div>
+                <textarea
+                  value={ogDescription}
+                  onChange={(e) => setOgDescription(e.target.value)}
+                  rows={2}
+                  placeholder="OpenGraph description for social sharing…"
+                  className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+                  style={{ borderColor: 'var(--border)' }}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <ImageIcon className="w-3.5 h-3.5 text-[var(--text-muted)]" /> OG Image URL
+                </label>
+                <p className="text-xs text-[var(--text-muted)]">Full URL to the OpenGraph image (1200×630px recommended). Leave blank to use the site default.</p>
+                <input
+                  value={ogImage}
+                  onChange={(e) => setOgImage(e.target.value)}
+                  placeholder="/og-image.png"
+                  className="w-full px-3 py-2 text-sm rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                  style={{ borderColor: 'var(--border)' }}
+                />
+              </div>
+
+              {/* ── SECTION: Structured Data ── */}
+              <div className="space-y-1 pt-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                  <Code2 className="w-3.5 h-3.5" /> JSON-LD Structured Data
+                </p>
+                <p className="text-xs text-[var(--text-muted)]">Injected into the article page head as <code className="font-mono bg-[var(--bg-card-hover)] px-1 rounded">{'<script type="application/ld+json">'}</code>.</p>
+              </div>
+
+              {/* Article Schema */}
+              {[
+                { key: 'article', label: 'Article Schema', hint: 'schema.org/Article', value: schemaArticle, set: setSchemaArticle },
+                { key: 'faq', label: 'FAQ Schema', hint: 'schema.org/FAQPage', value: schemaFaq, set: setSchemaFaq },
+                { key: 'breadcrumb', label: 'Breadcrumb Schema', hint: 'schema.org/BreadcrumbList', value: schemaBreadcrumb, set: setSchemaBreadcrumb },
+                { key: 'howto', label: 'HowTo Schema', hint: 'schema.org/HowTo', value: schemaHowTo, set: setSchemaHowTo },
+              ].map(({ key, label, hint, value, set }) => (
+                <div key={key} className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedSchemas((prev) => ({ ...prev, [key]: !prev[key] }))}
+                    className="w-full flex items-center justify-between px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition"
+                  >
+                    <span className="flex items-center gap-2 font-medium text-xs">
+                      <Code2 className="w-3.5 h-3.5 text-blue-400" />
+                      {label}
+                      <span className="text-[var(--text-muted)] font-normal">{hint}</span>
+                      {value && <span className="rounded-full bg-emerald-500/15 text-emerald-400 text-xs px-2 py-0.5 ml-1">✓ set</span>}
+                      {!value && <span className="rounded-full bg-zinc-500/15 text-zinc-400 text-xs px-2 py-0.5 ml-1">empty</span>}
+                    </span>
+                    {expandedSchemas[key]
+                      ? <ChevronDown className="w-4 h-4 text-[var(--text-muted)]" />
+                      : <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />}
+                  </button>
+                  {expandedSchemas[key] && (
+                    <div className="border-t p-4" style={{ borderColor: 'var(--border)' }}>
+                      <textarea
+                        value={value}
+                        onChange={(e) => set(e.target.value)}
+                        rows={10}
+                        placeholder={`{"@context": "https://schema.org", "@type": "...", …}`}
+                        className="w-full px-3 py-2 text-xs rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono resize-y"
+                        style={{ borderColor: 'var(--border)' }}
+                      />
+                      {value && (() => {
+                        try { JSON.parse(value); return <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Valid JSON</p>; }
+                        catch { return <p className="text-xs text-amber-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Invalid JSON — will not be injected</p>; }
+                      })()}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* ── SECTION: Content Structure ── */}
+              <div className="space-y-1 pt-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1.5">
+                  <AlignLeft className="w-3.5 h-3.5" /> Content Structure
+                </p>
+              </div>
+
+              {/* Stats row */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  {
+                    label: 'Reading Time',
+                    icon: <Clock className="w-4 h-4 text-blue-400" />,
+                    editable: true,
+                    value: seoReadingTime,
+                    onChange: (v: string) => setSeoReadingTime(v === '' ? '' : Number(v)),
+                    suffix: 'min',
+                  },
+                  {
+                    label: 'Word Count',
+                    icon: <FileText className="w-4 h-4 text-purple-400" />,
+                    editable: false,
+                    display: content.replace(/<[^>]+>/g, '').split(/\s+/).filter(Boolean).length.toLocaleString(),
+                    suffix: 'words',
+                  },
+                  {
+                    label: 'H2 Headings',
+                    icon: <BarChart2 className="w-4 h-4 text-emerald-400" />,
+                    editable: false,
+                    display: String(headingHierarchy.filter((h) => h.level === 'h2').length),
+                    suffix: '',
+                  },
+                  {
+                    label: 'H3 Headings',
+                    icon: <Hash className="w-4 h-4 text-orange-400" />,
+                    editable: false,
+                    display: String(headingHierarchy.filter((h) => h.level === 'h3').length),
+                    suffix: '',
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="rounded-xl border p-3 space-y-1"
+                    style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card-hover)' }}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                      {stat.icon} {stat.label}
+                    </div>
+                    {stat.editable ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          min={1}
+                          value={stat.value as number | ''}
+                          onChange={(e) => (stat.onChange as (v: string) => void)(e.target.value)}
+                          className="w-16 px-2 py-1 text-sm font-semibold rounded border bg-transparent text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          style={{ borderColor: 'var(--border)' }}
+                        />
+                        <span className="text-xs text-[var(--text-muted)]">{stat.suffix}</span>
+                      </div>
+                    ) : (
+                      <p className="text-lg font-bold text-[var(--text-primary)]">
+                        {stat.display} {stat.suffix && <span className="text-xs font-normal text-[var(--text-muted)]">{stat.suffix}</span>}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Last Updated */}
+              {article.updatedAt && (
+                <div className="text-xs text-[var(--text-muted)] flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  Last updated: {new Date(article.updatedAt).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </div>
+              )}
+
+              {/* Heading Hierarchy */}
+              <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setExpandedSchemas((prev) => ({ ...prev, headings: !prev.headings }))}
+                  className="w-full flex items-center justify-between px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition"
+                >
+                  <span className="flex items-center gap-2 text-xs font-medium">
+                    <Hash className="w-3.5 h-3.5 text-blue-400" />
+                    Heading Hierarchy
+                    <span className="text-[var(--text-muted)] font-normal">
+                      H2 × {headingHierarchy.filter((h) => h.level === 'h2').length} &nbsp;·&nbsp; H3 × {headingHierarchy.filter((h) => h.level === 'h3').length}
+                    </span>
+                  </span>
+                  {expandedSchemas.headings
+                    ? <ChevronDown className="w-4 h-4 text-[var(--text-muted)]" />
+                    : <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />}
+                </button>
+                {expandedSchemas.headings && (
+                  <div className="border-t p-4 space-y-1.5" style={{ borderColor: 'var(--border)' }}>
+                    {headingHierarchy.length === 0 ? (
+                      <p className="text-xs text-[var(--text-muted)] italic">No headings detected. Generate SEO to extract the heading tree from your content.</p>
+                    ) : (
+                      headingHierarchy.map((h, i) => (
+                        <div
+                          key={i}
+                          className={`flex items-start gap-2 text-xs py-1 ${h.level === 'h3' ? 'pl-5' : ''}`}
+                        >
+                          <span className={`font-mono font-bold shrink-0 ${h.level === 'h2' ? 'text-blue-400' : 'text-purple-400'}`}>
+                            {h.level.toUpperCase()}
+                          </span>
+                          <span className="text-[var(--text-secondary)] leading-relaxed">{h.text}</span>
+                          {h.id && (
+                            <span className="font-mono text-[var(--text-muted)] opacity-60 ml-auto shrink-0">#{h.id}</span>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Table of Contents */}
+              <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+                <button
+                  type="button"
+                  onClick={() => setExpandedSchemas((prev) => ({ ...prev, toc: !prev.toc }))}
+                  className="w-full flex items-center justify-between px-4 py-3 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-card-hover)] transition"
+                >
+                  <span className="flex items-center gap-2 text-xs font-medium">
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                    Table of Contents HTML
+                    {tableOfContents
+                      ? <span className="rounded-full bg-emerald-500/15 text-emerald-400 text-xs px-2 py-0.5">✓ set</span>
+                      : <span className="rounded-full bg-zinc-500/15 text-zinc-400 text-xs px-2 py-0.5">empty</span>}
+                  </span>
+                  {expandedSchemas.toc
+                    ? <ChevronDown className="w-4 h-4 text-[var(--text-muted)]" />
+                    : <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />}
+                </button>
+                {expandedSchemas.toc && (
+                  <div className="border-t p-4" style={{ borderColor: 'var(--border)' }}>
+                    <textarea
+                      value={tableOfContents}
+                      onChange={(e) => setTableOfContents(e.target.value)}
+                      rows={8}
+                      placeholder='<nav class="toc-box" aria-label="Table of Contents">…</nav>'
+                      className="w-full px-3 py-2 text-xs rounded-lg border bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono resize-y"
+                      style={{ borderColor: 'var(--border)' }}
+                    />
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
 
           {/* ── CONTENT ── */}
           {activeTab === 'content' && (
