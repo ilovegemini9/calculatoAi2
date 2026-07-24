@@ -33,6 +33,8 @@ import {
   X,
   XCircle,
   Zap,
+  PenLine,
+  Calculator,
 } from 'lucide-react';
 import type {
   Article,
@@ -584,7 +586,216 @@ function LoadingPulse({ message }: { message: string }) {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Direct Generate Panel (Phase 5 Human Content Engine) ─────────────────────
+
+interface DirectGenResult {
+  article: Article;
+  calculatorMatch: { slug: string; name: string; score: number } | null;
+  meta: {
+    wordCount: number;
+    readingTime: number;
+    faqCount: number;
+    hasHowTo: boolean;
+    hasToc: boolean;
+    schemaTypes: string[];
+  };
+}
+
+function DirectGeneratePanel({ onArticleCreated }: { onArticleCreated: () => void }) {
+  const [title, setTitle] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const [slug, setSlug] = useState('');
+  const [slugEdited, setSlugEdited] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState<DirectGenResult | null>(null);
+
+  // Auto-generate slug from title
+  const STOP = new Set(['a','an','the','and','or','but','for','to','of','in','on','at','by','is','it','its','this','that','with','how','what','why','when','your','you','our','not','all','more','about','get','use','do','does','can','may','has','have']);
+  function autoSlug(v: string) {
+    return v.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length > 1 && !STOP.has(w))
+      .slice(0, 6)
+      .join('-')
+      .replace(/(^-|-$)/g, '');
+  }
+
+  function handleTitleChange(v: string) {
+    setTitle(v);
+    if (!slugEdited) setSlug(autoSlug(v));
+  }
+
+  async function handleGenerate() {
+    setError('');
+    setResult(null);
+    if (!title.trim() || !keyword.trim() || !slug.trim()) {
+      setError('All three fields are required.');
+      return;
+    }
+    setGenerating(true);
+    try {
+      const res = await fetch('/api/admin/articles/generate-direct', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim(), keyword: keyword.trim(), slug: slug.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Generation failed');
+      setResult(data as DirectGenResult);
+      onArticleCreated();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Something went wrong');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function handleReset() {
+    setTitle(''); setKeyword(''); setSlug('');
+    setSlugEdited(false); setError(''); setResult(null);
+  }
+
+  const inputCls =
+    'w-full rounded-xl border bg-[var(--bg-input)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] outline-none transition focus:ring-2 focus:ring-blue-500/40';
+  const inputStyle = { borderColor: 'var(--border)' };
+
+  if (result) {
+    const { article, calculatorMatch, meta } = result;
+    return (
+      <div className="space-y-4">
+        {/* Success banner */}
+        <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 px-5 py-4">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-[var(--text-primary)]">Article generated</p>
+            <p className="mt-0.5 text-sm text-[var(--text-muted)]">
+              Saved as draft — {meta.wordCount.toLocaleString()} words · {meta.readingTime} min read · {meta.faqCount} FAQs
+              {meta.hasHowTo && ' · How-To'}{meta.hasToc && ' · TOC'}
+            </p>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {meta.schemaTypes.map(s => (
+                <span key={s} className="rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-semibold text-blue-500">{s}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Calculator match */}
+        {calculatorMatch ? (
+          <div className="flex items-start gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/5 px-5 py-4">
+            <Calculator className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-[var(--text-primary)]">Calculator linked</p>
+              <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                One natural internal link to <strong>{calculatorMatch.name}</strong> was added, plus a Related Calculator section near the conclusion.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-3 rounded-2xl border px-5 py-4" style={{ borderColor: 'var(--border)' }}>
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-muted)]" />
+            <p className="text-xs text-[var(--text-muted)]">No closely related calculator found — article generated without internal calculator links.</p>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <Link
+            href={`/admin/articles/${article.id}`}
+            className="flex-1 rounded-xl bg-blue-500 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-600">
+            View &amp; Edit Article
+          </Link>
+          <button type="button" onClick={handleReset}
+            className="rounded-xl border px-4 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
+            style={{ borderColor: 'var(--border)' }}>
+            New Article
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* Explanation */}
+      <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>
+        Enter your title, focus keyword, and SEO slug. The engine writes a premium expert article, then automatically finds the most relevant calculator on the platform — adding one natural internal link and a Related Calculator section if the match is strong enough.
+      </div>
+
+      {/* Form */}
+      <div className="space-y-4">
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-[var(--text-secondary)]">Article Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={e => handleTitleChange(e.target.value)}
+            placeholder="e.g. How to Pay Off a Mortgage Early: 7 Proven Strategies"
+            className={inputCls}
+            style={inputStyle}
+            disabled={generating}
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-[var(--text-secondary)]">Focus Keyword</label>
+          <input
+            type="text"
+            value={keyword}
+            onChange={e => setKeyword(e.target.value)}
+            placeholder="e.g. pay off mortgage early"
+            className={inputCls}
+            style={inputStyle}
+            disabled={generating}
+          />
+          <p className="mt-1 text-xs text-[var(--text-muted)]">The primary keyword this article targets. Used naturally — never stuffed.</p>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold text-[var(--text-secondary)]">SEO Slug</label>
+          <div className="flex items-center gap-0">
+            <span className="rounded-l-xl border border-r-0 bg-[var(--bg-input)] px-3 py-2.5 text-xs text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>/blog/</span>
+            <input
+              type="text"
+              value={slug}
+              onChange={e => { setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/--+/g, '-')); setSlugEdited(true); }}
+              placeholder="pay-off-mortgage-early"
+              className="flex-1 rounded-l-none rounded-r-xl border bg-[var(--bg-input)] px-3.5 py-2.5 text-sm font-mono text-[var(--text-primary)] outline-none transition focus:ring-2 focus:ring-blue-500/40"
+              style={{ borderColor: 'var(--border)' }}
+              disabled={generating}
+            />
+          </div>
+        </div>
+      </div>
+
+      {error && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-red-600">
+          <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => void handleGenerate()}
+        disabled={generating || !title.trim() || !keyword.trim() || !slug.trim()}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {generating ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Generating article — this takes about 60–90 seconds…
+          </>
+        ) : (
+          <>
+            <PenLine className="h-4 w-4" />
+            Generate Article
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -625,6 +836,9 @@ export default function ArticlesPage() {
   // Saved articles
   const [articles, setArticles] = useState<Article[]>([]);
   const [loadingArticles, setLoadingArticles] = useState(true);
+
+  // ── Active tab ──────────────────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState<'workflow' | 'direct'>('direct');
 
   // ── Derived ─────────────────────────────────────────────────────────────────
   const hasKeyword = Boolean(selectedKeyword.trim() && keywordLocked);
@@ -936,23 +1150,57 @@ export default function ArticlesPage() {
     <div className="mx-auto max-w-3xl space-y-6 pb-16">
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-blue-500">Content Studio</p>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Smart AI Article Workflow</h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
-            Topic → Keywords → Title → SEO Data → Outline → Article
-          </p>
-        </div>
-        <button type="button" onClick={reset}
-          className="inline-flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500"
-          style={{ borderColor: 'var(--border)' }}>
-          <X className="h-4 w-4" /> New article
+      <div>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-blue-500">Phase 5 · Content Studio</p>
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">Human Content Engine</h1>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">Premium expert articles — Google Helpful Content first.</p>
+      </div>
+
+      {/* Tab switcher */}
+      <div className="flex rounded-xl border p-1 text-sm" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+        <button
+          type="button"
+          onClick={() => setActiveTab('direct')}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-semibold transition ${activeTab === 'direct' ? 'bg-blue-500 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+        >
+          <PenLine className="h-4 w-4" /> Direct Generate
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('workflow')}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-semibold transition ${activeTab === 'workflow' ? 'bg-blue-500 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+        >
+          <Brain className="h-4 w-4" /> Smart Workflow
         </button>
       </div>
 
-      {/* Global notice */}
-      {notice && <Notice kind={notice.kind}>{notice.text}</Notice>}
+      {/* Global notice (workflow mode only) */}
+      {activeTab === 'workflow' && notice && <Notice kind={notice.kind}>{notice.text}</Notice>}
+
+      {/* ──────────────────────────────────────────────────────────────────────
+          DIRECT GENERATE MODE
+      ────────────────────────────────────────────────────────────────────── */}
+      {activeTab === 'direct' && (
+        <section className="rounded-2xl border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+          <div className="flex items-start gap-3 border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-500 text-xs font-bold text-white">
+              <PenLine className="h-3.5 w-3.5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-semibold text-[var(--text-primary)]">Direct Article Generator</h2>
+              <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                Enter a title, keyword, and slug. The Phase 5 engine writes a 1,800–2,400 word expert article with natural tone, real data, and smart calculator linking.
+              </p>
+            </div>
+          </div>
+          <div className="p-5">
+            <DirectGeneratePanel onArticleCreated={loadArticles} />
+          </div>
+        </section>
+      )}
+
+      {/* Only show workflow steps when in workflow mode */}
+      {activeTab === 'workflow' && (<>
 
       {/* ──────────────────────────────────────────────────────────────────────
           STEP 1 — AI Article Discovery
@@ -1366,6 +1614,7 @@ export default function ArticlesPage() {
           </div>
         )}
       </StepCard>
+      </>)}
 
       {/* ──────────────────────────────────────────────────────────────────────
           Saved Articles
