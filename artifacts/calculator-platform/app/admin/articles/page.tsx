@@ -86,8 +86,21 @@ const SECTION_COLORS: Record<ArticleOutlineSection['type'], string> = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function slugify(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/(^-|-$)/g, '');
+const SLUG_STOP_WORDS = new Set([
+  'a','an','the','and','or','but','for','nor','so','yet','to','of','in',
+  'on','at','by','up','as','is','are','was','be','do','it','its','this',
+  'that','with','from','into','how','what','why','when','where','who',
+  'which','your','you','our','we','they','their','will','can','may','has',
+  'have','had','not','all','more','about','get','use','using','do','does',
+]);
+
+function slugify(value: string): string {
+  const words = value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 1 && !SLUG_STOP_WORDS.has(w));
+  return words.join('-').replace(/-+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60);
 }
 
 function statusLabel(status: Article['status']) {
@@ -652,18 +665,24 @@ export default function ArticlesPage() {
     setOpportunities([]);
     try {
       const res = await fetch('/api/admin/articles/discover', { signal: controller.signal });
+      if (controller.signal.aborted) return;
       if (!res.ok) return;
       const data = await res.json() as { opportunities?: { title: string }[] };
-      setOpportunities(Array.isArray(data.opportunities) ? data.opportunities.slice(0, 3) : []);
+      if (!controller.signal.aborted) {
+        setOpportunities(Array.isArray(data.opportunities) ? data.opportunities.slice(0, 3) : []);
+      }
     } catch (e) {
       if ((e as Error).name === 'AbortError') return;
     } finally {
-      setLoadingDiscovery(false);
+      if (!controller.signal.aborted) setLoadingDiscovery(false);
     }
   }, []);
 
-  // Auto-discover on mount
-  useEffect(() => { void discoverOpportunities(); }, [discoverOpportunities]);
+  // Auto-discover on mount; abort on unmount to suppress unhandled rejections
+  useEffect(() => {
+    void discoverOpportunities();
+    return () => { discoverAbortRef.current?.abort(); };
+  }, [discoverOpportunities]);
 
   // ── Actions ─────────────────────────────────────────────────────────────────
 
@@ -1125,15 +1144,18 @@ export default function ArticlesPage() {
                   </div>
                 </div>
                 {/* Slug */}
-                <div className="pt-1 border-t" style={{ borderColor: 'var(--border)' }}>
-                  <label className="mb-1.5 block text-xs font-semibold text-[var(--text-muted)]">
-                    SEO Slug → /blog/{slug || 'your-slug'}
-                  </label>
+                <div className="pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
+                  <div className="mb-1.5 flex items-center justify-between gap-2">
+                    <label className="text-xs font-semibold text-[var(--text-muted)]">
+                      SEO URL Slug <span className="font-normal text-[var(--text-muted)] opacity-70">— auto-generated, editable</span>
+                    </label>
+                    <span className="text-[10px] text-[var(--text-muted)] font-mono opacity-60">/blog/{slug || '…'}</span>
+                  </div>
                   <div className="flex gap-2">
                     <input
                       value={slug}
-                      onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-'))}
-                      placeholder="url-slug"
+                      onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-+/, ''))}
+                      placeholder="keyword-focused-slug"
                       className={`${inputCls} font-mono flex-1`}
                       style={inputStyle}
                     />
