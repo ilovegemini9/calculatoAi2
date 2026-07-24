@@ -519,8 +519,57 @@ export async function POST(req: Request) {
     const wordCount = calcWordCount(content);
     const readingTime = calcReadingTime(content);
 
-    // Schemas
-    const metaDescription = content.replace(/<[^>]+>/g, '').slice(0, 155);
+    // AI-generated meta description (targeted 140–155 chars, front-loads keyword)
+    let metaDescription = '';
+    try {
+      const metaPrompt = `Write a Google search meta description for this article.
+
+TITLE: ${title}
+FOCUS KEYWORD: ${keyword}
+
+RULES:
+- Exactly 140–155 characters (count carefully)
+- Start with the focus keyword or a close variation
+- Tell the reader what they'll learn or gain
+- Conversational, active voice — no "discover", "delve", "explore"
+- No quotation marks, no trailing period
+- Return ONLY the meta description text, nothing else`;
+
+      const descModels = getProviderModels(
+        getAiSettings(db.settings.ai, db.settings.openrouterApiKey),
+        'openrouter',
+        [
+          'nvidia/nemotron-3-super-120b-a12b:free',
+          'google/gemma-4-31b-it:free',
+          'nvidia/nemotron-3-nano-30b-a3b:free',
+        ],
+      );
+      for (const model of descModels) {
+        try {
+          const raw = await callOpenRouter(orKey, model, [{ role: 'user', content: metaPrompt }]);
+          const cleaned = raw
+            .replace(/^["']|["']$/g, '')
+            .split('\n')[0]
+            .trim();
+          if (cleaned.length >= 50 && cleaned.length <= 165) {
+            metaDescription = cleaned.slice(0, 160);
+            break;
+          }
+        } catch { /* try next model */ }
+      }
+    } catch { /* fallback below */ }
+
+    // Fallback: extract the first meaningful sentence from the article
+    if (!metaDescription) {
+      const plainText = content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      // Skip the key takeaways box content (usually starts with "Key Takeaways")
+      const afterBox = plainText.replace(/^.*?Key Takeaways.*?\./i, '').trim();
+      const source = afterBox || plainText;
+      const firstSentence = source.match(/[^.!?]{40,200}[.!?]/)?.[0]?.trim() ?? '';
+      metaDescription = firstSentence.length > 30
+        ? firstSentence.slice(0, 158).replace(/\s\S*$/, '') + (firstSentence.length > 158 ? '…' : '')
+        : source.slice(0, 155).replace(/\s\S*$/, '') + '…';
+    }
     const faqSchema = faqPairs.length > 0 ? buildFaqSchema(keyword, faqPairs) : null;
     const articleSchema = buildArticleSchema({
       title,
