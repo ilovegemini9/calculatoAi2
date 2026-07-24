@@ -41,7 +41,7 @@ import type {
   ArticleResearchSummary,
   ResearchKeywordChip,
   ResearchTitleCard,
-  TopicSuggestion,
+
 } from '@/lib/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -283,44 +283,32 @@ function TitleCardItem({ card, selected, onClick }: {
   );
 }
 
-// ─── Topic Suggestion Card ────────────────────────────────────────────────────
+// ─── Opportunity Card ─────────────────────────────────────────────────────────
 
-function TopicSuggestionCard({ suggestion, selected, onClick }: {
-  suggestion: TopicSuggestion; selected: boolean; onClick: () => void;
+function OpportunityCard({ title, selected, locked, onClick }: {
+  title: string; selected: boolean; locked: boolean; onClick: () => void;
 }) {
   return (
-    <button type="button" onClick={onClick}
-      className={`group w-full rounded-2xl border text-left transition ${selected ? 'border-blue-500 bg-blue-500/5' : 'hover:border-blue-400/60 hover:bg-blue-500/3'}`}
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={locked && !selected}
+      className={`group w-full rounded-2xl border text-left transition-all duration-200 ${
+        selected
+          ? 'border-blue-500 bg-blue-500/8 shadow-md shadow-blue-500/10'
+          : locked
+          ? 'pointer-events-none opacity-40'
+          : 'hover:border-blue-400/60 hover:bg-blue-500/3'
+      }`}
       style={{ borderColor: selected ? undefined : 'var(--border)' }}
     >
-      <div className="flex items-center justify-between gap-3 p-4">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[var(--text-primary)]">{suggestion.topic}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-            {suggestion.searchVolumeLabel && (
-              <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                <Search className="h-3 w-3" />{suggestion.searchVolumeLabel}
-              </span>
-            )}
-            <CompetitionBadge competition={suggestion.competition} />
-            {suggestion.trend && (
-              <span className="inline-flex items-center gap-0.5 text-xs text-[var(--text-muted)]">
-                {suggestion.trend === 'Rising' ? <span className="font-bold text-emerald-500">↑</span>
-                  : suggestion.trend === 'Declining' ? <span className="font-bold text-red-500">↓</span>
-                  : <span className="text-[var(--text-muted)]">→</span>}
-                <span className="ml-0.5">{suggestion.trend}</span>
-              </span>
-            )}
-            {suggestion.opportunityScore !== null && (
-              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${suggestion.opportunityScore >= 70 ? 'bg-emerald-500/10 text-emerald-600' : suggestion.opportunityScore >= 45 ? 'bg-amber-500/10 text-amber-600' : 'bg-red-500/10 text-red-600'}`}>
-                <Zap className="h-2.5 w-2.5" />{suggestion.opportunityScore}
-              </span>
-            )}
-          </div>
-        </div>
+      <div className="flex items-center justify-between gap-4 px-5 py-4">
+        <p className={`text-sm font-semibold leading-snug ${selected ? 'text-blue-600 dark:text-blue-400' : 'text-[var(--text-primary)]'}`}>
+          {title}
+        </p>
         <div className="shrink-0">
           {selected
-            ? <span className="flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-semibold text-white"><Check className="h-3 w-3" /> Selected</span>
+            ? <span className="flex items-center gap-1.5 rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white"><Check className="h-3 w-3" /> Selected</span>
             : <ArrowRight className="h-4 w-4 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:text-blue-500" />}
         </div>
       </div>
@@ -579,28 +567,16 @@ function LoadingPulse({ message }: { message: string }) {
   );
 }
 
-// ─── Default topic suggestions shown immediately on page load ─────────────────
-
-const DEFAULT_TOPIC_SUGGESTIONS: TopicSuggestion[] = [
-  { topic: 'Mortgage Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-  { topic: 'BMI Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-  { topic: 'Loan Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-  { topic: 'Tax Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-  { topic: 'Salary Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-  { topic: 'Compound Interest Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-  { topic: 'Calorie Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-  { topic: 'Retirement Calculator', searchVolumeLabel: null, competition: null, trend: null, opportunityScore: null },
-];
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ArticlesPage() {
   // ── Workflow state ──────────────────────────────────────────────────────────
-  const [topic, setTopic] = useState('');
-  const [topicSuggestions, setTopicSuggestions] = useState<TopicSuggestion[]>(DEFAULT_TOPIC_SUGGESTIONS);
-  const [selectedTopicIdx, setSelectedTopicIdx] = useState<number | null>(null);
-  const [loadingTopics, setLoadingTopics] = useState(false);
-  const topicAbortRef = useRef<AbortController | null>(null);
+  const [opportunities, setOpportunities] = useState<{ title: string }[]>([]);
+  const [selectedOpportunityIdx, setSelectedOpportunityIdx] = useState<number | null>(null);
+  const [loadingDiscovery, setLoadingDiscovery] = useState(false);
+  const discoverAbortRef = useRef<AbortController | null>(null);
 
   const [research, setResearch] = useState<ArticleResearchSummary | null>(null);
   const [intentAnalysis, setIntentAnalysis] = useState('');
@@ -663,49 +639,33 @@ export default function ArticlesPage() {
 
   useEffect(() => { void loadArticles(); }, [loadArticles]);
 
-  // ── Debounced topic suggestions ─────────────────────────────────────────────
-  useEffect(() => {
-    const trimmed = topic.trim();
-    if (phase !== 'idle') {
-      setTopicSuggestions([]);
-      setSelectedTopicIdx(null);
-      return;
+  // ── Discover opportunities ──────────────────────────────────────────────────
+  const discoverOpportunities = useCallback(async () => {
+    discoverAbortRef.current?.abort();
+    const controller = new AbortController();
+    discoverAbortRef.current = controller;
+    setLoadingDiscovery(true);
+    setOpportunities([]);
+    try {
+      const res = await fetch('/api/admin/articles/discover', { signal: controller.signal });
+      if (!res.ok) return;
+      const data = await res.json() as { opportunities?: { title: string }[] };
+      setOpportunities(Array.isArray(data.opportunities) ? data.opportunities.slice(0, 3) : []);
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') return;
+    } finally {
+      setLoadingDiscovery(false);
     }
-    // Empty or too short → restore default popular suggestions
-    if (trimmed.length < 3) {
-      setTopicSuggestions(trimmed.length === 0 ? DEFAULT_TOPIC_SUGGESTIONS : []);
-      setSelectedTopicIdx(null);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      topicAbortRef.current?.abort();
-      const controller = new AbortController();
-      topicAbortRef.current = controller;
-      setLoadingTopics(true);
-      try {
-        const res = await fetch('/api/admin/articles/topics', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: trimmed }),
-          signal: controller.signal,
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        setTopicSuggestions(Array.isArray(data.suggestions) ? data.suggestions : []);
-      } catch (e) {
-        if ((e as Error).name === 'AbortError') return;
-      } finally {
-        setLoadingTopics(false);
-      }
-    }, 650);
-    return () => clearTimeout(timer);
-  }, [topic, phase]);
+  }, []);
+
+  // Auto-discover on mount
+  useEffect(() => { void discoverOpportunities(); }, [discoverOpportunities]);
 
   // ── Actions ─────────────────────────────────────────────────────────────────
 
-  const runResearch = async (topicOverride?: string) => {
-    const researchTopic = (topicOverride ?? topic).trim();
-    if (!researchTopic) { setNotice({ kind: 'info', text: 'Enter a topic first.' }); return; }
+  const runResearch = async (researchTopic: string) => {
+    const trimmed = researchTopic.trim();
+    if (!trimmed) return;
     setWorking('research');
     setNotice(null);
     setPhase('researching');
@@ -723,7 +683,7 @@ export default function ArticlesPage() {
       const res = await fetch('/api/admin/articles/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: researchTopic }),
+        body: JSON.stringify({ topic: trimmed }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Research failed.');
@@ -915,20 +875,14 @@ export default function ArticlesPage() {
     }
   };
 
-  const selectTopicSuggestion = (idx: number, suggestion: TopicSuggestion) => {
-    topicAbortRef.current?.abort();
-    setTopic(suggestion.topic);
-    setSelectedTopicIdx(idx);
-    setLoadingTopics(false);
-    void runResearch(suggestion.topic);
+  const selectOpportunity = (idx: number, title: string) => {
+    setSelectedOpportunityIdx(idx);
+    void runResearch(title);
   };
 
   const reset = () => {
-    topicAbortRef.current?.abort();
-    setTopic('');
-    setTopicSuggestions([]);
-    setSelectedTopicIdx(null);
-    setLoadingTopics(false);
+    discoverAbortRef.current?.abort();
+    setSelectedOpportunityIdx(null);
     setResearch(null);
     setIntentAnalysis('');
     setSelectedKeyword('');
@@ -943,6 +897,7 @@ export default function ArticlesPage() {
     setWorking(null);
     setGenerationStage('');
     setNotice(null);
+    void discoverOpportunities();
   };
 
   // ── Phase helpers ────────────────────────────────────────────────────────────
@@ -975,71 +930,76 @@ export default function ArticlesPage() {
       {notice && <Notice kind={notice.kind}>{notice.text}</Notice>}
 
       {/* ──────────────────────────────────────────────────────────────────────
-          STEP 1 — Research Topic
+          STEP 1 — AI Article Discovery
       ────────────────────────────────────────────────────────────────────── */}
       <section className="rounded-2xl border" style={{ borderColor: phase === 'idle' || phase === 'researching' ? 'var(--blue-500, #3b82f6)' : 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
         <div className="flex items-start gap-3 border-b px-5 py-4" style={{ borderColor: 'var(--border)' }}>
           <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${phase === 'idle' || phase === 'researching' ? 'bg-blue-500 text-white' : 'bg-blue-500/10 text-blue-500'}`}>1</span>
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold text-[var(--text-primary)]">Research Topic</h2>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)]">AI Article Discovery</h2>
             <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-              Enter a broad topic. The system researches Google, PAA, trends, Reddit — then identifies the 5 strongest keyword opportunities.
+              AI automatically discovers the 3 strongest article opportunities using Google Search, Autocomplete, Trends, People Also Ask, Reddit, Quora and OpenRouter analysis.
             </p>
           </div>
           {phase === 'researching' && <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-blue-500" />}
           {research && phase !== 'idle' && phase !== 'researching' && <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-500" />}
         </div>
         <div className="p-5 space-y-4">
-          <div className="space-y-3">
-            <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
-              <input
-                value={topic}
-                onChange={(e) => {
-                  setTopic(e.target.value);
-                  setSelectedTopicIdx(null);
-                  if (phase !== 'idle') reset();
-                }}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !working) void runResearch(); }}
-                placeholder="Type a topic and click a suggestion — e.g. Mortgage, BMI, Tax, Loan…"
-                className={`${inputCls} pl-10`}
-                style={inputStyle}
-                disabled={phase === 'researching'}
-              />
-              {loadingTopics && (
-                <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-blue-400" />
-              )}
-            </div>
 
-            {/* Topic suggestions — primary action */}
-            {phase === 'idle' && topicSuggestions.length > 0 && (
-              <div className="space-y-2">
+          {/* Discovery loading */}
+          {loadingDiscovery && phase === 'idle' && (
+            <LoadingPulse message="Analysing Google Autocomplete, Trends, PAA, Reddit, Quora — discovering best opportunities…" />
+          )}
+
+          {/* Opportunity cards — shown when idle and not yet locked */}
+          {!loadingDiscovery && opportunities.length > 0 && phase === 'idle' && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
                 <p className="flex items-center gap-1.5 text-xs font-semibold text-blue-500">
                   <Sparkles className="h-3.5 w-3.5" />
-                  {topic.trim().length === 0 ? 'Suggestions populaires — cliquez pour démarrer automatiquement' : 'Cliquez une suggestion pour démarrer le workflow automatiquement'}
+                  Select an opportunity to begin — the workflow continues automatically
                 </p>
-                <div className="space-y-2">
-                  {topicSuggestions.map((suggestion, i) => (
-                    <TopicSuggestionCard
-                      key={i}
-                      suggestion={suggestion}
-                      selected={selectedTopicIdx === i}
-                      onClick={() => { if (working === null) selectTopicSuggestion(i, suggestion); }}
-                    />
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => { if (!loadingDiscovery) void discoverOpportunities(); }}
+                  disabled={loadingDiscovery}
+                  className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-blue-500 hover:text-blue-500 disabled:opacity-50"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <RefreshCw className="h-3 w-3" /> Refresh Suggestions
+                </button>
               </div>
-            )}
+              <div className="space-y-2">
+                {opportunities.map((opp, i) => (
+                  <OpportunityCard
+                    key={i}
+                    title={opp.title}
+                    selected={selectedOpportunityIdx === i}
+                    locked={selectedOpportunityIdx !== null && selectedOpportunityIdx !== i}
+                    onClick={() => { if (working === null && selectedOpportunityIdx === null) selectOpportunity(i, opp.title); }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
-            {/* Typing hint — only shown for 1-2 chars */}
-            {phase === 'idle' && topic.trim().length > 0 && topic.trim().length < 3 && (
-              <p className="text-xs text-[var(--text-muted)]">Continuez à taper pour voir des suggestions…</p>
-            )}
-          </div>
+          {/* Locked selection shown after workflow starts */}
+          {selectedOpportunityIdx !== null && opportunities[selectedOpportunityIdx] && phase !== 'idle' && (
+            <div className="rounded-2xl border border-blue-500 bg-blue-500/8 px-5 py-4 shadow-md shadow-blue-500/10">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-sm font-semibold leading-snug text-blue-600 dark:text-blue-400">
+                  {opportunities[selectedOpportunityIdx].title}
+                </p>
+                <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-blue-500 px-3 py-1 text-xs font-semibold text-white">
+                  <Lock className="h-3 w-3" /> Selected
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Research in progress */}
           {phase === 'researching' && (
-            <LoadingPulse message="Searching Google, collecting PAA questions, analyzing trends, running AI analysis…" />
+            <LoadingPulse message="Searching Google, collecting PAA questions, analysing trends, running AI analysis…" />
           )}
 
           {/* Research summary */}
