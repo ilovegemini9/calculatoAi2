@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb } from '@/lib/db';
+import { getSetting } from '@/lib/pg-settings';
 import { verifySession } from '@/lib/session';
 
 export async function GET(request: NextRequest) {
@@ -7,6 +8,14 @@ export async function GET(request: NextRequest) {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = getDb();
+
+  // Prefer PostgreSQL-persisted logs so events written in previous serverless
+  // invocations (where /tmp is ephemeral) are still visible.
+  const pgLogs = await getSetting<typeof db.logs>('platform_logs');
+  if (pgLogs && Array.isArray(pgLogs) && pgLogs.length > db.logs.length) {
+    db.logs = pgLogs;
+  }
+
   const { searchParams } = new URL(request.url);
   const level = searchParams.get('level');
   const search = searchParams.get('search')?.toLowerCase();

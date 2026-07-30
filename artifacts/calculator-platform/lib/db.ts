@@ -210,6 +210,12 @@ export function logEvent(level: 'INFO' | 'WARN' | 'ERROR', message: string, rout
     };
     db.logs = [newLog, ...(db.logs || [])].slice(0, 500);
     saveDb(db);
+
+    // Persist logs to PostgreSQL so they survive serverless cold starts
+    // where /tmp is ephemeral. Fire-and-forget — never block the caller.
+    import('@/lib/pg-settings').then(({ setSetting }) => {
+      setSetting('platform_logs', db.logs).catch(() => { /* ignore */ });
+    }).catch(() => { /* ignore */ });
   } catch (err) {
     console.error('[logEvent] failed:', err);
   }

@@ -38,8 +38,11 @@ export function buildSessionToken(username: string): string {
 export function sessionCookieOptions(maxAge = SESSION_MAX_AGE) {
   return {
     httpOnly: true,
-    // Allow HTTP in dev/container preview environment; enable secure only when COOKIE_SECURE is true
-    secure: process.env.COOKIE_SECURE === 'true',
+    // Always set Secure in production (HTTPS) so the cookie is transmitted
+    // by browsers and proxies (Cloudflare, Vercel edge, etc.) that silently
+    // drop non-Secure cookies on HTTPS origins. In dev (HTTP preview) keep
+    // it off so the local workflow still works.
+    secure: process.env.COOKIE_SECURE === 'true' || process.env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
     maxAge,
     path: '/',

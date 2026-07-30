@@ -121,6 +121,16 @@ export async function POST(req: Request) {
     if (!topic?.trim()) return NextResponse.json({ error: 'topic is required' }, { status: 400 });
 
     const db = getDb();
+
+    // Prefer PostgreSQL-persisted AI settings over the JSON file so an API key
+    // saved via the Settings UI is visible here even when the JSON file is stale
+    // or missing (e.g. serverless cold start). Mirrors the discover route.
+    const { getSetting } = await import('@/lib/pg-settings');
+    const pgAi = await getSetting<typeof db.settings.ai>('ai_settings');
+    const pgSerpEncrypted = await getSetting<string>('serp_api_key_encrypted');
+    if (pgAi) db.settings.ai = pgAi;
+    if (pgSerpEncrypted) db.settings.serpApiKeyEncrypted = pgSerpEncrypted;
+
     const serpKey = getSerpApiKey(db.settings);
     const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
     const orKey =

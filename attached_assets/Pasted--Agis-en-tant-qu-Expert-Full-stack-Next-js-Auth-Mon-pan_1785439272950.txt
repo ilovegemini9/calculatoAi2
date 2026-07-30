@@ -1,0 +1,14 @@
+"Agis en tant qu'Expert Full-stack Next.js & Auth. Mon panel d'administration (/admin) sur luckyhoroscope.online souffre de défaillances critiques au niveau de la couche API et de l'authentification. Tu dois corriger les problèmes suivants de manière structurelle :
+Smart Workflow 'Unauthorized' Fix :
+Dans la section AI Articles, le 'Smart Workflow' affiche une erreur 'Unauthorized' dès qu'on sélectionne une opportunité (Étape 1 vers Étape 2).
+Action : Vérifie l'appel API vers /api/admin/articles/analyze (ou endpoint similaire). Assure-toi que les headers d'autorisation sont correctement transmis et que le middleware ne bloque pas cette requête spécifique.
+Réparation Globale des API Routes (Unable to Load) :
+Les sections AI Settings, Logs, AI Calculators et Ads Manager affichent toutes 'Unable to load' ou 'Failed to load'.
+Action : Il y a une rupture de communication entre le frontend et le backend. Inspecte les API Routes correspondantes. Vérifie si c'est un problème de permissions (401/403) ou une erreur serveur (500). Ajoute des logs serveur pour identifier si la base de données ou les services tiers (OpenRouter, etc.) répondent correctement.
+Persistance de Session & Deep Linking :
+La session admin est perdue lors d'un rafraîchissement de page ou d'un accès direct à une URL (ex: /admin/seo).
+Action : Revois la configuration des cookies dans ton système d'authentification. Assure-toi que le cookie de session a un Path=/ et qu'il est accessible sur toutes les sous-routes. Vérifie le middleware.ts pour qu'il valide correctement la session sur les accès directs.
+Stabilité de la Base de Données :
+La section Logs est vide et renvoie une erreur de chargement.
+Action : Vérifie la connexion Drizzle/SQL. Assure-toi que les tables existent et que les requêtes de lecture ne sont pas bloquées par une erreur de schéma ou de connexion.
+Objectif Final : Je veux pouvoir naviguer dans l'admin, utiliser le Smart Workflow jusqu'à la génération complète, et voir mes réglages AI sans aucune déconnexion ou erreur 'Unauthorized'."
