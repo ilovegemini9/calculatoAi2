@@ -1,0 +1,46 @@
+You are acting as a Principal Next.js & Webpack Engineer. My project is throwing a severe Webpack Runtime Error during execution:
+
+### ERROR DETAILS:
+Runtime Error: Cannot find module './3135.js'
+Require stack:
+- .next/server/webpack-runtime.js
+- .next/server/pages/_document.js
+- node_modules/next/dist/server/require.js
+- node_modules/next/dist/server/load-components.js
+
+At: .next/server/app/page.js
+
+### PROJECT ENVIRONMENT:
+- Framework: Next.js 15
+- Package Manager / Runtime: Bun / pnpm
+- Architecture: Monorepo / App Router
+
+---
+
+### ROOT CAUSE ANALYSIS NEEDED:
+This error is caused by corrupted Webpack chunk manifests, stale build artifacts, or structural routing conflicts between Pages Router (`pages/_document.js`) and App Router (`app/page.js`).
+
+---
+
+### YOUR ACTION PLAN:
+
+1. **Clean Build Artifacts & Cache:**
+   - Provide terminal instructions to force-purge all Webpack caches, `.next` directories, `node_modules`, and lockfiles safely.
+
+2. **Router Conflict Resolution:**
+   - Inspect the repository layout for structural conflicts.
+   - If the project has migrated to App Router (`src/app` or `app/`), identify and refactor or remove leftover legacy Pages Router files (like `pages/_document.js` or `pages/_app.js`) that are triggering hybrid Webpack bundling conflicts.
+
+3. **Next.js & Webpack Config Optimization (`next.config.js` / `next.config.mjs`):**
+   - Provide an updated Next.js configuration that ensures clean chunk generation and disables invalid cache behaviors.
+   - Enforce explicit `output` and `transpilePackages` options if running inside a monorepo workspace.
+
+4. **Execution Commands:**
+   - Provide the exact sequential commands to clean, re-install dependencies using Bun/pnpm, build cleanly, and launch the application without missing module runtime errors.
+
+---
+
+### DELIVERABLES:
+1. Explain the exact architectural fix.
+2. Provide the complete code for any updated configuration or routing files.
+3. List the step-by-step commands to purge cache and re-run the project.

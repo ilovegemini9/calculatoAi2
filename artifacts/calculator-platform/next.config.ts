@@ -1,9 +1,17 @@
+import path from 'path';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Point file-tracing at the monorepo root so Next.js resolves shared
+  // packages (lib/*, node_modules) correctly during builds and deploys.
+  outputFileTracingRoot: path.join(__dirname, '../../'),
+
   // Experimental features
   experimental: {
     cpus: 1,
+    // Disable the webpack build worker — it spawns a separate process that
+    // cannot share the monorepo's module resolution context, which causes
+    // "Cannot find module './NNNN.js'" chunk errors on Replit's FS.
     webpackBuildWorker: false,
     // React 19 server actions
     serverActions: {
