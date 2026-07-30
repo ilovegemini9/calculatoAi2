@@ -1,0 +1,350 @@
+CRITICAL BACKEND INVESTIGATION
+
+The issue is NOT fixed.
+
+Do NOT guess.
+
+Do NOT provide assumptions.
+
+Do NOT stop until the exact root cause is found and fixed.
+
+==================================================
+CURRENT PROBLEMS
+==================================================
+
+1. Clicking "Save" in AI Settings always returns:
+
+401 Unauthorized
+
+2. Human Content Engine displays:
+
+Unable to load saved articles.
+
+3. No article suggestions are displayed.
+
+4. AI Settings are not loading correctly.
+
+5. Live article discovery is not working.
+
+Do NOT assume the issue is OpenRouter, SerpAPI, PostgreSQL or authentication.
+
+Investigate the entire stack.
+
+==================================================
+STEP 1
+TRACE THE 401
+==================================================
+
+Identify the exact endpoint returning 401.
+
+Log:
+
+- Request URL
+- HTTP Method
+- Request Headers
+- Cookies
+- Response Code
+- Response Body
+- Stack Trace
+
+Determine exactly where the request is rejected.
+
+==================================================
+STEP 2
+AUTHENTICATION AUDIT
+==================================================
+
+Verify:
+
+- admin_session cookie
+- SESSION_SECRET
+- Middleware
+- API route protection
+- Authorization headers
+- Cookie parsing
+- Cookie validation
+- Session creation
+- Session persistence
+
+Verify the authenticated administrator reaches:
+
+POST /api/admin/settings/ai
+
+without being rejected.
+
+Verify login remains valid across all admin pages.
+
+Verify opening another admin page does not destroy the session.
+
+==================================================
+STEP 3
+POSTGRESQL AUDIT
+==================================================
+
+Verify:
+
+DATABASE_URL
+
+Connection
+
+SSL
+
+Queries
+
+Table creation
+
+Read
+
+Write
+
+Updates
+
+Transactions
+
+Connection pooling
+
+Check all SQL errors.
+
+Check all failed queries.
+
+Verify PostgreSQL is the single source of truth.
+
+==================================================
+STEP 4
+AI SETTINGS AUDIT
+==================================================
+
+When opening AI Settings:
+
+Read ONLY from PostgreSQL.
+
+Never read from:
+
+- memory
+- localStorage
+- db.json
+- fallback objects
+
+When clicking Save:
+
+- Encrypt API keys
+- Save into PostgreSQL
+- Return success
+
+DO NOT call OpenRouter.
+
+DO NOT call SerpAPI.
+
+Saving settings must never depend on external APIs.
+
+==================================================
+STEP 5
+OPENROUTER AUDIT
+==================================================
+
+Verify:
+
+- API key loading
+- Encryption
+- Decryption
+- Request headers
+- Error handling
+
+OpenRouter should only be called when:
+
+- Test Connection
+- Generate Article
+
+Never during Save Settings.
+
+Display real API errors.
+
+Never replace them with 401 Unauthorized.
+
+==================================================
+STEP 6
+SERPAPI AUDIT
+==================================================
+
+Verify:
+
+- API key loading
+- Request construction
+- Error handling
+- Rate limits
+
+Display real SerpAPI errors.
+
+Never hide them.
+
+==================================================
+STEP 7
+HUMAN CONTENT ENGINE AUDIT
+==================================================
+
+Investigate:
+
+Unable to load saved articles
+
+Find the exact failing query.
+
+Find the exact exception.
+
+Find the exact file.
+
+Find the exact line number.
+
+Verify:
+
+- Saved articles query
+- Discovery query
+- Content generation query
+- Settings loading query
+
+If PostgreSQL fails:
+
+display the real SQL error.
+
+==================================================
+STEP 8
+ARTICLE DISCOVERY AUDIT
+==================================================
+
+Verify the AI Discovery Engine.
+
+Check:
+
+- OpenRouter
+- SerpAPI
+- Google Autocomplete
+- Google Trends
+- People Also Ask
+- Reddit
+- Quora
+
+Verify article opportunities are generated dynamically.
+
+Verify no hardcoded titles exist anywhere.
+
+Search the entire codebase for:
+
+Complete Guide
+Ultimate Guide
+Calculator App
+Calculator Net
+Calculator Online
+
+Remove any remaining fallback logic.
+
+==================================================
+STEP 9
+DEBUG LOGGING
+==================================================
+
+Temporarily enable verbose logging.
+
+Log:
+
+Authentication status
+
+Session status
+
+Cookie status
+
+Middleware status
+
+Database connection
+
+SQL queries
+
+OpenRouter requests
+
+OpenRouter responses
+
+SerpAPI requests
+
+SerpAPI responses
+
+Internal exceptions
+
+Unhandled exceptions
+
+==================================================
+STEP 10
+ERROR HANDLING
+==================================================
+
+Never return generic errors like:
+
+401 Unauthorized
+
+Unable to load saved articles
+
+Instead display:
+
+- real error
+- source
+- file
+- function
+
+during debugging mode.
+
+==================================================
+STEP 11
+ARCHITECTURE CLEANUP
+==================================================
+
+Remove:
+
+- duplicated auth logic
+- duplicated database logic
+- legacy storage
+- db.json dependencies
+- memory persistence
+- temporary fallback code
+
+Use:
+
+- single auth system
+- single PostgreSQL persistence layer
+- single settings service
+
+==================================================
+FINAL REPORT
+==================================================
+
+Return:
+
+✓ Exact root cause
+
+✓ File(s) modified
+
+✓ Function(s) modified
+
+✓ Line number(s)
+
+✓ Why 401 happened
+
+✓ Why saved articles could not load
+
+✓ Why article suggestions were missing
+
+✓ Authentication status
+
+✓ Session status
+
+✓ PostgreSQL status
+
+✓ OpenRouter status
+
+✓ SerpAPI status
+
+✓ Human Content Engine status
+
+✓ Confirmation that AI Settings save correctly
+
+✓ Confirmation that saved articles load correctly
+
+✓ Confirmation that article discovery works correctly
+
+Do not stop until every issue is fixed and verified with real tests.

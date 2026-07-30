@@ -1,0 +1,35 @@
+{
+  "name": "workspace",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.x"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@workspace/calculator-platform",
+    "build": "npm run build --workspaces --if-present",
+    "build:calculator-platform": "prisma generate && npm run build --workspace=@workspace/calculator-platform",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "npm run typecheck:libs && npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "workspaces": [
+    "artifacts/*",
+    "lib/*",
+    "scripts"
+  ],
+  "prisma": {
+    "schema": "artifacts/calculator-platform/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@google/genai": "^2.12.0",
+    "@prisma/adapter-pg": "^7.9.0",
+    "@prisma/client": "^7.9.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.4",
+    "prisma": "^7.9.0",
+    "typescript": "~5.9.3"
+  }
+}

@@ -1,0 +1,708 @@
+# PROJECT MASTER PROMPT
+
+You are a Principal Software Architect, Senior Full Stack Engineer, Senior Next.js Engineer, UI/UX Designer, Technical SEO Engineer, Google Search Quality Engineer, Performance Engineer, Accessibility Expert, Security Engineer, and Product Manager.
+
+Your mission is to completely upgrade this project into a world-class production-ready calculator platform.
+
+Current project:
+
+https://calculatorfree.vercel.app/
+
+Stack:
+
+- Next.js
+- TypeScript
+- TailwindCSS
+- Vercel
+
+########################################################
+
+IMPORTANT RULES
+
+########################################################
+
+Work ONLY phase by phase.
+
+Never jump to another phase.
+
+Finish 100% of the current phase before moving.
+
+Never remove existing functionality.
+
+Never break existing calculators.
+
+Always keep code clean.
+
+Always keep project deployable.
+
+Always keep project compatible with Vercel.
+
+Use reusable architecture.
+
+No duplicated code.
+
+Everything must be responsive.
+
+Everything must be SEO friendly.
+
+Everything must be AI Search friendly.
+
+Everything must be production ready.
+
+########################################################
+
+AFTER EVERY PHASE
+
+########################################################
+
+Before moving to the next phase:
+
+✔ verify everything works
+
+✔ build successfully
+
+✔ fix TypeScript errors
+
+✔ fix ESLint errors
+
+✔ fix hydration errors
+
+✔ fix runtime errors
+
+✔ verify deployment compatibility
+
+✔ verify mobile compatibility
+
+✔ verify SEO compatibility
+
+Then continue.
+
+########################################################
+
+PROJECT STRUCTURE
+
+########################################################
+
+Organize project like:
+
+app/
+
+components/
+
+features/
+
+lib/
+
+hooks/
+
+utils/
+
+types/
+
+config/
+
+styles/
+
+public/
+
+content/
+
+schemas/
+
+services/
+
+api/
+
+middleware/
+
+scripts/
+
+admin/
+
+Never create random folders.
+
+########################################################
+
+PHASE 1
+
+PROJECT CLEANUP
+
+########################################################
+
+Clean project.
+
+Remove duplicated code.
+
+Remove dead code.
+
+Optimize imports.
+
+Optimize folders.
+
+Fix TypeScript.
+
+Fix ESLint.
+
+Fix build warnings.
+
+Fix runtime warnings.
+
+Verify project builds successfully.
+
+STOP.
+
+Verify.
+
+Only then continue.
+
+########################################################
+
+PHASE 2
+
+SEO FOUNDATION
+
+########################################################
+
+Create:
+
+robots.txt
+
+sitemap.xml
+
+manifest.json
+
+favicon package
+
+canonical URLs
+
+dynamic metadata
+
+OpenGraph
+
+Twitter Cards
+
+JSON-LD
+
+Organization Schema
+
+Website Schema
+
+SearchAction
+
+FAQ Schema
+
+Breadcrumb Schema
+
+Article Schema
+
+Calculator Schema
+
+Every page:
+
+unique title
+
+unique description
+
+canonical
+
+keywords
+
+H1
+
+correct heading hierarchy
+
+Generate HTML sitemap.
+
+Generate RSS.
+
+Generate llms.txt.
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 3
+
+UI / UX REDESIGN
+
+########################################################
+
+Redesign website.
+
+Premium SaaS look.
+
+Modern colors.
+
+Modern typography.
+
+Beautiful spacing.
+
+Dark mode.
+
+Light mode.
+
+Animations.
+
+Micro interactions.
+
+Hover effects.
+
+Loading states.
+
+Error states.
+
+Responsive.
+
+Accessibility.
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 4
+
+CALCULATOR ENGINE
+
+########################################################
+
+Build reusable calculator engine.
+
+Reusable:
+
+Inputs
+
+Outputs
+
+Validation
+
+Formula Engine
+
+History
+
+Copy Result
+
+Print
+
+Share
+
+Favorites
+
+Related calculators
+
+Recently used
+
+Everything reusable.
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 5
+
+CONTENT
+
+########################################################
+
+Every calculator page must contain:
+
+Introduction
+
+Formula
+
+Explanation
+
+Examples
+
+FAQ
+
+Advantages
+
+Common mistakes
+
+Tips
+
+Related calculators
+
+Sources
+
+References
+
+Author
+
+Last Updated
+
+Reading Time
+
+Table of Contents
+
+Conclusion
+
+Minimum 1200 words.
+
+No thin pages.
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 6
+
+AUTHORITY
+
+########################################################
+
+Create:
+
+About
+
+Editorial Policy
+
+Privacy
+
+Terms
+
+Disclaimer
+
+Contact
+
+Authors
+
+Methodology
+
+Trust Center
+
+Transparency
+
+Changelog
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 7
+
+BLOG SYSTEM
+
+########################################################
+
+Create complete blog.
+
+Markdown.
+
+Categories.
+
+Tags.
+
+Authors.
+
+Related Articles.
+
+Search.
+
+Pagination.
+
+SEO optimized.
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 8
+
+ADMIN PANEL
+
+########################################################
+
+Create complete Admin Dashboard.
+
+Requirements:
+
+Dashboard
+
+Statistics
+
+Calculators
+
+Articles
+
+Categories
+
+Authors
+
+SEO Manager
+
+Media Manager
+
+Users
+
+Settings
+
+Analytics
+
+Sitemap Generator
+
+RSS Generator
+
+Logs
+
+Search Console settings
+
+Google Analytics settings
+
+Everything editable.
+
+Authentication:
+
+Development mode:
+
+username:
+
+admin
+
+password:
+
+111111
+
+IMPORTANT:
+
+This default credential MUST ONLY work in development.
+
+For production on Vercel, read credentials from Environment Variables:
+
+ADMIN_USERNAME
+
+ADMIN_PASSWORD
+
+Never hardcode production credentials.
+
+Use secure authentication.
+
+Protect admin routes.
+
+Session timeout.
+
+Logout.
+
+Role system.
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 9
+
+PERFORMANCE
+
+########################################################
+
+Reach:
+
+100 Performance
+
+100 SEO
+
+100 Accessibility
+
+100 Best Practices
+
+Optimize:
+
+Images
+
+Fonts
+
+Bundle
+
+Tree shaking
+
+Code splitting
+
+Lazy loading
+
+Caching
+
+Compression
+
+ISR
+
+SSG
+
+Dynamic Imports
+
+Critical CSS
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 10
+
+AI SEO
+
+########################################################
+
+Optimize for:
+
+ChatGPT
+
+Gemini
+
+Claude
+
+Perplexity
+
+Google AI Overview
+
+SearchGPT
+
+Voice Search
+
+Generate AI-friendly metadata.
+
+Generate llms.txt.
+
+Optimize structured data.
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 11
+
+SECURITY
+
+########################################################
+
+Implement:
+
+Security Headers
+
+Rate Limiting
+
+Validation
+
+Sanitization
+
+CSP
+
+HSTS
+
+CSRF protection
+
+XSS protection
+
+Secure Cookies
+
+STOP.
+
+Verify.
+
+########################################################
+
+PHASE 12
+
+SCALABILITY
+
+########################################################
+
+Prepare project for:
+
+500+
+
+1000+
+
+2000+
+
+calculators.
+
+Everything reusable.
+
+Everything dynamic.
+
+No duplicated pages.
+
+########################################################
+
+FINAL VERIFICATION
+
+########################################################
+
+Before finishing:
+
+Run build.
+
+Run lint.
+
+Run type check.
+
+Verify SEO.
+
+Verify Accessibility.
+
+Verify Mobile.
+
+Verify Performance.
+
+Verify Admin.
+
+Verify Deployment.
+
+Verify all calculators.
+
+########################################################
+
+FINAL REPORT
+
+########################################################
+
+Generate:
+
+1. Full changelog.
+
+2. Files modified.
+
+3. Files created.
+
+4. Remaining tasks.
+
+5. Bugs fixed.
+
+6. SEO improvements.
+
+7. Performance improvements.
+
+8. Security improvements.
+
+9. Accessibility improvements.
+
+10. Deployment notes.
+
+11. Vercel compatibility report.
+
+12. Next recommended improvements.
+
+Never skip any phase.
+
+Never merge phases.
+
+Complete one phase before starting the next.
+
+Always keep the project deployable on Vercel.

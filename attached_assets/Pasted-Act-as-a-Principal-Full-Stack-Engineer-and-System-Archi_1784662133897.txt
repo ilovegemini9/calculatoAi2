@@ -1,0 +1,41 @@
+Act as a Principal Full-Stack Engineer and System Architect.
+
+Your task is to merge "Editorial Blog Workspace" and "SEO Content & Keyword Finder" into a unified, high-performing "Editorial Workspace & AI Content Engine".
+
+This workspace will automatically suggest high-opportunity article ideas and generate 100% human-sounding, fully-optimized SEO articles with zero manual effort.
+
+==================================================
+1. UNIFIED KEYWORD & TREND OPPORTUNITY ENGINE
+==================================================
+Build an automated suggestion engine inside the Editorial Workspace that discovers top content opportunities based on:
+- High Demand + Low Competition (The Sweet Spot): Identify topics with massive monthly search volume where indexed search results are poor, outdated, or sparse (Low Keyword Difficulty / Low Occurrence).
+- Google Trends & Breakouts: Track real-time search spikes and viral search queries.
+- Google Autocomplete Scraper/API Integration: Pull real long-tail user queries straight from Google auto-suggestions.
+- Automated Content Ideas: For every discovered opportunity, the system must automatically generate:
+  1. Suggested Article H1 Title (High-CTR & Search Intent focused)
+  2. Suggested Meta Title (under 60 characters)
+  3. Suggested Meta Description (under 155 characters)
+  4. Suggested URL Slug (e.g., /mortgage-payoff-calculator-guide)
+
+==================================================
+2. 100% AI-SEO & 100% HUMAN-LIKE CONTENT GENERATOR
+==================================================
+When a user clicks "Generate Article" on any suggested title, the AI writing engine must craft an article strictly adhering to these rules:
+- Human Tone & Style (No AI Footprint): Strictly ban robotic AI jargon (e.g., ban words like "delve", "testament", "in conclusion", "furthermore", "unlock", "harness", "pivotal", "tapestry"). Write in an accessible, helpful peer voice.
+- Natural High-Frequency Keyword Integration: Naturally inject primary, secondary, and LSI keywords into H1, H2, H3 headings, introduction, body, and conclusion without keyword stuffing.
+- Automatic Internal Calculator Tool Linking: Automatically scan the internal 'calculators' database and embed contextual internal links to relevant free tools inside the body (e.g., automatically linking to `/mortgage-calculator` whenever mortgage calculations or payments are discussed).
+- Complete Google & AI-SEO On-Page Requirements:
+  * Key Takeaways Summary Box at the top.
+  * Structured Data Tables (HTML <table>) for quick comparative scanning and data summary.
+  * FAQ Section formatted with structured FAQPage Schema.org markup.
+  * Dynamic Meta Title, Meta Description, and Clean Canonical Tags injected into the database entry.
+
+==================================================
+3. WORKSPACE WORKFLOW & DRAFT MANAGEMENT
+==================================================
+- Consolidate all controls into ONE single "Editorial Workspace" screen. Remove the standalone SEO Content Finder tab.
+- Display a list of AI-Suggested Articles with metrics (Opportunity Score, Search Volume, Competition, Suggested Calculator Link).
+- Provide a One-Click "Generate & Review" workflow that opens the generated article in a Markdown Editor with real-time SEO scoring, ready for one-click publishing to the 'articles' database.
+
+DELIVERABLE:
+Refactor the codebase to unify the Editorial Workspace. Ensure zero mock data — wrap external Google API checks and fallback gracefully to empty states or system alerts if credentials are missing.

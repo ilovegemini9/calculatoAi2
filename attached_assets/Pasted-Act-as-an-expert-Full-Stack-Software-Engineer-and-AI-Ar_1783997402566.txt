@@ -1,0 +1,142 @@
+Act as an expert Full-Stack Software Engineer and AI Architect. Your task is to update and refactor our "AI SEO Writer and Article Manager" application to implement a high-performance 3-stage cascading agent pipeline (Chaining), build a suite of bulletproof SEO-optimized interactive calculators, and deploy a dynamic sitemap automation system.
+
+This is a Next.js application. Ensure all backend code conforms to Next.js API Routes (or App Router handlers) and all frontend code uses clean React components. Once the full update is complete, push and upload all changes directly to GitHub via the configured Git credentials/key.
+
+Here is the architectural design you must implement for article generation:
+[Llama-3.3-70B (The Brain/SEO Planner)] ➔ [Gemma-3-27B (The Writer/Copywriter)] ➔ [Mistral-7B (The Technical SEO Optimizer)]
+
+---
+
+### 1. NEW: INTERACTIVE CALCULATORS ENGINE & SEO HUBS
+Integrate a dedicated "Calculators" section inside the application. These tools must perform highly accurate calculations based on proven algorithms (referencing calculator.net style) without any logical or JavaScript runtime errors.
+Every calculator must be designed as an **SEO/E-SEO/AI-SEO Landing Page Powerhouse** to capture transactional search intent.
+
+#### A. The Calculators to Implement:
+1. **Calorie & TDEE Calculator:** Uses the Mifflin-St Jeor Equation to calculate BMR and Daily Calorie needs based on activity multiplier.
+2. **Compound Interest & Investment Calculator:** Calculates future value with regular monthly contributions, compounded annually/monthly.
+3. **Mortgage & Loan Amortization Calculator:** Standard PMT formula calculating monthly principal + interest, total interest paid, and dynamic amortization table.
+
+#### B. Technical & SEO Requirements for Calculators:
+- **Zero-Error Execution:** Use strict type checking (TypeScript/JS) for inputs. Prevent NaN, division by zero, or infinite loops.
+- **Embedded Human-Like SEO Guides:** Each calculator page must display a deep, highly readable, human-like editorial guide beneath the tool explaining:
+  - *How the calculation works* (the exact formula simplified).
+  - *Practical advice and actionable takeaways* related to the result.
+- **AI-SEO Optimized Metadata:** Automatically generate specific schema markup (Structured Data like Product, FAQPage, or SoftwareApplication) inside the HTML head of each calculator route to secure rich snippets in search results.
+
+---
+
+### 2. NEW: DYNAMIC SITEMAP AUTOMATION
+Implement a highly automated and robust Sitemap generator (`sitemap.xml` Route in Next.js):
+- **Automated Generation:** It must dynamically fetch all active static pages, newly created SEO articles from the database, and all Interactive Calculator routes.
+- **SEO Standard compliance:** Correct headers (`Content-Type: text/xml`), proper `<loc>`, `<lastmod>` (updated on article modifications), and optimal `<changefreq>` priority tags.
+- **Indexation-Ready:** Fully verified to trigger search console indexing without redirect loops or canonical mismatches.
+
+---
+
+### 3. CORE UI CLEANUP & SECURITY RULES (CRITICAL)
+You must remove or hide the following elements from the user interface and codebase:
+1. **Remove Version Mentions:** Do NOT display "AI Assistant Engine Active v1.4.2-PROD" anywhere on the site.
+2. **Remove SEO Badge:** Do NOT display "SEO Health Grade 100/100 Dynamic rendering, zero LCP layout shifts, and client-side performance fully verified" anywhere on the site.
+3. **Remove Admin Dashboard Link/UI:** Completely hide or remove any visible link, button, or section referencing the "Admin Dashboard".
+4. **Fix Vercel Login Password (admin / 123456):** The current admin login does not work when deployed on Vercel. Fix the authentication mechanism. Ensure that the username "admin" and password "123456" are verified correctly (e.g., matching env variables, or fallback comparison in code if env variables are missing during deployment). Ensure it works seamlessly on production serverless environments.
+5. **API Keys Persistence:** The API keys configured in the API Router dashboard/settings MUST be saved permanently when the user clicks "Save". They must NOT be deleted, lost, or reset when a generation is triggered or when the server restarts. All subsequent generations must successfully read these saved keys to communicate with the models.
+
+---
+
+### 4. CORE WRITING REQUIREMENT (STRICT HUMAN-LIKE STYLE)
+All written output (the article, descriptions, summaries, and introductory sections) must sound entirely human, natural, and free of typical AI footprint, clichés, or structures.
+- ABSOLUTELY PROHIBITED AI-isms: "In today's fast-paced digital world", "delve", "testament", "tapestry", "moreover", "furthermore", "in conclusion" (as a heading), repetitive sentence patterns, or passive, robotic structures.
+- REQUIREMENT: Use active voice, varied sentence lengths (including short, punchy statements), smooth contextual transitions, and authentic human warmth.
+
+---
+
+### 5. BACKEND PIEPLINE ARCHITECTURE & DATA FLOW
+
+You must chain the API calls sequentially inside Next.js API routes, ensuring the output of each model serves as the direct input for the next:
+
+#### STEP 1: Plan & Structure with Llama-3.3-70B
+- Input: User parameters (Topic, Target Keywords, Tone/Audience)
+- System Prompt:
+"""
+Act as an expert SEO Strategist (The Brain). Your job is to analyze the user's topic and keywords, and create an ultra-optimized SEO brief and outline.
+Input parameters:
+- Topic: {topic}
+- Target Keywords: {keywords}
+- Target Audience/Tone: {tone}
+
+Your output must be a clean, valid JSON object with the following keys:
+1. "meta_title_suggestion": A compelling, SEO-friendly title under 60 characters.
+2. "search_intent": Brief analysis of the user search intent (informational, transactional, etc.).
+3. "semantic_entities": A list of 10 related semantic terms and entities to include in the article.
+4. "outline": A structured array of sections. Each section must have:
+   - "heading": The H2 or H3 title (fully optimized with keywords).
+   - "key_points": A bulleted list of specific points, data, or arguments to cover in this section.
+   - "target_keywords": 1 or 2 specific keywords to focus on in this section.
+
+Do not write the article. Only generate the JSON brief.
+"""
+- Output Handling: Parse the response as JSON to pass to Step 2. If parsing fails, implement a fallback parser or retry.
+
+#### STEP 2: Draft with Gemma-3-27B
+- Input: The JSON output from Step 1.
+- System Prompt:
+"""
+Act as a professional, high-end copywriter and journalist (The Writer). Your goal is to write a deeply engaging, highly human-like, and authoritative article based on the provided SEO Brief.
+
+Input Brief (JSON): {step_1_json}
+
+CRITICAL STYLE INSTRUCTIONS:
+- You must write like an expert human author. Avoid any robotic structures, predictable formulas, or generic transitions.
+- Absolutely ban AI clichés ("In today's digital age...", "tapestry", "delve", "nestled", "testament", "moreover", etc.).
+- Use varied sentence lengths. Use punchy, conversational yet authoritative language. 
+- Write to hook the reader. Your content must feel fresh, authentic, and naturally engaging.
+
+Instructions:
+1. Write the full body of the article following the structured "outline" step-by-step.
+2. Seamlessly integrate the "semantic_entities" and section-specific "target_keywords" naturally into the flow of the text. Do not force them where they don't fit.
+3. Write in Markdown format. Use clear paragraphs, bullet points where necessary, and bold key terms to make the text highly readable.
+4. Do not output any HTML tags or meta-descriptions yet. Focus entirely on high-quality editorial content.
+"""
+- Output Handling: Pass the generated Markdown text directly to Step 3.
+
+#### STEP 3: Optimize & Format with Mistral-7B
+- Input: The Markdown draft from Step 2 AND the original JSON brief from Step 1.
+- System Prompt:
+"""
+Act as a technical SEO Developer and Editor (The Technical Optimizer). Your job is to take the drafted article, refine its code structure, optimize technical SEO elements, and output the final, ready-to-publish HTML.
+
+Input Draft (Markdown): {step_2_markdown}
+Original Brief info: {step_1_json}
+
+CRITICAL STYLE INSTRUCTIONS:
+- The text must remain completely human-like. When formatting, do not inject any synthetic AI language or robotic introductions.
+- Ensure the meta description and summary are written with strong, clickable copywriting that sounds like a human marketer, not an AI bot.
+
+Instructions:
+1. Convert the entire Markdown article into clean, semantic HTML5 (use <h2>, <h3>, <p>, <strong>, <ul>, <li>). Do not include <html>, <head>, or <body> tags, just the article body.
+2. Optimize the text: Ensure keywords from the brief are placed naturally in the first 100 words, in at least two H2/H3 headers, and in the bolded text.
+3. Add a "Key Takeaways" summary box at the very beginning of the article using a styled <div> (e.g., class="seo-summary-box"). Ensure the language inside this box is organic and punchy.
+4. Add the final metadata at the very top of the output in a JSON format or commented block, containing:
+   - Final Meta-Title (optimized)
+   - Meta-Description (150-160 characters, highly clickable, natural human tone with a call-to-action).
+   - URL Slug suggestion.
+5. Output ONLY the technical SEO metadata block followed by the clean HTML content. No conversational intro or outro.
+"""
+- Output Handling: Parse the metadata block to save in the DB (for the Article Manager UI) and render the HTML in the preview tab.
+
+---
+
+### 6. USER INTERFACE (UI) UPDATES
+- **Dynamic Step Tracker:** Implement a real-time progress indicator on the UI. When the user clicks "Generate", display which agent is currently working:
+  - Phase 1/3: "Brainstorming and SEO Strategy mapping (Llama-3.3-70B)..." [Spinner]
+  - Phase 2/3: "Drafting article with premium, human-like copywriting style (Gemma-3-27B)..." [Spinner]
+  - Phase 3/3: "Applying HTML semantic markup and technical SEO optimization (Mistral-7B)..." [Spinner]
+- **Dual View Mode:** After generation, let the user toggle easily between "Visual Preview" (rendered HTML) and "Raw Code" (HTML source + SEO Metadata).
+
+---
+
+### 7. ERROR HANDLING & ROBUSTNESS
+- If Step 1 fails to output valid JSON, create a self-healing block that extracts the JSON using regex or requests a quick JSON repair.
+- Implement clear error alerts in the UI if any API key fails or timeouts occur, indicating at which stage of the pipeline the issue occurred.
+
+Review the existing code, refactor the Next.js generation router/controller, apply these updates now, and push the finalized project to GitHub.

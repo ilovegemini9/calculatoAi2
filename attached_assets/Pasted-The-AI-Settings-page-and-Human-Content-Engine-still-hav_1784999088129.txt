@@ -1,0 +1,200 @@
+The AI Settings page and Human Content Engine still have critical issues.
+
+Investigate and fix ALL of the following problems.
+
+==================================================
+1. AI SETTINGS
+==================================================
+
+Clicking "Save" returns:
+
+401 Unauthorized
+
+Requirements:
+
+- Verify the authenticated admin session.
+- Verify cookies are sent correctly.
+- Verify middleware.
+- Verify protected API routes.
+- Verify the POST endpoint.
+- Never return 401 for a logged-in administrator.
+- Store AI Settings in PostgreSQL (Neon).
+- Never use localStorage.
+- Never use memory storage.
+- Encrypt the OpenRouter API Key before storing it.
+- Load saved settings automatically after page refresh.
+- Test Connection must use the saved API Key server-side.
+
+==================================================
+2. OPENROUTER
+==================================================
+
+Verify that the OpenRouter API Key is loaded correctly.
+
+Verify:
+
+OPENROUTER_API_KEY
+
+exists in Environment Variables.
+
+If the key is invalid,
+
+display the real API error instead of Unauthorized.
+
+==================================================
+3. DATABASE
+==================================================
+
+Use Neon PostgreSQL.
+
+Persist:
+
+AI Settings
+
+Article Settings
+
+Calculator Settings
+
+Admin Preferences
+
+Never lose settings after restarting the application.
+
+==================================================
+4. HUMAN CONTENT ENGINE
+==================================================
+
+The Smart Workflow still returns static fake suggestions.
+
+Current suggestions:
+
+Calculator App — Complete Guide
+
+Calculator Net — Complete Guide
+
+Calculator Online — Complete Guide
+
+These are hardcoded fallback values.
+
+Remove ALL hardcoded suggestions immediately.
+
+Search suggestions must NEVER be static.
+
+==================================================
+5. LIVE ARTICLE DISCOVERY
+==================================================
+
+Every page load or Refresh Suggestions must perform a completely new live analysis.
+
+Use only configured providers.
+
+Priority:
+
+1. SerpAPI Google Search
+2. Google Autocomplete
+3. Google Trends
+4. Google People Also Ask
+5. Reddit
+6. Quora
+7. OpenRouter AI
+
+The AI must discover NEW article opportunities every time.
+
+Never reuse fixed suggestions.
+
+==================================================
+6. ARTICLE SUGGESTIONS
+==================================================
+
+Generate only the 3 strongest article opportunities.
+
+Rank using:
+
+Highest Search Volume
+
+Lowest Competition
+
+Highest Opportunity Score
+
+Current Trend
+
+Helpful Content Potential
+
+Strong Search Intent
+
+Long-tail Opportunities
+
+Evergreen Potential
+
+Never generate generic titles.
+
+Never generate:
+
+Complete Guide
+
+Ultimate Guide
+
+Calculator App
+
+Calculator Online
+
+Calculator Net
+
+unless live research genuinely indicates they are among the best opportunities.
+
+==================================================
+7. FALLBACK POLICY
+==================================================
+
+If live data cannot be retrieved,
+
+display:
+
+"No live article opportunities found."
+
+Do NOT invent titles.
+
+Do NOT use placeholder data.
+
+Do NOT use demo data.
+
+==================================================
+8. API VALIDATION
+==================================================
+
+Verify:
+
+SerpAPI Key
+
+OpenRouter Key
+
+Database Connection
+
+Authentication
+
+Rate Limits
+
+API Responses
+
+Return detailed error messages.
+
+Never hide errors behind:
+
+Unauthorized
+
+==================================================
+9. REPORT
+==================================================
+
+After fixing everything,
+
+generate a report including:
+
+- Cause of the 401 Unauthorized
+- Files modified
+- APIs tested
+- Database status
+- Authentication status
+- OpenRouter status
+- SerpAPI status
+- Human Content Engine status
+- Confirmation that no hardcoded article suggestions remain.

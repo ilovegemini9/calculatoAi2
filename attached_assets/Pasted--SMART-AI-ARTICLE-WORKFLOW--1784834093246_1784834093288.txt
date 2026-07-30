@@ -1,0 +1,472 @@
+==================================================
+SMART AI ARTICLE WORKFLOW
+==================================================
+
+Completely redesign the AI Articles Manager into a fully automated SEO workflow.
+
+The administrator should not manually configure every step.
+
+The workflow must intelligently guide the administrator from idea to publication.
+
+==================================================
+STEP 1 — RESEARCH TOPIC
+==================================================
+
+The "Research Topic" field is the starting point.
+
+The administrator only enters a broad topic.
+
+Examples:
+
+Mortgage
+
+BMI
+
+Tax
+
+Loan
+
+Salary
+
+Investment
+
+Weight Loss
+
+Body Fat
+
+Nutrition
+
+Insurance
+
+Immediately after typing, the system performs live research using the configured providers.
+
+Sources may include:
+
+• Google Search
+• Google Autocomplete
+• Google Related Questions (People Also Ask)
+• Google Trends
+• Reddit
+• Quora
+• Stack Overflow (technical topics)
+• GitHub Discussions (technical calculators)
+• YouTube Search
+• OpenRouter AI analysis
+
+The system must understand:
+
+• User Intent
+• Search Intent
+• Common Problems
+• Frequently Asked Questions
+• Popular Discussions
+• Trending Topics
+
+Never generate random ideas.
+
+==================================================
+STEP 2 — KEYWORD SUGGESTIONS
+==================================================
+
+After research is complete,
+
+Automatically generate ONLY the 5 strongest keyword suggestions.
+
+Rank them using:
+
+• Highest Search Volume
+• Lowest Competition
+• Highest Opportunity Score
+• Current Trend
+• User Search Intent
+
+Display them as modern clickable cards.
+
+Do NOT use tables.
+
+Each card shows only:
+
+• Keyword
+• Search Volume
+• Competition
+• Trend
+
+When one keyword is selected:
+
+✓ Highlight it.
+
+✓ Display "Selected".
+
+✓ Lock the selected keyword.
+
+✓ Automatically continue to the next step.
+
+==================================================
+STEP 3 — TITLE SUGGESTIONS
+==================================================
+
+Based ONLY on the selected keyword,
+
+Generate the 5 strongest SEO article titles.
+
+Titles must be:
+
+• Human
+• Attractive
+• Click-worthy
+• Helpful
+• SEO Optimized
+
+Rank using:
+
+• Search Intent
+• CTR Potential
+• Ranking Opportunity
+
+Display as clickable cards.
+
+When one title is selected:
+
+✓ Fill the Article Title automatically.
+
+✓ Highlight the selected card.
+
+✓ Generate the SEO Slug automatically.
+
+==================================================
+STEP 4 — SEO DATA
+==================================================
+
+Automatically generate:
+
+• Focus Keyword
+
+• Secondary Keywords
+
+• Long-tail Keywords
+
+• Semantic Keywords
+
+• Entity Keywords
+
+• User Intent
+
+• Search Intent
+
+• Target Audience
+
+• Content Angle
+
+Everything must be generated automatically.
+
+No manual work.
+
+==================================================
+STEP 5 — CONTENT OUTLINE
+==================================================
+
+Automatically generate:
+
+• Hook
+
+• Introduction
+
+• Table of Contents
+
+• H2
+
+• H3
+
+• H4 (when needed)
+
+• FAQ
+
+• How To
+
+• Step-by-Step Guide
+
+• Examples
+
+• Comparison Sections
+
+• Pros & Cons
+
+• Tips
+
+• Common Mistakes
+
+• Summary
+
+• Conclusion
+
+• Call To Action
+
+==================================================
+STEP 6 — ARTICLE GENERATION
+==================================================
+
+After all previous steps,
+
+Enable:
+
+Generate Article
+
+The administrator clicks only one button.
+
+Everything else is automatic.
+
+==================================================
+ARTICLE QUALITY
+==================================================
+
+The article must be written like a real expert.
+
+It must NEVER feel AI generated.
+
+Human writing style.
+
+Natural tone.
+
+Easy to read.
+
+Useful.
+
+Helpful.
+
+Trustworthy.
+
+Unique.
+
+No duplicate content.
+
+No keyword stuffing.
+
+No repetitive paragraphs.
+
+No AI patterns.
+
+The article must solve the visitor's problem before trying to rank.
+
+Always prioritize user satisfaction.
+
+==================================================
+ARTICLE STRUCTURE
+==================================================
+
+Every article must include:
+
+• Powerful Hook
+
+• Introduction
+
+• Reading Time
+
+• Last Updated
+
+• Table of Contents
+
+• H2/H3 hierarchy
+
+• Real explanations
+
+• Practical examples
+
+• Step-by-Step Guide
+
+• Frequently Asked Questions
+
+• Common Mistakes
+
+• Tips
+
+• Best Practices
+
+• Real comparison tables ONLY when useful
+
+• Summary
+
+• Conclusion
+
+• Natural Call-To-Action
+
+==================================================
+RELATED CALCULATORS
+==================================================
+
+If the article is related to one or more calculators already existing on the website:
+
+Automatically detect them.
+
+Suggest the best related calculator.
+
+Insert a natural internal link inside the article.
+
+Display a dedicated section:
+
+Related Calculator
+
+If no calculator exists,
+
+Suggest creating one inside the AI Calculator Factory.
+
+==================================================
+RELATED ARTICLES
+==================================================
+
+Automatically detect existing articles related to the topic.
+
+Suggest internal links naturally.
+
+Never force links.
+
+Only include highly relevant articles.
+
+==================================================
+SEO AUTOMATION
+==================================================
+
+Automatically generate:
+
+• SEO Meta Title
+
+• SEO Meta Description
+
+• SEO Slug
+
+• Canonical URL
+
+• OpenGraph
+
+• Twitter Cards
+
+• JSON-LD
+
+• Article Schema
+
+• FAQ Schema
+
+• Breadcrumb Schema
+
+• Reading Time
+
+• Last Updated
+
+• Internal Links
+
+• External References
+
+==================================================
+SEO & AI OPTIMIZATION
+==================================================
+
+Optimize every article for:
+
+• Google Search
+
+• Google AI Overview
+
+• ChatGPT
+
+• Gemini
+
+• Claude
+
+• Perplexity
+
+• Bing AI
+
+• Voice Search
+
+• Featured Snippets
+
+• Rich Results
+
+• Entity SEO
+
+• E-E-A-T
+
+• Helpful Content
+
+• Semantic SEO
+
+• Programmatic SEO
+
+==================================================
+LIVE DATA POLICY
+==================================================
+
+Whenever possible,
+
+Retrieve live data from configured providers.
+
+Never invent:
+
+• Search Volume
+
+• Competition
+
+• Trend
+
+• Keyword Difficulty
+
+• Opportunity Score
+
+If live data cannot be retrieved,
+
+Display:
+
+"Live search data unavailable."
+
+Never display fake metrics.
+
+==================================================
+WORKFLOW SUMMARY
+==================================================
+
+Research Topic
+
+↓
+
+5 Keyword Suggestions
+
+↓
+
+Keyword Selection
+
+↓
+
+5 SEO Title Suggestions
+
+↓
+
+Title Selection
+
+↓
+
+Automatic Slug
+
+↓
+
+Automatic SEO Data
+
+↓
+
+Automatic Outline
+
+↓
+
+Generate Article
+
+↓
+
+Draft
+
+↓
+
+Pending Review
+
+↓
+
+Published
+
+The entire workflow must remain simple, fast, modern and require the minimum number of clicks while producing world-class SEO articles that genuinely help visitors first and maximize long-term organic rankings.

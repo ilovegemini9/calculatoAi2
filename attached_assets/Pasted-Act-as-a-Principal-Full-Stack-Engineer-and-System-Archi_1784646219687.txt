@@ -1,0 +1,49 @@
+Act as a Principal Full-Stack Engineer and System Architect.
+
+Your task is to refactor and rebuild the Admin Dashboard for this web application to transform it into a Production-Ready Enterprise SaaS Console.
+
+STRICT RULE: "ZERO MOCK DATA" POLICY
+- Absolute ban on fake numbers, hardcoded metrics, placeholder charts, simulated traffic, dummy logs, or fabricated growth percentages (e.g., remove hardcoded "3400 Traffic", "18.2%", fake graphs, etc.).
+- EVERY statistic, chart, status, and metric MUST originate directly from live Database tables, active System metrics, or authenticated third-party APIs.
+- If data or an API connection does not exist, you MUST render an informative Empty State with an action button (CTA). NEVER estimate or simulate values.
+
+IMPLEMENT THE FOLLOWING MODULES WITH REAL DATA SOURCES & EMPTY STATES:
+
+1. DASHBOARD OVERVIEW:
+   - Query 'calculators' table: Total, Published, Draft, Disabled.
+   - Query 'articles' table: Published, Draft, Pending Review, Scheduled.
+
+2. SEO & GOOGLE SEARCH CONSOLE:
+   - Query internal SEO audit tables: Indexed, Non-Indexed, Missing Meta, Missing FAQ, Missing Schema, Missing Content, Missing Internal Links.
+   - Integrated Google Search Console API check:
+     * If connected: Fetch real Clicks, Impressions, CTR, Average Position.
+     * If disconnected: Display Empty State -> "Google Search Console is not connected" with a [Connect GSC API] CTA button.
+
+3. ANALYTICS & ADSENSE:
+   - Analytics API Check (e.g., GA4):
+     * If connected: Stream real Users, Sessions, Page Views, Top Pages, Top Calculators.
+     * If disconnected: Display Empty State -> "Analytics provider not connected".
+   - Google AdSense Management API Check:
+     * If connected: Display real Estimated Revenue, Impressions, Clicks, CTR, RPM.
+     * If disconnected: Display Empty State -> "AdSense not connected".
+
+4. AUTOMATION & AI ENGINE (Calculator Factory & AI Usage):
+   - Query database: Total AI Generated, Pending Approval, Published, Failed jobs.
+   - Fetch live AI usage metrics: Provider, Current Model, Tokens Used Today, Monthly Tokens, Daily Budget, Remaining Budget, API Errors, Average Response Time, Queue Status.
+
+5. QUEUE, LOGS & BACKUPS:
+   - Real-time Queue state: Pending, Running, Completed, Failed, Retry Queue.
+   - Query 'error_logs' table: Level, Message, Route, Timestamp (Include functional search & severity filter).
+   - Backup status: Last Backup timestamp, Backup Size, Restore Points, Next Scheduled Backup.
+
+6. MEDIA, USERS & SECURITY:
+   - Media storage: Count Images, Optimized Images, Unused Images, Storage Used.
+   - User sessions: Count Administrators, Editors, Last Login timestamps, Active Sessions.
+   - Security auditing: Query Failed Login Attempts, Blocked IPs, Rate Limit Events, Active Alerts.
+
+7. SYSTEM HEALTH & LIVE CHARTS:
+   - Read system runtime: Database Ping, Redis Ping, Queue Worker status, Disk Storage, Memory Usage, CPU Usage, Server Time, Environment.
+   - Charts: Render graphs strictly using time-series database records. If no historical records exist, render an empty chart grid with the message "No historical data available".
+
+DELIVERABLE:
+Refactor the code, remove all static fallback arrays and dummy JSON objects, wrap all external integrations with dynamic connection checks, and ensure every component gracefully falls back to a clean UI Empty State when data is missing.

@@ -1,0 +1,96 @@
+Prompt pour Google AI Studio (Gemini)
+
+Copy and paste this prompt into Google AI Studio after uploading your source code files to fix the issues identified in the admin panel.
+
+
+
+
+Role: Expert Full-Stack Developer & Debugging Specialist (React, Next.js, TypeScript, Tailwind CSS).
+
+Context: I have a calculator platform admin panel that is currently riddled with bugs, data inconsistencies, and loading errors. I am providing you with the source code.
+
+Objective: Analyze the provided code and the specific error report below to identify the root causes and provide fixed versions of the code for the affected components and API routes.
+
+Identified Issues to Fix:
+
+1.
+Infinite Loaders (Critical): The following pages stay stuck on a loading spinner:
+
+•
+SEO Center (/admin/seo)
+
+•
+Ads Manager (/admin/ads)
+
+•
+Verification Center (/admin/verifications)
+
+•
+AI Settings (/admin/settings/ai)
+
+•
+Check if these are due to missing API endpoints, incorrect client-side fetching logic, or unhandled promise rejections.
+
+
+
+2.
+Data Fetching Failures:
+
+•
+AI Calculators page shows "Failed to load calculators" despite the Dashboard saying 22 are active.
+
+•
+Users page shows "No users found" even though an admin is logged in.
+
+•
+Logs page is empty even when errors occur.
+
+
+
+3.
+Dashboard Inconsistencies:
+
+•
+Most stats show "No data" (Articles, Page Views, Traffic).
+
+•
+Database Ping shows 0ms (check the ping utility).
+
+•
+Memory usage is high (85%) — check for memory leaks or inefficient state management.
+
+
+
+4.
+UI/UX & Logic Bugs:
+
+•
+AI Articles: "Smart Workflow" button does nothing. Existing articles are not listed.
+
+•
+Sidebar: The logo link / takes the user out of the admin panel context. Change it to /admin/dashboard or make it open in a new tab.
+
+•
+Search/Notifications: These buttons are currently non-functional.
+
+
+
+Instructions:
+
+1.
+Analyze the Data Flow: Look at how the frontend fetches data from the backend. Verify that the API routes exist and return the expected JSON structure.
+
+2.
+Fix State Management: Ensure that loading states are correctly updated and errors are caught and displayed.
+
+3.
+Synchronize Components: Fix the mismatch between the Dashboard counts and the individual list pages.
+
+4.
+Provide Clean Code: Return the corrected code for each affected file. Explain briefly what was wrong and how you fixed it.
+
+
+
+
+[Now, please upload your code files or paste the relevant snippets below this prompt]
+

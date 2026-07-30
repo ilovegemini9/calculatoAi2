@@ -1,0 +1,290 @@
+Configure the project to use Neon PostgreSQL correctly for both development and production.
+
+DO NOT break any existing functionality.
+
+==================================================
+DATABASE CONFIGURATION
+==================================================
+
+Use Neon PostgreSQL as the only database.
+
+Use environment variables only.
+
+Never hardcode credentials.
+
+Production:
+Use DATABASE_URL.
+
+Development:
+Use DATABASE_URL from local environment.
+
+==================================================
+PRISMA
+==================================================
+
+If Prisma is not installed:
+
+- Install prisma
+- Install @prisma/client
+- Initialize Prisma
+
+Create or update:
+
+prisma/schema.prisma
+
+Datasource:
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+Generate Prisma Client.
+
+Verify Prisma connects successfully to Neon.
+
+==================================================
+DATABASE MODELS
+==================================================
+
+Create all required models for the platform.
+
+At minimum:
+
+User
+
+Session
+
+Role
+
+Article
+
+ArticleCategory
+
+ArticleTag
+
+Keyword
+
+Calculator
+
+CalculatorCategory
+
+Media
+
+SEOSettings
+
+AISettings
+
+Analytics
+
+Logs
+
+AppSettings
+
+FavoriteCalculator
+
+RecentCalculator
+
+==================================================
+MIGRATIONS
+==================================================
+
+Create database migrations.
+
+If the database is empty:
+
+Run the initial migration.
+
+If tables already exist:
+
+Synchronize safely without data loss.
+
+Never delete existing data.
+
+==================================================
+DATABASE SERVICE
+==================================================
+
+Create a reusable database service.
+
+Use a singleton Prisma Client.
+
+Prevent multiple Prisma instances during development.
+
+==================================================
+ADMIN AUTH
+==================================================
+
+Store admin sessions inside PostgreSQL.
+
+Do NOT use memory storage.
+
+Do NOT use fake authentication.
+
+Read credentials from:
+
+ADMIN_USERNAME
+
+ADMIN_PASSWORD
+
+Environment Variables.
+
+==================================================
+ARTICLES
+==================================================
+
+Store:
+
+Drafts
+
+Pending Review
+
+Published Articles
+
+SEO Metadata
+
+Keywords
+
+Slugs
+
+Generated Content
+
+Reading Time
+
+Last Updated
+
+JSON-LD
+
+Everything must be stored in PostgreSQL.
+
+==================================================
+CALCULATORS
+==================================================
+
+Store:
+
+Calculator Data
+
+Formula
+
+Metadata
+
+Schema
+
+Related Articles
+
+Related Calculators
+
+Usage Statistics
+
+==================================================
+AI
+==================================================
+
+Store:
+
+OpenRouter Settings
+
+Selected Models
+
+Generation History
+
+Usage
+
+Daily Requests
+
+Monthly Requests
+
+Errors
+
+Logs
+
+==================================================
+SEO
+==================================================
+
+Store:
+
+Meta Titles
+
+Meta Descriptions
+
+Canonical URLs
+
+OpenGraph
+
+Twitter Cards
+
+JSON-LD
+
+Sitemap Settings
+
+Robots Settings
+
+RSS Settings
+
+==================================================
+ANALYTICS
+==================================================
+
+Store real analytics only.
+
+Never generate fake numbers.
+
+If no data exists, display:
+
+"No data available"
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Handle gracefully:
+
+Database offline
+
+Migration errors
+
+Connection timeout
+
+Invalid credentials
+
+==================================================
+FINAL VERIFICATION
+==================================================
+
+Verify:
+
+✓ Prisma Client generated
+
+✓ Neon connection successful
+
+✓ DATABASE_URL detected
+
+✓ Migrations successful
+
+✓ No TypeScript errors
+
+✓ No ESLint errors
+
+✓ No build errors
+
+✓ No runtime errors
+
+✓ Compatible with Vercel
+
+✓ Compatible with Replit
+
+Finally generate a report including:
+
+- Packages installed
+- Files created
+- Files modified
+- Database models
+- Migrations created
+- Connection status
+- Remaining tasks (if any)

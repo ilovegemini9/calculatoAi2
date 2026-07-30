@@ -1,0 +1,143 @@
+==================================================
+RESEARCH TOPIC WORKFLOW
+==================================================
+
+The "Research Topic" field must become an intelligent starting point for the entire article generation workflow.
+
+As the administrator types a topic, the system must automatically retrieve live search data from the configured providers (Google Search, Google Autocomplete, Google Trends, People Also Ask, Reddit, Quora and other configured sources when available).
+
+Do NOT require the administrator to enter the exact title manually.
+
+Instead, automatically generate the 5 strongest topic suggestions.
+
+Rank suggestions using:
+
+• Highest Search Volume
+• Lowest Competition
+• Highest Opportunity Score
+• Current Trend
+• User Search Intent
+• Content Potential
+
+Display the suggestions as clean clickable cards below the Research Topic field.
+
+Do NOT use tables.
+
+Each suggestion card displays only:
+
+• Topic
+• Search Volume
+• Competition (Low / Medium / High)
+• Trend (↑ ↓)
+
+When the administrator selects one suggestion:
+
+✓ The Research Topic field is filled automatically.
+✓ The selected card is highlighted.
+✓ A "Selected" badge is displayed.
+✓ The remaining workflow starts automatically.
+
+==================================================
+AUTOMATIC SEO WORKFLOW
+==================================================
+
+After selecting the Research Topic, the system automatically performs the following steps in order:
+
+1. Generate the 5 best SEO Article Titles.
+
+2. After selecting a Title:
+   • Generate the SEO-friendly URL Slug automatically.
+
+3. Generate the 5 best Focus Keywords related only to the selected title.
+
+4. After selecting the Focus Keyword:
+   • Generate Secondary Keywords.
+   • Generate Long-tail Keywords.
+   • Generate Semantic Keywords.
+   • Generate Entity Keywords.
+
+5. Generate the complete SEO outline automatically:
+   • H1
+   • H2
+   • H3
+   • Table of Contents
+   • FAQ
+   • How-To
+   • Pros & Cons
+   • Common Mistakes
+   • Tips
+   • Comparison Sections (only when useful)
+
+6. Enable the "Generate Article" button only after all required selections are completed.
+
+==================================================
+ARTICLE GENERATION
+==================================================
+
+The generated article must prioritize helping the visitor before ranking.
+
+It must never feel AI-generated.
+
+Write like a real industry expert using a natural human tone.
+
+The content must be unique, trustworthy, practical and easy to understand.
+
+The article should include:
+
+• Strong SEO Hook at the beginning.
+• Clear introduction.
+• Table of Contents.
+• Well-structured H2/H3 hierarchy.
+• Step-by-step explanations.
+• Practical examples.
+• Real-world use cases.
+• Tips and best practices.
+• Common mistakes to avoid.
+• FAQ based on real user questions.
+• Comparison tables only when they improve understanding.
+• Bullet lists where appropriate.
+• Helpful conclusion.
+• Strong but natural Call-To-Action.
+
+If the topic is related to one or more calculators available on the website:
+
+• Automatically detect them.
+• Suggest the most relevant calculator(s).
+• Insert contextual internal links naturally inside the article.
+• Display a "Related Calculators" section near the end.
+
+If relevant blog articles already exist:
+
+• Suggest related articles automatically.
+• Create natural internal links.
+
+Automatically generate:
+
+• SEO Meta Title
+• Meta Description
+• Canonical URL
+• OpenGraph
+• Twitter Cards
+• JSON-LD Schema
+• Breadcrumb Schema
+• FAQ Schema
+• Article Schema
+• Reading Time
+• Last Updated
+
+The article must be optimized for:
+
+• Google Search
+• Google AI Overview
+• ChatGPT
+• Gemini
+• Claude
+• Perplexity
+• Voice Search
+• Featured Snippets
+• Entity SEO
+• E-E-A-T
+• Helpful Content
+• Programmatic SEO compatibility
+
+The final objective is not only to rank well in search engines, but to genuinely solve the visitor's problem and maximize user satisfaction.

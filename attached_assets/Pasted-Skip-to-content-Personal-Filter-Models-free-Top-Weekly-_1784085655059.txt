@@ -1,0 +1,266 @@
+Skip to content
+
+
+
+Personal
+Filter
+Models
+free
+
+Top Weekly
+top-weekly
+List
+Table
+All
+Text
+21
+Image
+0
+Embeddings
+1
+Audio
+0
+Video
+0
+Rerank
+1
+Speech
+0
+Transcription
+0
+Hy3 (free)
+Going away 21 juillet 2026
+8,45T tokens
+
+
+Academia (#1)
+
+Finance (#4)
+
+Health (#14)
+
+Legal (#7)
+
+Marketing (#2)
+
++7 categories
+Hy3 is a 295B-parameter Mixture-of-Experts model from Tencent (21B active, 192 experts with top-8 routing) built for reasoning, agentic workflows, and real-world production use. It supports a configurable reasoning effort: a direct no-think mode by default, plus low and high chain-of-thought modes for complex math, coding, and multi-step problems. With a 256K context window, Hy3 targets long-horizon tasks, including improved coreference resolution, multi-turn constraint tracking, and stable tool-calling that generalizes across agent scaffoldings.  Tencent positions it as a reliable, cost-effective option across coding, document processing, financial analysis, game development, and frontend design, with a strong emphasis on grounded, anti-hallucination behavior that answers when grounded and flags when evidence is missing rather than fabricating.
+
+by tencent
+262K context
+$0/M input
+$0/M output
+Nemotron 3 Ultra (free)
+2,78T tokens
+
+
+Marketing (#50)
+
+Trivia (#21)
+NVIDIA Nemotron 3 Ultra is an open frontier-reasoning and orchestration model from NVIDIA, with 55B active parameters out of 550B total (MoE). Built on a hybrid Transformer-Mamba mixture-of-experts architecture, it supports text input and output with a context window of up to 1M tokens. It is suited for long-running agentic workflows, including agent orchestration, coding agents, deep research, and complex enterprise tasks.  It is particularly strong at multi-step reasoning and planning, with high-throughput inference designed for high-volume agent pipelines. It is part of the NVIDIA Nemotron family of open models for agentic AI.
+
+by nvidia
+1M context
+$0/M input
+$0/M output
+Laguna M.1 (free)
+564B tokens
+
+
+Academia (#36)
+
+Finance (#36)
+
+Programming (#16)
+
+Roleplay (#38)
+
+Science (#17)
+Laguna M.1 is the flagship coding agent model from Poolside, optimized for complex software engineering tasks. Designed for agentic coding workflows, it supports tool calling and reasoning, with a 256K context window and up to 32K output tokens. Quantized to NVFP4 for efficient inference.  Laguna M.1 is designed for software engineering and agentic coding use cases, and you are responsible for confirming that it is appropriate for your intended application. Laguna M.1 is subject to the Apache 2.0 License, and should be used consistently with Poolside's Acceptable Use Policy. We advise against circumventing Laguna M.1 safety guardrails without implementing substantially equivalent mitigations appropriate for your use case.  Please report security vulnerabilities or safety concerns to security@poolside.ai.  If you are using Laguna M.1 for free, we may use your inputs and outputs to train and improve our models.
+
+by poolside
+262K context
+$0/M input
+$0/M output
+Nemotron 3 Super (free)
+341B tokens
+
+
+Academia (#33)
+
+Finance (#22)
+
+Legal (#33)
+
+Marketing (#44)
+
+SEO (#20)
+
++5 categories
+NVIDIA Nemotron 3 Super is a 120B-parameter open hybrid MoE model, activating just 12B parameters for maximum compute efficiency and accuracy in complex multi-agent applications. Built on a hybrid Mamba-Transformer Mixture-of-Experts architecture with multi-token prediction (MTP), it delivers over 50% higher token generation compared to leading open models.   The model features a 1M token context window for long-term agent coherence, cross-document reasoning, and multi-step task planning. Latent MoE enables calling 4 experts for the inference cost of only one, improving intelligence and generalization. Multi-environment RL training across 10+ environments delivers leading accuracy on benchmarks including AIME 2025, TerminalBench, and SWE-Bench Verified.   Fully open with weights, datasets, and recipes under the NVIDIA Open License, Nemotron 3 Super allows easy customization and secure deployment anywhere — from workstation to cloud.
+
+by nvidia
+1M context
+$0/M input
+$0/M output
+North Mini Code (free)
+127B tokens
+
+
+Programming (#13)
+
+Science (#40)
+North Mini Code is Cohere's first agentic coding model and the debut of its North family. A sparse mixture-of-experts model with 30B total parameters and 3B active, it is optimized for code generation, agentic software engineering, and terminal tasks, and is trained to generalize across agent harnesses such as OpenCode and SWE-Agent.  It offers a 256K-token context window with up to 64K tokens of output, supports interleaved reasoning and tool use via JSON schema, and is released open-weight under the Apache 2.0 license. Its small active-parameter footprint enables low-latency inference, including on local hardware.
+
+by cohere
+256K context
+$0/M input
+$0/M output
+Laguna XS 2.1 (free)
+102B tokens
+
+
+Programming (#27)
+Laguna XS 2.1 is the latest coding agent model in the 33B-A3B category from Poolside and a step forward from their Laguna XS.2 model (released in April 2026). It combines tool calling and reasoning capabilities with a compact footprint, offering a 256K context window and up to 32K output tokens. Quantized to FP8 for fast, cost-efficient agentic coding workflows.  Laguna XS 2.1 is designed for software engineering and agentic coding use cases, and you are responsible for confirming that it is appropriate for your intended application. Laguna XS 2.1 is subject to the OpenMDW-1.1 License, and should be used consistently with Poolside's Acceptable Use Policy. We advise against circumventing Laguna XS 2.1 safety guardrails without implementing substantially equivalent mitigations appropriate for your use case.  Please report security vulnerabilities or safety concerns to security@poolside.ai.  If you are using Laguna XS 2.1 for free, we may use your inputs and outputs to train and improve our models.
+
+by poolside
+262K context
+$0/M input
+$0/M output
+Nemotron 3 Nano 30B A3B (free)
+38,6B tokens
+
+
+SEO (#26)
+NVIDIA Nemotron 3 Nano 30B A3B is a small language MoE model with highest compute efficiency and accuracy for developers to build specialized agentic AI systems.  The model is fully open with open-weights, datasets and recipes so developers can easily customize, optimize, and deploy the model on their infrastructure for maximum privacy and security.
+
+by nvidia
+256K context
+$0/M input
+$0/M output
+gpt-oss-20b (free)
+21B tokens
+
+
+SEO (#18)
+gpt-oss-20b is an open-weight 21B parameter model released by OpenAI under the Apache 2.0 license. It uses a Mixture-of-Experts (MoE) architecture with 3.6B active parameters per forward pass, optimized for lower-latency inference and deployability on consumer or single-GPU hardware. The model is trained in OpenAI’s Harmony response format and supports reasoning level configuration, fine-tuning, and agentic capabilities including function calling, tool use, and structured outputs.
+
+by openai
+131K context
+$0/M input
+$0/M output
+Gemma 4 31B (free)
+18,3B tokens
+
+Gemma 4 31B Instruct is Google DeepMind's 30.7B dense multimodal model supporting text and image input with text output. Features a 256K token context window, configurable thinking/reasoning mode, native function calling, and multilingual support across 140+ languages. Strong on coding, reasoning, and document understanding tasks. Apache 2.0 license.
+
+by google
+262K context
+$0/M input
+$0/M output
+Llama Nemotron Rerank VL 1B V2 (free)
+17,3B tokens
+
+Llama Nemotron Rerank VL 1B V2 is a 1.7B multimodal reranking model from NVIDIA. It evaluates the relevance of document images and text against user queries, designed for vision RAG pipelines handling charts, tables, infographics, and mixed-media documents. Functions as a cross-encoder that accepts text queries paired with image, text, or combined document inputs, delivering approximately 6-7% recall improvements over embedding-only baselines on visual document retrieval benchmarks.
+
+by nvidia
+10K context
+$0/M input
+$0/M output
+Nemotron 3 Nano Omni (free)
+16B tokens
+
+NVIDIA Nemotron™ 3 Nano Omni is a 30B-A3B open multimodal model designed to function as a perception and context sub-agent in enterprise agent systems. It accepts text, image, video, and audio inputs and produces text output, enabling agents to perceive and reason across modalities in a single inference loop.  Built on a hybrid MoE Transformer-Mamba architecture with Conv3D video layers and Efficient Video Sampling (EVS), it delivers approximately 2× higher throughput and 2.5× lower compute for video reasoning versus separate vision + speech pipelines. It supports up to 300K context length and a 16,384 reasoning budget, with extended thinking enabled via reasoning.enabled on OpenRouter.
+
+by nvidia
+256K context
+$0/M input
+$0/M output
+Nemotron Nano 9B V2 (free)
+12,8B tokens
+
+NVIDIA-Nemotron-Nano-9B-v2 is a large language model (LLM) trained from scratch by NVIDIA, and designed as a unified model for both reasoning and non-reasoning tasks. It responds to user queries and tasks by first generating a reasoning trace and then concluding with a final response.   The model's reasoning capabilities can be controlled via a system prompt. If the user prefers the model to provide its final answer without intermediate reasoning traces, it can be configured to do so.
+
+by nvidia
+128K context
+$0/M input
+$0/M output
+Llama Nemotron Embed VL 1B V2 (free)
+8,47B tokens
+
+The Llama Nemotron Embed VL 1B V2 embedding model is optimized for multimodal question-answering retrieval. The model can embed 'documents' in the form of image, text, or image and text combined. Documents can be retrieved given a user query in text form. The model supports images containing text, tables, charts, and infographics.
+
+by nvidia
+131K context
+$0/M input
+$0/M output
+Nemotron Nano 12B 2 VL (free)
+7,67B tokens
+
+NVIDIA Nemotron Nano 2 VL is a 12-billion-parameter open multimodal reasoning model designed for video understanding and document intelligence. It introduces a hybrid Transformer-Mamba architecture, combining transformer-level accuracy with Mamba’s memory-efficient sequence modeling for significantly higher throughput and lower latency.  The model supports inputs of text and multi-image documents, producing natural-language outputs. It is trained on high-quality NVIDIA-curated synthetic datasets optimized for optical-character recognition, chart reasoning, and multimodal comprehension.  Nemotron Nano 2 VL achieves leading results on OCRBench v2 and scores ≈ 74 average across MMMU, MathVista, AI2D, OCRBench, OCR-Reasoning, ChartQA, DocVQA, and Video-MME—surpassing prior open VL baselines. With Efficient Video Sampling (EVS), it handles long-form videos while reducing inference cost.  Open-weights, training data, and fine-tuning recipes are released under a permissive NVIDIA open license, with deployment supported across NeMo, NIM, and major inference runtimes.
+
+by nvidia
+128K context
+$0/M input
+$0/M output
+Gemma 4 26B A4B (free)
+5,58B tokens
+
+Gemma 4 26B A4B IT is an instruction-tuned Mixture-of-Experts (MoE) model from Google DeepMind. Despite 25.2B total parameters, only 3.8B activate per token during inference — delivering near-31B quality at a fraction of the compute cost. Supports multimodal input including text, images, and video (up to 60s at 1fps). Features a 256K token context window, native function calling, configurable thinking/reasoning mode, and structured output support. Released under Apache 2.0.
+
+by google
+262K context
+$0/M input
+$0/M output
+Nemotron 3.5 Content Safety (free)
+1,46B tokens
+
+NVIDIA Nemotron 3.5 Content Safety is a compact 4B-parameter multimodal guardrail model from NVIDIA, fine-tuned from Google Gemma-3-4B. It moderates both inputs to and responses from LLMs and VLMs, accepting text and image input and returning text output: a safe/unsafe classification for the user prompt and the response, safety category labels, and an optional reasoning trace. It covers 12 languages with a context window of up to 128K tokens.  It is suited for prompt and response moderation, content classification, safety pipelines, and enterprise AI guardrails with policy enforcement, and includes a togglable reasoning mode. It is part of the NVIDIA Nemotron family of open models for agentic AI.
+
+by nvidia
+128K context
+$0/M input
+$0/M output
+Qwen3 Next 80B A3B Instruct (free)
+Going away 19 juillet 2026
+276M tokens
+
+Qwen3-Next-80B-A3B-Instruct is an instruction-tuned chat model in the Qwen3-Next series optimized for fast, stable responses without “thinking” traces. It targets complex tasks across reasoning, code generation, knowledge QA, and multilingual use, while remaining robust on alignment and formatting. Compared with prior Qwen3 instruct variants, it focuses on higher throughput and stability on ultra-long inputs and multi-turn dialogues, making it well-suited for RAG, tool use, and agentic workflows that require consistent final answers rather than visible chain-of-thought.  The model employs scaling-efficient training and decoding to improve parameter efficiency and inference speed, and has been validated on a broad set of public benchmarks where it reaches or approaches larger Qwen3 systems in several categories while outperforming earlier mid-sized baselines. It is best used as a general assistant, code helper, and long-context task solver in production settings where deterministic, instruction-following outputs are preferred.
+
+by qwen
+262K context
+$0/M input
+$0/M output
+© 2026 OpenRouter, Inc
+Product
+Chat
+Rankings
+Apps
+Models
+Providers
+Pricing
+Enterprise
+Labs
+Company
+About
+Blog
+Careers
+Hiring
+Privacy
+Terms of Service
+Support
+State of AI
+Works With OR
+Data
+Developer
+Documentation
+API Reference
+SDK
+Status
+Connect
+Discord
+GitHub
+LinkedIn
+X
+YouTube
+Models: 'free' | OpenRouter

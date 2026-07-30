@@ -1,0 +1,39 @@
+Act as a Principal Full-Stack Engineer and System Architect.
+
+Your task is to merge and build an integrated module: "Editorial Workspace & AI SEO Content Finder" within the web application.
+
+This module must automate high-opportunity keyword discovery, trend analysis, and generate 100% human-like, fully-optimized SEO articles.
+
+==================================================
+1. KEYWORD & OPPORTUNITY DISCOVERY ENGINE
+==================================================
+Build a Keyword Research & Trend Finder tool that calculates a "Search Opportunity Score" based on:
+- Google Trends Integration: Track spike velocity and breakout trends for target niches.
+- High Search Volume + High Intent: Identify topics with massive monthly search volume.
+- Content Gap / Low Competition (The Sweet Spot): Target queries where search volume is HUGE but existing indexed search results are poor, outdated, or sparse (Low Keyword Difficulty / Low Occurrence).
+- Google Autocomplete Scraper/API Integration: Extract long-tail, real-time user search queries directly from search auto-suggestions.
+- Article Title Generator: Automatically suggest click-worthy, high-CTR H1 Title suggestions based on the discovered high-opportunity keywords.
+
+==================================================
+2. AI ARTICLE GENERATOR (100% AI-SEO & 100% HUMAN-LIKE)
+==================================================
+Implement an automated article generation engine with strict writing rules:
+- Writing Style & Tone: Natural, conversational, helpful peer voice. Strictly eliminate robotic AI phrasing (e.g., ban words like "delve", "testament", "in conclusion", "furthermore", "unlock", "harness").
+- Natural Keyword Frequency & LSI Density: Integrate primary and secondary keywords naturally into H1, H2, H3, intro, body, and conclusion without keyword stuffing.
+- Internal Tool Cross-Linking: Automatically scan internal 'calculators' tables and embed contextual internal links to relevant free calculator tools inside the article body (e.g., linking to `/mortgage-calculator` inside a mortgage tips article).
+- Google E-E-A-T & AI SEO Standards:
+  * Include a key takeaway summary box at the beginning.
+  * Embed structured Data Tables for quick comparative reading.
+  * Add FAQ section structured with FAQPage Schema.org markup.
+  * Inject dynamic meta title, meta description, and clean canonical tags automatically.
+
+==================================================
+3. WORKSPACE INTEGRATION & WORKFLOW UI
+==================================================
+Integrate this into the Admin Editorial Workspace:
+- Dashboard Interface: Display discovered Keyword Opportunities with metrics (Volume, Competition, Trend, Suggested H1 Title).
+- One-Click Generate: A CTA to trigger the AI Generator directly from a keyword suggestion.
+- Editorial Draft Editor: Render the generated article in a rich Markdown editor allowing instant review, edit, dynamic internal link mapping, and publishing directly to the 'articles' database.
+
+DELIVERABLE:
+Refactor the codebase to unify the Editorial Workspace and SEO Keyword Finder. Ensure zero mock data—if live Google APIs are disconnected, provide functional Empty States with setup guidance.

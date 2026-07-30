@@ -1,0 +1,8 @@
+- [Prisma 7 setup quirks](prisma7-setup.md) — no url in schema.prisma; requires prisma.config.ts + adapter-pg; @prisma/client-runtime-utils must be installed separately
+- [Articles Manager 2.0 architecture](articles-manager-2-arch.md) — SerpAPI + free fallback research flow; 5 new API routes; live-data policy; SerpAPI key encrypted in db.settings
+- [Calculator codegen architecture](codegen-architecture.md) — 3-pass parallel Gemini approach; article must NOT be inside JSON to avoid corruption
+- [OpenRouter model selection](openrouter-model-selection.md) — per-task free model picks (code vs article) chosen by live testing, not spec sheets; avoid "going away" models
+- [Calculator Factory architecture](calculator-factory.md) — two-stage AI generation (spec then tests); calculators saved inactive, enable blocked until tests pass
+- [AI settings security](ai-settings-security.md) — provider keys are encrypted at rest and only masked configuration reaches admin clients
+- [Article suggestions live-data rule](article-suggestions-live-data.md) — never fabricate keyword metrics; configured AI models need fallback chains because model names can become stale
+- [Vercel artifact root](vercel-artifact-root.md) — when Vercel root is an artifact package, outputDirectory must be relative to that package

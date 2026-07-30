@@ -1,0 +1,265 @@
+PHASE X — REBUILD AI ARTICLES MANAGER
+
+Completely remove the current AI Articles page and rebuild it from scratch.
+
+Do not modify the rest of the Admin Dashboard.
+
+The new AI Articles Manager must be minimal, clean, modern and focused on productivity.
+
+Do NOT use tables.
+
+Do NOT display fake analytics.
+
+Do NOT display placeholder metrics.
+
+Everything must be editable.
+
+==================================================
+STEP 1 — TITLE
+==================================================
+
+Create a field:
+
+Article Title
+
+Add a button:
+
+✨ AI Suggest Titles
+
+When clicked:
+
+Retrieve live keyword opportunities from the configured search provider.
+
+Generate 10 SEO-friendly article title suggestions.
+
+Sort suggestions by:
+
+• Highest Search Volume
+• Lowest Competition
+• Highest Opportunity Score
+
+Display suggestions as simple clickable cards.
+
+Example:
+
+Mortgage Calculator Guide for First-Time Buyers
+
+How to Calculate Mortgage Payments in 2026
+
+Mortgage Calculator With Extra Payments
+
+No tables.
+
+Clicking a suggestion automatically fills the Title field.
+
+==================================================
+STEP 2 — FOCUS KEYWORD
+==================================================
+
+After a title is selected,
+
+unlock the Focus Keyword section.
+
+Field:
+
+Focus Keyword
+
+Button:
+
+✨ AI Suggest Keywords
+
+Generate only keywords related to the selected title.
+
+Show keywords as clickable chips/cards.
+
+Example:
+
+Mortgage Calculator
+
+Mortgage Payment Calculator
+
+Mortgage Calculator USA
+
+Extra Payment Mortgage Calculator
+
+Lowest Mortgage Calculator
+
+Clicking one automatically fills the field.
+
+The selected keyword becomes locked to prevent duplicates.
+
+==================================================
+STEP 3 — URL SLUG
+==================================================
+
+Automatically generate the SEO slug from the selected title.
+
+Example:
+
+mortgage-calculator-guide
+
+Allow manual editing.
+
+Add button:
+
+✨ AI Improve Slug
+
+==================================================
+STEP 4 — ARTICLE
+==================================================
+
+Button:
+
+🚀 Generate Article
+
+Only enabled after:
+
+✓ Title selected
+
+✓ Keyword selected
+
+✓ Slug generated
+
+Generate a complete article.
+
+Length:
+
+1500–3000+ words.
+
+Human writing style.
+
+No AI repetitive patterns.
+
+SEO optimized.
+
+AI Search optimized.
+
+Google AI Overview optimized.
+
+Helpful Content optimized.
+
+Include automatically:
+
+• Introduction
+
+• Table of Contents
+
+• H2
+
+• H3
+
+• FAQ
+
+• How To
+
+• Comparison Sections
+
+• Bullet Lists
+
+• Numbered Lists
+
+• Examples
+
+• Tables (inside the article only when useful)
+
+• Internal Links
+
+• Related Calculators
+
+• CTA
+
+• Conclusion
+
+• References
+
+• Reading Time
+
+• Last Updated
+
+• Meta Title
+
+• Meta Description
+
+• OpenGraph
+
+• JSON-LD Schema
+
+==================================================
+STEP 5 — SAVE
+==================================================
+
+Buttons:
+
+Save Draft
+
+Send to Review
+
+Publish
+
+Publishing must never happen automatically.
+
+Workflow:
+
+Draft
+
+↓
+
+Pending Review
+
+↓
+
+Published
+
+==================================================
+LIVE DATA
+==================================================
+
+Whenever possible,
+
+retrieve live search information from the configured provider.
+
+Never invent metrics.
+
+Never use fake Search Volume.
+
+Never use fake Competition.
+
+If live data is unavailable,
+
+display:
+
+"Live keyword data unavailable."
+
+instead of generating fake values.
+
+==================================================
+UI
+==================================================
+
+The interface must be extremely clean.
+
+No tables.
+
+No unnecessary widgets.
+
+No fake charts.
+
+Only:
+
+Title
+
+Keyword
+
+Slug
+
+Article
+
+Action buttons
+
+Everything responsive.
+
+Everything matches the current Admin Dashboard design system.
+
+Do not modify the public website.
+
+Only rebuild the AI Articles Manager.

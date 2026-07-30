@@ -1,0 +1,107 @@
+==================================================
+STEP 12
+SETTINGS PERSISTENCE AUDIT
+==================================================
+
+AI Settings are NOT persistent.
+
+Current behavior:
+
+- Enter API keys.
+- Click Save.
+- Refresh the page.
+- All saved values disappear.
+
+This must NEVER happen.
+
+Investigate the complete persistence flow.
+
+Verify:
+
+- Save request reaches the backend.
+- PostgreSQL INSERT or UPDATE succeeds.
+- Transaction is committed.
+- GET request reads the same saved record.
+- No fallback overwrites the saved values.
+- No default configuration replaces saved settings.
+- No initialization script resets the settings.
+- No server restart clears the data.
+- No environment variables overwrite database values.
+- No migration recreates the table.
+- No duplicate settings service exists.
+
+Use PostgreSQL as the ONLY source of truth.
+
+After clicking Save:
+
+✓ Refreshing the page must reload the saved values.
+
+✓ Restarting the application must keep the saved values.
+
+✓ Redeploying the application must keep the saved values.
+
+✓ The administrator should never need to re-enter API keys.
+
+==================================================
+STEP 13
+FULL END-TO-END VERIFICATION
+==================================================
+
+After fixing everything, perform a complete end-to-end test.
+
+Scenario:
+
+1. Open AI Settings.
+
+2. Enter:
+
+- OpenRouter API Key
+- SerpAPI API Key
+
+3. Click Save.
+
+Expected:
+
+✓ HTTP 200
+
+✓ Settings stored in PostgreSQL.
+
+4. Refresh the page.
+
+Expected:
+
+✓ API keys remain saved.
+
+✓ Settings are loaded from PostgreSQL.
+
+5. Navigate to another admin page.
+
+6. Return to AI Settings.
+
+Expected:
+
+✓ Nothing is lost.
+
+7. Open Human Content Engine.
+
+Expected:
+
+✓ Saved AI settings are detected automatically.
+
+✓ Live article discovery works.
+
+✓ No Unauthorized error.
+
+✓ No "Unable to load saved articles."
+
+✓ Dynamic article suggestions appear.
+
+Finally verify that:
+
+- No hardcoded fallback data exists.
+- No db.json is used.
+- No localStorage is used.
+- No in-memory storage is used.
+- PostgreSQL is the only persistence layer.
+- Authentication works across the entire admin panel.
+- Every Save operation is persistent.

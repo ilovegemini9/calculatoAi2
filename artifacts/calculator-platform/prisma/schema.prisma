@@ -1,0 +1,379 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth & Access Control ────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String    @map("password_hash")
+  email        String?   @unique
+  role         Role      @relation(fields: [roleId], references: [id])
+  roleId       String    @map("role_id")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  sessions     Session[]
+
+  favoriteCalculators FavoriteCalculator[]
+  recentCalculators   RecentCalculator[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. "admin", "editor", "viewer"
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  users       User[]
+
+  @@map("roles")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
+// ─── Calculators ─────────────────────────────────────────────────────────────
+
+model CalculatorCategory {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  slug        String       @unique
+  description String?
+  icon        String?
+  sortOrder   Int          @default(0) @map("sort_order")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  calculators Calculator[]
+
+  @@map("calculator_categories")
+}
+
+model Calculator {
+  id          String              @id @default(cuid())
+  slug        String              @unique
+  name        String
+  description String?
+  formula     String?             // custom formula body (JS string)
+  schemaJsonLd String?            @map("schema_json_ld")
+  status      CalculatorStatus    @default(ACTIVE)
+  category    CalculatorCategory? @relation(fields: [categoryId], references: [id])
+  categoryId  String?             @map("category_id")
+
+  // Rich metadata
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description")
+  howToUse        Json?   @map("how_to_use")   // String[]
+  faqItems        Json?   @map("faq_items")    // {question,answer}[]
+  inputs          Json?                         // input field definitions
+  outputs         Json?                         // output field definitions
+
+  // Stats
+  viewCount       Int      @default(0) @map("view_count")
+  usageCount      Int      @default(0) @map("usage_count")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  keywords            Keyword[]
+  articles            Article[]
+  relatedCalculators  CalculatorRelation[] @relation("CalculatorFrom")
+  relatedTo           CalculatorRelation[] @relation("CalculatorTo")
+  analytics           Analytics[]
+  favoriteCalculators FavoriteCalculator[]
+  recentCalculators   RecentCalculator[]
+
+  @@map("calculators")
+}
+
+enum CalculatorStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+model CalculatorRelation {
+  fromId String     @map("from_id")
+  toId   String     @map("to_id")
+  from   Calculator @relation("CalculatorFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to     Calculator @relation("CalculatorTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@id([fromId, toId])
+  @@map("calculator_relations")
+}
+
+// ─── Articles ─────────────────────────────────────────────────────────────────
+
+model ArticleCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  articles    Article[]
+
+  @@map("article_categories")
+}
+
+model ArticleTag {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  articles Article[] @relation("ArticleToTag")
+
+  @@map("article_tags")
+}
+
+model Article {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  title        String
+  content      String        @db.Text
+  status       ArticleStatus @default(DRAFT)
+  readingTime  Int?          @map("reading_time") // minutes
+  version      Int           @default(1)
+
+  // SEO
+  metaTitle       String? @map("meta_title")
+  metaDescription String? @map("meta_description")
+  canonicalUrl    String? @map("canonical_url")
+  ogTitle         String? @map("og_title")
+  ogDescription   String? @map("og_description")
+  ogImage         String? @map("og_image")
+  twitterTitle    String? @map("twitter_title")
+  twitterCard     String? @map("twitter_card")
+  schemaJsonLd    String? @map("schema_json_ld") @db.Text
+
+  // Relations
+  calculator   Calculator?     @relation(fields: [calculatorId], references: [id])
+  calculatorId String?         @map("calculator_id")
+  category     ArticleCategory? @relation(fields: [categoryId], references: [id])
+  categoryId   String?         @map("category_id")
+  tags         ArticleTag[]    @relation("ArticleToTag")
+
+  // AI generation tracking
+  aiGenerated      Boolean  @default(false) @map("ai_generated")
+  aiModel          String?  @map("ai_model")
+  aiGeneratedAt    DateTime? @map("ai_generated_at")
+
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+
+  versions   ArticleVersion[]
+  keywords   Keyword[]
+
+  @@index([status])
+  @@index([calculatorId])
+  @@map("articles")
+}
+
+enum ArticleStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+model ArticleVersion {
+  id        String   @id @default(cuid())
+  articleId String   @map("article_id")
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  version   Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([articleId])
+  @@map("article_versions")
+}
+
+// ─── Keywords ─────────────────────────────────────────────────────────────────
+
+model Keyword {
+  id           String      @id @default(cuid())
+  keyword      String
+  searchVolume Int?        @map("search_volume")
+  difficulty   Float?
+  cpc          Float?
+  intent       String?     // informational, commercial, transactional, navigational
+  source       String?     // serpapi, manual, ai-generated
+
+  calculator   Calculator? @relation(fields: [calculatorId], references: [id])
+  calculatorId String?     @map("calculator_id")
+  article      Article?    @relation(fields: [articleId], references: [id])
+  articleId    String?     @map("article_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([calculatorId])
+  @@index([articleId])
+  @@map("keywords")
+}
+
+// ─── Media ────────────────────────────────────────────────────────────────────
+
+model Media {
+  id        String    @id @default(cuid())
+  filename  String
+  mimeType  String    @map("mime_type")
+  url       String
+  size      Int?      // bytes
+  width     Int?
+  height    Int?
+  alt       String?
+  caption   String?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("media")
+}
+
+// ─── SEO Settings ────────────────────────────────────────────────────────────
+
+model SEOSettings {
+  id                String   @id @default(cuid())
+  siteTitle         String?  @map("site_title")
+  siteDescription   String?  @map("site_description")
+  siteUrl           String?  @map("site_url")
+  ogImage           String?  @map("og_image")
+  twitterHandle     String?  @map("twitter_handle")
+  googleVerification String? @map("google_verification")
+  robotsTxt         String?  @map("robots_txt") @db.Text
+  sitemapEnabled    Boolean  @default(true) @map("sitemap_enabled")
+  rssEnabled        Boolean  @default(true) @map("rss_enabled")
+  canonicalBase     String?  @map("canonical_base")
+  schemaOrgType     String?  @map("schema_org_type")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("seo_settings")
+}
+
+// ─── AI Settings ─────────────────────────────────────────────────────────────
+
+model AISettings {
+  id                   String   @id @default(cuid())
+  openrouterApiKey     String?  @map("openrouter_api_key") // encrypted at rest
+  articleModel         String?  @map("article_model")
+  codeModel            String?  @map("code_model")
+  keywordModel         String?  @map("keyword_model")
+  aiEnabled            Boolean  @default(false) @map("ai_enabled")
+  dailyRequestLimit    Int      @default(100) @map("daily_request_limit")
+  monthlyRequestLimit  Int      @default(2000) @map("monthly_request_limit")
+  dailyRequestCount    Int      @default(0) @map("daily_request_count")
+  monthlyRequestCount  Int      @default(0) @map("monthly_request_count")
+  lastResetDate        DateTime? @map("last_reset_date")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  generationHistory AIGenerationLog[]
+
+  @@map("ai_settings")
+}
+
+model AIGenerationLog {
+  id          String      @id @default(cuid())
+  settingsId  String      @map("settings_id")
+  settings    AISettings  @relation(fields: [settingsId], references: [id])
+  model       String
+  prompt      String?     @db.Text
+  tokensUsed  Int?        @map("tokens_used")
+  cost        Float?
+  success     Boolean     @default(true)
+  error       String?     @db.Text
+  taskType    String?     @map("task_type") // article, code, keyword
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  @@index([settingsId])
+  @@map("ai_generation_logs")
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+model Analytics {
+  id           String      @id @default(cuid())
+  calculatorId String?     @map("calculator_id")
+  calculator   Calculator? @relation(fields: [calculatorId], references: [id])
+  date         DateTime    @db.Date
+  pageViews    Int         @default(0) @map("page_views")
+  uniqueVisits Int         @default(0) @map("unique_visits")
+  calcUsages   Int         @default(0) @map("calc_usages")
+  bounceRate   Float?      @map("bounce_rate")
+  avgDuration  Float?      @map("avg_duration") // seconds
+
+  @@unique([calculatorId, date])
+  @@index([date])
+  @@map("analytics")
+}
+
+// ─── Logs ─────────────────────────────────────────────────────────────────────
+
+model Logs {
+  id        String   @id @default(cuid())
+  type      String   // system, error, redirect, backup, auth, ai
+  message   String   @db.Text
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([type])
+  @@index([createdAt])
+  @@map("logs")
+}
+
+// ─── App Settings ─────────────────────────────────────────────────────────────
+
+model AppSettings {
+  id               String   @id @default(cuid())
+  adminUsername    String   @default("admin") @map("admin_username")
+  adsenseEnabled   Boolean  @default(false) @map("adsense_enabled")
+  adsenseCode      String?  @map("adsense_code")
+  analyticsCode    String?  @map("analytics_code")
+  maintenanceMode  Boolean  @default(false) @map("maintenance_mode")
+  siteUrl          String?  @map("site_url")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
+
+// ─── User Interactions ───────────────────────────────────────────────────────
+
+model FavoriteCalculator {
+  id           String     @id @default(cuid())
+  userId       String     @map("user_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calculatorId String     @map("calculator_id")
+  calculator   Calculator @relation(fields: [calculatorId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@unique([userId, calculatorId])
+  @@map("favorite_calculators")
+}
+
+model RecentCalculator {
+  id           String     @id @default(cuid())
+  userId       String     @map("user_id")
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calculatorId String     @map("calculator_id")
+  calculator   Calculator @relation(fields: [calculatorId], references: [id], onDelete: Cascade)
+  visitedAt    DateTime   @default(now()) @map("visited_at")
+
+  @@unique([userId, calculatorId])
+  @@map("recent_calculators")
+}
