@@ -1,4 +1,5 @@
 - [Prisma 7 setup quirks](prisma7-setup.md) — no url in schema.prisma; requires prisma.config.ts + adapter-pg; @prisma/client-runtime-utils must be installed separately
+- [pnpm workspace setup](pnpm-workspace-setup.md) — needs pnpm-workspace.yaml + link-workspace-packages=true + onlyBuiltDependencies; Next.js dev must use ${PORT:-3000}
 - [Articles Manager 2.0 architecture](articles-manager-2-arch.md) — SerpAPI + free fallback research flow; 5 new API routes; live-data policy; SerpAPI key encrypted in db.settings
 - [Calculator codegen architecture](codegen-architecture.md) — 3-pass parallel Gemini approach; article must NOT be inside JSON to avoid corruption
 - [OpenRouter model selection](openrouter-model-selection.md) — per-task free model picks (code vs article) chosen by live testing, not spec sheets; avoid "going away" models

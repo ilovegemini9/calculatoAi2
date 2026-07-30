@@ -19,6 +19,17 @@
     "lib/*",
     "scripts"
   ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@google/genai",
+      "@prisma/engines",
+      "esbuild",
+      "prisma",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
   "prisma": {
     "schema": "artifacts/calculator-platform/prisma/schema.prisma"
   },
