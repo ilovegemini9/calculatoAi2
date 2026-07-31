@@ -44,33 +44,38 @@ export async function GET() {
   // Node's os module has no disk API; we surface what we can without spawning
   const platform = os.platform();
 
-  return NextResponse.json({
-    serverTime:  new Date().toISOString(),
-    environment: process.env.NODE_ENV ?? 'development',
-    nodeVersion: process.version,
-    platform,
-    db: {
-      status:  dbStatus,
-      pingMs:  dbPingMs,
-      error:   dbError,
-    },
-    memory: {
-      heapUsedMB,
-      heapTotalMB,
-      rssUsedMB,
-      sysTotalMB,
-      sysUsedMB,
-      sysFreeMB,
-      heapUsedPct: heapTotalMB > 0 ? Math.round((heapUsedMB / heapTotalMB) * 100) : 0,
-      sysUsedPct:  sysTotalMB  > 0 ? Math.round((sysUsedMB  / sysTotalMB)  * 100) : 0,
-    },
-    cpu: {
-      count: cpuCount,
-      model: cpuModel,
-    },
-    uptime: {
-      seconds: uptimeSec,
-      display: `${uptimeH}h ${uptimeM}m ${uptimeS}s`,
-    },
-  });
+  try {
+    return NextResponse.json({
+      serverTime:  new Date().toISOString(),
+      environment: process.env.NODE_ENV ?? 'development',
+      nodeVersion: process.version,
+      platform,
+      db: {
+        status:  dbStatus,
+        pingMs:  dbPingMs,
+        error:   dbError,
+      },
+      memory: {
+        heapUsedMB,
+        heapTotalMB,
+        rssUsedMB,
+        sysTotalMB,
+        sysUsedMB,
+        sysFreeMB,
+        heapUsedPct: heapTotalMB > 0 ? Math.round((heapUsedMB / heapTotalMB) * 100) : 0,
+        sysUsedPct:  sysTotalMB  > 0 ? Math.round((sysUsedMB  / sysTotalMB)  * 100) : 0,
+      },
+      cpu: {
+        count: cpuCount,
+        model: cpuModel,
+      },
+      uptime: {
+        seconds: uptimeSec,
+        display: `${uptimeH}h ${uptimeM}m ${uptimeS}s`,
+      },
+    });
+  } catch (err) {
+    console.error('[API ERROR - GET /api/admin/system]:', err);
+    return NextResponse.json({ error: 'Failed to load system info' }, { status: 500 });
+  }
 }

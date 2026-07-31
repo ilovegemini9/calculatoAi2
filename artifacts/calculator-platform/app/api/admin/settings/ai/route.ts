@@ -30,29 +30,34 @@ function publicResponse(settings: AiSettings, extra: Record<string, unknown> = {
 export async function GET() {
   if (!(await verifySession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = getDb();
+  try {
+    const db = getDb();
 
-  // Prefer PostgreSQL-persisted settings when available
-  const pgAi = await getSetting<typeof db.settings.ai>(PG_AI_KEY);
-  const pgSerpEncrypted = await getSetting<string>(PG_SERP_KEY);
+    // Prefer PostgreSQL-persisted settings when available
+    const pgAi = await getSetting<typeof db.settings.ai>(PG_AI_KEY);
+    const pgSerpEncrypted = await getSetting<string>(PG_SERP_KEY);
 
-  if (pgAi) db.settings.ai = pgAi;
-  if (pgSerpEncrypted) db.settings.serpApiKeyEncrypted = pgSerpEncrypted;
+    if (pgAi) db.settings.ai = pgAi;
+    if (pgSerpEncrypted) db.settings.serpApiKeyEncrypted = pgSerpEncrypted;
 
-  const settings = resetUsagePeriodIfNeeded(getAiSettings(db.settings.ai, db.settings.openrouterApiKey));
-  db.settings.ai = settings;
-  saveDb(db);
+    const settings = resetUsagePeriodIfNeeded(getAiSettings(db.settings.ai, db.settings.openrouterApiKey));
+    db.settings.ai = settings;
+    saveDb(db);
 
-  // Only write usage-counter updates back to PostgreSQL when we successfully
-  // read from it first. Writing when pgAi is null would silently overwrite a
-  // valid encrypted key with empty defaults on a transient DB failure.
-  if (pgAi !== null) {
-    await setSetting(PG_AI_KEY, settings);
+    // Only write usage-counter updates back to PostgreSQL when we successfully
+    // read from it first. Writing when pgAi is null would silently overwrite a
+    // valid encrypted key with empty defaults on a transient DB failure.
+    if (pgAi !== null) {
+      await setSetting(PG_AI_KEY, settings);
+    }
+
+    return publicResponse(settings, {
+      serpApiKeyConfigured: Boolean(getSerpApiKey(db.settings)),
+    });
+  } catch (err) {
+    console.error('[API ERROR - GET /api/admin/settings/ai]:', err);
+    return NextResponse.json({ error: 'Failed to load AI settings' }, { status: 500 });
   }
-
-  return publicResponse(settings, {
-    serpApiKeyConfigured: Boolean(getSerpApiKey(db.settings)),
-  });
 }
 
 export async function POST(req: Request) {

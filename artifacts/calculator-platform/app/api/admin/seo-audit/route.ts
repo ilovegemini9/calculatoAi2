@@ -8,6 +8,7 @@ export async function GET() {
   const isAuth = await verifySession();
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  try {
   const db = getDb();
   const dynamicCalcs = db.calculators;
 
@@ -133,23 +134,27 @@ export async function GET() {
     },
   ];
 
-  return NextResponse.json({
-    calculators: {
-      total: totalCalcs,
-      indexed,
-      nonIndexed,
-      missingMeta,
-      missingFaq,
-      missingSchema,
-      missingContent,
-      missingInternalLinks: missingLinks,
-    },
-    articles: {
-      total: articles.length,
-      missingMeta: articlesMissingMeta,
-      missingCanonical: articlesMissingCanonical,
-    },
-    redirects: db.redirects.length,
-    checks,
-  });
+    return NextResponse.json({
+      calculators: {
+        total: totalCalcs,
+        indexed,
+        nonIndexed,
+        missingMeta,
+        missingFaq,
+        missingSchema,
+        missingContent,
+        missingInternalLinks: missingLinks,
+      },
+      articles: {
+        total: articles.length,
+        missingMeta: articlesMissingMeta,
+        missingCanonical: articlesMissingCanonical,
+      },
+      redirects: db.redirects.length,
+      checks,
+    });
+  } catch (err) {
+    console.error('[API ERROR - GET /api/admin/seo-audit]:', err);
+    return NextResponse.json({ error: 'Failed to load SEO audit' }, { status: 500 });
+  }
 }

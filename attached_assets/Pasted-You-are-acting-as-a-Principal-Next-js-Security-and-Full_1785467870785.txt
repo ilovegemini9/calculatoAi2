@@ -1,0 +1,38 @@
+You are acting as a Principal Next.js, Security, and Full-Stack Engineer. 
+
+Based on a detailed step-by-step state tracing audit, there are 3 precise technical root causes breaking the Admin Panel and Smart Workflow. Perform a surgical refactor on the codebase to resolve them:
+
+---
+
+### SPECIFIC TECHNICAL FIXES:
+
+#### 1. SMART WORKFLOW STATE TRANSITION (`/api/admin/articles/analyze` - 401 Unauthorized)
+- **Problem:** Transitioning from Step 1 (Discovery) to Step 2 (Keywords Analysis) fires an HTTP POST/GET request to `/api/admin/articles/analyze` that fails with `401 Unauthorized`.
+- **Root Cause:** The client-side fetch call is missing `credentials: 'include'` and/or the `Authorization: Bearer <token>` header, causing the browser to strip the session cookie on this specific endpoint transition.
+- **Action:**
+  1. Inspect the Smart Workflow client component (e.g., `components/admin/smart-workflow.tsx` or similar).
+  2. Ensure EVERY `fetch` call—especially to `/api/admin/articles/analyze`—explicitly includes `credentials: 'include'` and passes authorization headers.
+  3. Ensure the server-side route handler `/api/admin/articles/analyze/route.ts` uses the exact same session verification helper as the rest of the working admin dashboard.
+
+#### 2. MIDDLEWARE & DEEP LINKING SESSION PERSISTENCE
+- **Problem:** Direct navigation to sub-routes (e.g., pasting `/admin/settings/ai` directly into the address bar or refreshing) drops the session and redirects to `/login`.
+- **Root Cause:** The session cookie is scoped narrowly or the Next.js `middleware.ts` fails to extract cookies on nested paths.
+- **Action:**
+  1. In `middleware.ts` and session config (NextAuth or custom JWT), enforce cookie options:
+     `httpOnly: true`, `sameSite: 'lax'`, `secure: process.env.NODE_ENV === 'production'`, `path: '/'`.
+  2. Ensure the middleware matcher pattern correctly permits all nested `/admin/(.*)` and `/api/admin/(.*)` paths without stripping valid session cookies.
+
+#### 3. GLOBAL API DECORATOR & VERBOSE LOGGING (`Unable to load`)
+- **Problem:** Endpoints `/api/admin/settings/ai`, `/api/admin/logs`, and `/api/admin/calculators` fail silently with "Unable to load".
+- **Action:**
+  1. Audit the authentication wrapper/decorator used across these API routes. Ensure it does not expire tokens prematurely or reject valid admin sessions.
+  2. Add explicit `console.error('[API ERROR - <route_name>]:', error)` blocks inside every `catch` block in all `/api/admin/*` route files so the exact database or auth failure is printed to the Replit Server Console.
+
+---
+
+### EXECUTION REQUIREMENTS:
+1. Provide the complete corrected code for:
+   - `middleware.ts`
+   - Smart Workflow client component (fixing `/api/admin/articles/analyze` fetch)
+   - Updated `/api/admin/*` route handlers with detailed `console.error` logs.
+2. Confirm that all fetch calls across the admin dashboard use a unified, authenticated API wrapper.

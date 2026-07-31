@@ -6,37 +6,47 @@ export async function GET() {
   const isAuth = await verifySession();
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const db = getDb();
-  return NextResponse.json(db.redirects || []);
+  try {
+    const db = getDb();
+    return NextResponse.json(db.redirects || []);
+  } catch (err) {
+    console.error('[API ERROR - GET /api/admin/redirects]:', err);
+    return NextResponse.json({ error: 'Failed to load redirects' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
   const isAuth = await verifySession();
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json();
-  const { oldUrl, newUrl, statusCode } = body as {
-    oldUrl: string;
-    newUrl: string;
-    statusCode: number;
-  };
+  try {
+    const body = await request.json();
+    const { oldUrl, newUrl, statusCode } = body as {
+      oldUrl: string;
+      newUrl: string;
+      statusCode: number;
+    };
 
-  if (!oldUrl || !newUrl) {
-    return NextResponse.json({ error: 'oldUrl and newUrl are required' }, { status: 400 });
+    if (!oldUrl || !newUrl) {
+      return NextResponse.json({ error: 'oldUrl and newUrl are required' }, { status: 400 });
+    }
+
+    const db = getDb();
+    const redirect = {
+      id: Date.now().toString(),
+      oldUrl,
+      newUrl,
+      statusCode: statusCode || 301,
+      createdAt: new Date().toISOString(),
+    };
+
+    db.redirects.push(redirect);
+    saveDb(db);
+    return NextResponse.json(redirect);
+  } catch (err) {
+    console.error('[API ERROR - POST /api/admin/redirects]:', err);
+    return NextResponse.json({ error: 'Failed to save redirect' }, { status: 500 });
   }
-
-  const db = getDb();
-  const redirect = {
-    id: Date.now().toString(),
-    oldUrl,
-    newUrl,
-    statusCode: statusCode || 301,
-    createdAt: new Date().toISOString(),
-  };
-
-  db.redirects.push(redirect);
-  saveDb(db);
-  return NextResponse.json(redirect);
 }
 
 export async function DELETE(request: NextRequest) {

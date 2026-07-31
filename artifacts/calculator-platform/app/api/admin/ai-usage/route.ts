@@ -7,6 +7,7 @@ export async function GET() {
   const isAuth = await verifySession();
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  try {
   const db = getDb();
   const calcs = db.calculators;
   const logs  = db.logs ?? [];
@@ -57,19 +58,23 @@ export async function GET() {
       createdAt: c.createdAt,
     }));
 
-  return NextResponse.json({
-    connected:  isConnected,
-    aiEnabled,
-    provider,
-    stats: {
-      totalGenerated,
-      published,
-      pendingApproval,
-      failed: factoryErrors,
-      generatedThisWeek,
-    },
-    // Token usage is not tracked server-side — external API dashboard required
-    tokenUsage: null,
-    recentActivity,
-  });
+    return NextResponse.json({
+      connected:  isConnected,
+      aiEnabled,
+      provider,
+      stats: {
+        totalGenerated,
+        published,
+        pendingApproval,
+        failed: factoryErrors,
+        generatedThisWeek,
+      },
+      // Token usage is not tracked server-side — external API dashboard required
+      tokenUsage: null,
+      recentActivity,
+    });
+  } catch (err) {
+    console.error('[API ERROR - /api/admin/ai-usage]:', err);
+    return NextResponse.json({ error: 'Failed to load AI usage data' }, { status: 500 });
+  }
 }

@@ -9,6 +9,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  try {
   const db = getDb();
 
   // ── Calculator stats — static + dynamic ───────────────────────────────────
@@ -57,17 +58,21 @@ export async function GET() {
       calculations: data.calculations,
     }));
 
-  return NextResponse.json({
-    totalDynamic:   dynamicCalcs.length,
-    totalArticles:  articles.length,
-    totalRedirects: db.redirects.length,
-    calcStats,
-    articleStats,
-    trends,
-    settings: {
-      adsenseEnabled: db.settings.adsenseEnabled,
-      adsenseCode:    db.settings.adsenseCode,
-      analyticsCode:  db.settings.analyticsCode,
-    },
-  });
+    return NextResponse.json({
+      totalDynamic:   dynamicCalcs.length,
+      totalArticles:  articles.length,
+      totalRedirects: db.redirects.length,
+      calcStats,
+      articleStats,
+      trends,
+      settings: {
+        adsenseEnabled: db.settings.adsenseEnabled,
+        adsenseCode:    db.settings.adsenseCode,
+        analyticsCode:  db.settings.analyticsCode,
+      },
+    });
+  } catch (err) {
+    console.error('[API ERROR - /api/admin/analytics]:', err);
+    return NextResponse.json({ error: 'Failed to load analytics' }, { status: 500 });
+  }
 }
