@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useState } from 'react';
 import { Check, ExternalLink, Globe2, Loader2, RefreshCw, Save, Search, ShieldCheck, XCircle } from 'lucide-react';
@@ -30,7 +31,7 @@ export default function VerificationsPage() {
       setLoading(true);
     }
     try {
-      const response = await fetch('/api/admin/verifications', { cache: 'no-store' });
+      const response = await fetchAdmin('/api/admin/verifications', { cache: 'no-store' });
       if (!response.ok) throw new Error('Unable to load verification settings.');
       setVerification((await response.json()).verification as VerificationSettings);
     } catch (error) {
@@ -43,7 +44,7 @@ export default function VerificationsPage() {
     if (!verification) return;
     setSaving(true); setMessage(null);
     try {
-      const response = await fetch('/api/admin/verifications', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(verification) });
+      const response = await fetchAdmin('/api/admin/verifications', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(verification) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Unable to save verification settings.');
       setVerification(result.verification);

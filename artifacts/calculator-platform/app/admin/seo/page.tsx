@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -163,7 +164,7 @@ export default function SeoPage() {
     if (quiet) setRefreshing(true);
     else setLoading(true);
     try {
-      const response = await fetch('/api/admin/seo', { cache: 'no-store' });
+      const response = await fetchAdmin('/api/admin/seo', { cache: 'no-store' });
       if (!response.ok) throw new Error('Unable to load SEO settings.');
       const next = (await response.json()) as SeoResponse;
       setData(next);
@@ -187,7 +188,7 @@ export default function SeoPage() {
     setSaving(true);
     setMessage(null);
     try {
-      const response = await fetch('/api/admin/seo', {
+      const response = await fetchAdmin('/api/admin/seo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useState } from 'react';
 import { Loader2, RefreshCw, UserPlus, Users, XCircle } from 'lucide-react';
@@ -21,7 +22,7 @@ export default function UsersPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/admin/users', { cache: 'no-store' });
+      const res = await fetchAdmin('/api/admin/users', { cache: 'no-store' });
       if (!res.ok) throw new Error('Unable to load users.');
       const data = (await res.json()) as User[];
       setUsers(Array.isArray(data) ? data : []);

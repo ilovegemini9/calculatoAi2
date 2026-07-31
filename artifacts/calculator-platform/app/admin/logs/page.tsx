@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useState } from 'react';
 import { Loader2, RefreshCw, Trash2, XCircle } from 'lucide-react';
@@ -24,7 +25,7 @@ export default function LogsPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/admin/logs', { cache: 'no-store' });
+      const res = await fetchAdmin('/api/admin/logs', { cache: 'no-store' });
       if (!res.ok) throw new Error('Unable to load logs.');
       const data = (await res.json()) as LogEntry[];
       // Newest first
@@ -41,7 +42,7 @@ export default function LogsPage() {
   const clearLogs = async () => {
     setClearing(true);
     try {
-      await fetch('/api/admin/logs', { method: 'DELETE' });
+      await fetchAdmin('/api/admin/logs', { method: 'DELETE' });
       setLogs([]);
     } catch {
       // ignore

@@ -1,0 +1,43 @@
+You are acting as a Principal Next.js & Security Engineer. There is a major regression in the Admin Panel: every section shows "Unable to load" and the Smart Workflow throws "Unauthorized" errors.
+
+The authentication middleware and API session handling are completely broken. You must implement a deep fix for cookie persistence and API route authorization.
+
+---
+
+### ROOT CAUSES TO FIX IMMEDIATELY:
+
+#### 1. AUTHENTICATION MIDDLEWARE & ROUTE PROTECTION (`middleware.ts`)
+- **Issue:** The middleware is intercepting and blocking internal requests to `/api/admin/*` without properly verifying or forwarding the session cookie.
+- **Action:**
+  1. Inspect `middleware.ts`. Ensure public assets (`_next`, static files, images) are bypassed using proper matcher regex.
+  2. For `/api/admin/*` and `/admin/*` routes, extract the auth token from BOTH:
+     - The HTTP-only Session Cookie (e.g., `next-auth.session-token`, `__Secure-next-auth.session-token`, or custom JWT cookie).
+     - The `Authorization: Bearer <token>` header (for fetch requests from the UI).
+  3. If valid, allow the request to proceed seamlessly without stripping cookies/headers.
+
+#### 2. COOKIE PERSISTENCE & SESSION (Fix Refresh Disconnections)
+- **Issue:** User gets logged out every time the page is refreshed.
+- **Action:**
+  1. Set explicit cookie attributes upon login/session creation:
+     `httpOnly: true`, `secure: process.env.NODE_NODE_ENV === 'production'`, `sameSite: 'lax'`, `path: '/'`, `maxAge: 30 * 24 * 60 * 60` (30 days).
+  2. Ensure the auth cookie is scoped globally to `path: '/'` so it isn't lost on nested routes like `/admin/articles` or `/api/admin/ai`.
+
+#### 3. FRONTEND FETCH WRAPPER / AUTH HEADERS
+- **Issue:** Smart Workflow (AI Discovery) sends requests without auth headers, triggering `401 Unauthorized`.
+- **Action:**
+  1. Create or update a unified API fetch utility (e.g., `lib/api-client.ts` or `fetchWithAuth`) that automatically includes `credentials: 'include'` and passes the session Bearer token in headers for all calls to `/api/admin/*`.
+  2. Update Smart Workflow, AI Articles, AI Settings, Logs, and Ads Manager to use this fetching utility.
+
+#### 4. DRIZZLE / DATABASE CONNECTION CHECK
+- **Issue:** "Unable to load" across all sections indicates DB query failures or locked connection pools.
+- **Action:**
+  1. Test the Drizzle ORM / SQL connection pool inside `lib/db.ts` or `server/db.ts`.
+  2. Add `try / catch` fallback wrapping around all admin API route handlers so they never return silent 500s or crash on missing table/connection errors.
+
+---
+
+### EXECUTION INSTRUCTIONS:
+1. Fix `middleware.ts` first, then the session cookie configuration.
+2. Update the frontend fetch strategy for Smart Workflow and Admin sections to guarantee credentials are sent.
+3. Test every admin endpoint (`/api/admin/articles`, `/api/admin/settings`, `/api/admin/logs`, `/api/admin/ads`) to confirm they return HTTP 200 JSON responses.
+4. Output the full code for all updated files without truncation.

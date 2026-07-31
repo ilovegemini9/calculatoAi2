@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -72,7 +73,7 @@ export default function AnalyticsPage() {
     else setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/admin/analytics', { cache: 'no-store' });
+      const res = await fetchAdmin('/api/admin/analytics', { cache: 'no-store' });
       if (!res.ok) throw new Error('Unable to load analytics data.');
       const json = (await res.json()) as AnalyticsData;
       setData(json);

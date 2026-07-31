@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -636,7 +637,7 @@ function DirectGeneratePanel({ onArticleCreated }: { onArticleCreated: () => voi
     }
     setGenerating(true);
     try {
-      const res = await fetch('/api/admin/articles/generate-direct', {
+      const res = await fetchAdmin('/api/admin/articles/generate-direct', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: title.trim(), keyword: keyword.trim(), slug: slug.trim() }),
@@ -859,7 +860,7 @@ export default function ArticlesPage() {
   const loadArticles = useCallback(async () => {
     setLoadingArticles(true);
     try {
-      const res = await fetch('/api/admin/blog', { cache: 'no-store' });
+      const res = await fetchAdmin('/api/admin/blog', { cache: 'no-store' });
       if (!res.ok) throw new Error('Unable to load saved articles.');
       const data = await res.json();
       setArticles(Array.isArray(data) ? data : []);
@@ -881,7 +882,7 @@ export default function ArticlesPage() {
     setOpportunities([]);
     setDiscoveryError(null);
     try {
-      const res = await fetch('/api/admin/articles/discover', { signal: controller.signal });
+      const res = await fetchAdmin('/api/admin/articles/discover', { signal: controller.signal });
       if (controller.signal.aborted) return;
       const data = await res.json() as { opportunities?: { title: string }[]; error?: string };
       if (!controller.signal.aborted) {
@@ -924,7 +925,7 @@ export default function ArticlesPage() {
     setOutline([]);
     setArticle(null);
     try {
-      const res = await fetch('/api/admin/articles/research', {
+      const res = await fetchAdmin('/api/admin/articles/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic: trimmed }),
@@ -955,7 +956,7 @@ export default function ArticlesPage() {
     setPhase('loading-titles');
     setWorking('titles');
     try {
-      const res = await fetch('/api/admin/articles/titles', {
+      const res = await fetchAdmin('/api/admin/articles/titles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ keyword: chip.keyword, researchSummary: research }),
@@ -990,7 +991,7 @@ export default function ArticlesPage() {
     setWorking('slug');
     setNotice(null);
     try {
-      const res = await fetch('/api/admin/articles/suggest', {
+      const res = await fetchAdmin('/api/admin/articles/suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind: 'slug', title: selectedTitle.trim() }),
@@ -1018,7 +1019,7 @@ export default function ArticlesPage() {
 
       if (!activeOutline.length || !activeSeoData) {
         setGenerationStage('Analysing keyword and building content strategy…');
-        const outlineRes = await fetch('/api/admin/articles/outline', {
+        const outlineRes = await fetchAdmin('/api/admin/articles/outline', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1048,7 +1049,7 @@ export default function ArticlesPage() {
         subpoints: s.subpoints,
       }));
 
-      const genRes = await fetch('/api/admin/articles/generate', {
+      const genRes = await fetchAdmin('/api/admin/articles/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

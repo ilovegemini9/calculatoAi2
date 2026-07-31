@@ -3,7 +3,7 @@ import { createHmac, timingSafeEqual } from 'crypto';
 import type { NextResponse } from 'next/server';
 
 export const SESSION_COOKIE_NAME = 'admin_session';
-const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
+const SESSION_MAX_AGE = 30 * 24 * 60 * 60; // 30 days in seconds
 
 /** Lazily resolved — throws on first call at runtime if the variable is absent. */
 function getSessionSecret(): string {

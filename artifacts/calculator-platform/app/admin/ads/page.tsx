@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -51,7 +52,7 @@ export default function AdsPage() {
       setLoading(true);
     }
     try {
-      const response = await fetch('/api/admin/ads', { cache: 'no-store' });
+      const response = await fetchAdmin('/api/admin/ads', { cache: 'no-store' });
       if (!response.ok) throw new Error('Unable to load ad settings.');
       setAds((await response.json()).ads as AdsSettings);
     } catch (error) {
@@ -73,7 +74,7 @@ export default function AdsPage() {
     setSaving(true);
     setMessage(null);
     try {
-      const response = await fetch('/api/admin/ads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ads) });
+      const response = await fetchAdmin('/api/admin/ads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ads) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Unable to save ad settings.');
       setAds(result.ads);

@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -120,7 +121,7 @@ export default function AiSettingsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/settings/ai', { cache: 'no-store' });
+      const response = await fetchAdmin('/api/admin/settings/ai', { cache: 'no-store' });
       if (!response.ok) throw new Error('Unable to load AI settings.');
       const result = await response.json() as { ai: PublicAi; serpApiKeyConfigured?: boolean };
       setDraft(providerDraft(result.ai));
@@ -157,7 +158,7 @@ export default function AiSettingsPage() {
             providers: draft.providers,
             ...(action === 'save' && serpKeyInput.trim() ? { serpApiKey: serpKeyInput.trim() } : {}),
           };
-      const response = await fetch('/api/admin/settings/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const response = await fetchAdmin('/api/admin/settings/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const result = await response.json() as { ai?: PublicAi; success?: boolean; message?: string; error?: string };
       if (!response.ok || result.success === false) throw new Error(result.error || 'AI settings request failed.');
       if (result.ai) setDraft(providerDraft(result.ai));

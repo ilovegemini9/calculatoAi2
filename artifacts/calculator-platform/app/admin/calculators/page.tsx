@@ -1,4 +1,5 @@
 'use client';
+import { fetchAdmin } from '@/lib/fetch-admin';
 
 import { useState, useEffect, useCallback } from 'react';
 import {
@@ -220,7 +221,7 @@ export default function CalculatorsPage() {
     setLoadingList(true);
     setListError('');
     try {
-      const res = await fetch('/api/admin/factory/save');
+      const res = await fetchAdmin('/api/admin/factory/save');
       if (!res.ok) throw new Error('Failed to load calculators');
       const data = await res.json();
       setCalculators(Array.isArray(data) ? data : []);
@@ -241,7 +242,7 @@ export default function CalculatorsPage() {
     setResearchError('');
     setOpportunities([]);
     try {
-      const res = await fetch('/api/admin/factory/keywords', {
+      const res = await fetchAdmin('/api/admin/factory/keywords', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: researchQuery.trim() }),
@@ -299,7 +300,7 @@ export default function CalculatorsPage() {
     try {
       // Stage 1: Generate full spec + tests
       const prompt = `${calcName.trim()} — ${selectedOpp.description || selectedOpp.keyword}`;
-      const genRes = await fetch('/api/admin/factory/generate', {
+      const genRes = await fetchAdmin('/api/admin/factory/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
@@ -323,7 +324,7 @@ export default function CalculatorsPage() {
       setGenStage('Saving to database...');
 
       // Stage 2: Save (inactive by default)
-      const saveRes = await fetch('/api/admin/factory/save', {
+      const saveRes = await fetchAdmin('/api/admin/factory/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(genData),
@@ -355,7 +356,7 @@ export default function CalculatorsPage() {
     setTesting(true);
     setTestResults([]);
     try {
-      const res = await fetch('/api/admin/factory/test', {
+      const res = await fetchAdmin('/api/admin/factory/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -383,7 +384,7 @@ export default function CalculatorsPage() {
     setEnabling(true);
     setEnableError('');
     try {
-      const res = await fetch('/api/admin/factory/enable', {
+      const res = await fetchAdmin('/api/admin/factory/enable', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug: generatedSpec.slug, enabled: true }),
@@ -404,7 +405,7 @@ export default function CalculatorsPage() {
   const handleToggleStatus = async (slug: string, currentStatus: string) => {
     const enabled = currentStatus !== 'active';
     try {
-      const res = await fetch('/api/admin/factory/enable', {
+      const res = await fetchAdmin('/api/admin/factory/enable', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug, enabled }),
