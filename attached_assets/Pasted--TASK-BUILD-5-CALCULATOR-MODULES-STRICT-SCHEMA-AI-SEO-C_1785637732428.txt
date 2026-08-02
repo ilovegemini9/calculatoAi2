@@ -1,0 +1,35 @@
+# TASK: BUILD 5 CALCULATOR MODULES (STRICT SCHEMA & AI SEO COMPLIANCE)
+
+You are updating `calculatoAi2` (CalculatorFree). Analyze existing codebase first, reuse UI components, and maintain strict TypeScript types. Every calculator MUST follow the EXACT dynamic structure below:
+
+## 1. MANDATORY PAGE STRUCTURE & UI LAYOUT
+Dynamic route `/calculator/[slug]` layout:
+1. Header & Meta: Title, Emoji Icon, Category Badge, Short Description with core math rule/rule-of-thumb.
+2. Split Calculator Widget:
+   - Left (Inputs): Accessible inputs (labels, htmlFor, IDs, min/max/step, sliders, ARIA tags, focus rings). Note: "Results computed instantly — your data never leaves your device."
+   - Right (Results Dashboard): Primary metric cards, secondary breakdown tags, progress bars (percentage split), dynamic warnings/alerts (e.g., PMI thresholds), and "100% Client-Side - Private & Secure" badge.
+3. How to Use Section: 4-step numbered guide (1, 2, 3, 4).
+4. Formula & Mathematical Basis: Explicit LaTeX formula, Variable Key, and Technical Math Callout Box explaining edge cases & algorithm steps.
+5. Step-by-Step Examples: Real-world scenario, numbered calculation, and highlighted ✅ Final Output.
+6. Practical Use Cases: Bulleted list with ✓ icons.
+7. Common Mistakes to Avoid: Bulleted list with ⚠ warning icons.
+8. Glossary of Terms: Key technical definitions.
+9. FAQ Section: Accordion component with authoritative expanded answers.
+10. Sources & EEAT References: Citations from authoritative entities (CFPB, Fannie Mae, NIH, CDC, IEEE, ISO, etc.).
+11. Author & Editorial Review Badge: Team attribution & underwriting standard checks.
+12. Related Calculators Grid: 4-6 contextual internal links.
+
+## 2. SEO & AI SEO (GEO / SGE) ARCHITECTURE
+- Schema Injection: Auto-generate dynamic JSON-LD tags (`FAQPage`, `HowTo`, `WebApplication`, `BreadcrumbList`).
+- Direct Conversational Answers: Content structured so AI search models (SearchGPT, Claude, Perplexity, Gemini) can digest definitions directly.
+- Client-Side Math: 100% client-side reactive calculations (`useState`, `useMemo`). Zero server-side calculation overhead.
+
+---
+
+## 3. CALCULATORS TO IMPLEMENT IN THIS PHASE:
+[INSERT THE 5 TOOLS BELOW]
+
+---
+
+## VERIFICATION
+- Execute `pnpm build` (or `npm run build`) and confirm ZERO TypeScript compilation or type errors.

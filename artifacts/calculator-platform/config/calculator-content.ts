@@ -1854,4 +1854,449 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
       description: 'UK mortgage and SDLT calculations verified against current HMRC published rates and FCA mortgage guidance.',
     },
   },
+
+  // ── Canadian Mortgage ─────────────────────────────────────────────────────
+  'canadian-mortgage': {
+    howToSteps: [
+      'Enter the home purchase price in Canadian dollars and your down payment amount — the calculator shows your down payment percentage in real time.',
+      'Input the quoted annual interest rate from your lender (e.g. 5.25%). The calculator automatically applies Canadian semi-annual compounding as required by the Interest Act.',
+      'Choose your amortization period (5–30 years; maximum 25 years if CMHC insurance applies) and preferred payment frequency: Monthly, Bi-Weekly, or Accelerated Bi-Weekly.',
+      'Optionally add your annual property tax and monthly condo/strata fee — the Total Monthly Outlay card will reflect all costs together.',
+    ],
+    faqs: [
+      {
+        question: 'Why is a Canadian mortgage calculated differently from a US mortgage?',
+        answer: 'Canada\'s Interest Act requires that mortgage interest be compounded semi-annually, not monthly. Lenders quote a nominal annual rate, but interest actually compounds twice per year. To find your true monthly payment, the quoted rate must first be converted to an effective monthly rate: (1 + r/200)^(1/6) − 1, where r is the annual rate. This produces slightly lower payments than a US-style monthly-compounding loan at the same quoted rate.',
+      },
+      {
+        question: 'What is CMHC mortgage insurance and when is it required?',
+        answer: 'CMHC (Canada Mortgage and Housing Corporation) mortgage default insurance is mandatory when your down payment is between 5% and 19.99% of the purchase price. The premium (2.8%–4.0% of the insured loan amount) is added directly to your mortgage principal and amortized over the life of the loan. With ≥ 20% down, CMHC insurance is not required and the maximum amortization extends to 30 years.',
+      },
+      {
+        question: 'What is accelerated bi-weekly payment and how much does it save?',
+        answer: 'Accelerated bi-weekly payments are calculated by dividing the monthly payment in half and paying that amount every two weeks (26 times per year). Because 26 × (monthly/2) = 13 monthly payments per year rather than 12, you make one extra full monthly payment annually. This can shave 2–4 years off a 25-year amortization and save tens of thousands of dollars in interest.',
+      },
+      {
+        question: 'What is the minimum down payment in Canada?',
+        answer: 'The minimum down payment depends on purchase price: 5% on the first $500,000, and 10% on the portion between $500,000 and $999,999. Properties priced at $1,000,000 or more require a minimum 20% down payment and are not eligible for CMHC insurance.',
+      },
+      {
+        question: 'Does my mortgage term equal my amortization period?',
+        answer: 'No. In Canada, the amortization period is the total time to pay off the mortgage (typically 25 years), while the mortgage term is the length of your current rate contract (commonly 1–5 years). At the end of each term you renegotiate or renew the rate, but the amortization clock keeps running.',
+      },
+      {
+        question: 'Is the interest rate the same as the APR for Canadian mortgages?',
+        answer: 'No. Lenders in Canada must disclose an Annual Percentage Rate (APR) that includes the lender\'s fees. However, the semi-annual compounding rule means even the stated rate understates the cost slightly compared to a monthly-compounding loan. Always compare the effective monthly rate — shown in the results panel — when evaluating different lenders.',
+      },
+    ],
+    formula: {
+      expression:
+        'Step 1 — Effective monthly rate:\n  r_m = (1 + r_nom / 200)^(1/6) − 1\n\nStep 2 — Monthly payment (P&I):\n  M = L × r_m × (1 + r_m)^n\n      ────────────────────────\n      (1 + r_m)^n − 1\n\nStep 3 — Accelerated bi-weekly payment:\n  P_abw = M / 2   (paid 26×/yr → one extra monthly payment/yr)\n\nStep 4 — CMHC premium (if down < 20%):\n  Premium = L × CMHC_rate\n  Total mortgage = L + Premium',
+      variables: [
+        { symbol: 'r_nom', definition: 'Nominal annual interest rate quoted by the lender (e.g. 5.25)' },
+        { symbol: 'r_m', definition: 'Effective monthly rate after converting from semi-annual compounding' },
+        { symbol: 'L', definition: 'Loan amount = Home Price − Down Payment (+ CMHC premium if applicable)' },
+        { symbol: 'n', definition: 'Total number of monthly payments = Amortization Years × 12' },
+        { symbol: 'M', definition: 'Monthly principal & interest payment' },
+        { symbol: 'P_abw', definition: 'Accelerated bi-weekly payment = M ÷ 2' },
+        { symbol: 'CMHC_rate', definition: '4.00% (5–9.99% down), 3.10% (10–14.99%), or 2.80% (15–19.99%)' },
+      ],
+      notes:
+        'The semi-annual compounding conversion is mandated by Section 6 of Canada\'s Interest Act (RSC 1985, c I-15). Bi-weekly (non-accelerated) payments use an effective bi-weekly rate of (1 + r_m)^(1/2) − 1 and produce the same total interest as monthly payments; only accelerated bi-weekly payments reduce the amortization.',
+    },
+    examples: [
+      {
+        title: 'First-time buyer — 10% down, CMHC required',
+        scenario: 'Purchasing a $650,000 condo in Toronto with $65,000 down (10%), 5.25% rate, 25-year amortization, monthly payments.',
+        steps: [
+          'Loan amount: $650,000 − $65,000 = $585,000. Down payment = 10% → CMHC rate = 3.10%.',
+          'CMHC premium: $585,000 × 3.10% = $18,135. Total mortgage: $585,000 + $18,135 = $603,135.',
+          'Effective monthly rate: (1 + 5.25/200)^(1/6) − 1 = 0.43279% per month.',
+          'n = 25 × 12 = 300 payments.',
+          'Monthly payment: $603,135 × 0.0043279 × (1.0043279)^300 / [(1.0043279)^300 − 1] = $3,203.77.',
+          'Total interest over 25 years: ≈ $357,996. Total cost: ≈ $961,131.',
+        ],
+        result: '$3,203.77/month | $18,135 CMHC premium added to mortgage | ≈ $358K total interest',
+      },
+      {
+        title: 'Move-up buyer — 20% down, accelerated bi-weekly savings',
+        scenario: 'Purchasing an $800,000 home with $160,000 down (20%), 5.00% rate, 25-year amortization. Comparing monthly vs accelerated bi-weekly.',
+        steps: [
+          'Loan: $800,000 − $160,000 = $640,000. No CMHC (20% down).',
+          'Effective monthly rate: (1 + 5.00/200)^(1/6) − 1 = 0.41239%.',
+          'Monthly payment (25 yr): $640,000 × 0.0041239 × (1.0041239)^300 / [(1.0041239)^300 − 1] = $3,724.21.',
+          'Accelerated bi-weekly payment: $3,724.21 / 2 = $1,862.11.',
+          'Effective annual payments: 26 × $1,862.11 = $48,414.86 vs 12 × $3,724.21 = $44,690.52 — one extra month paid each year.',
+          'Accelerated bi-weekly fully amortizes in ≈ 22.0 years, saving ≈ 3 years and ≈ $44,000 in interest.',
+        ],
+        result: '$3,724.21/mo OR $1,862.11 bi-weekly (accelerated) — saves ~3 years and ~$44,000 in interest',
+      },
+    ],
+    useCases: [
+      '✓ Budgeting for a first home purchase anywhere in Canada — including CMHC premium impact',
+      '✓ Comparing monthly vs accelerated bi-weekly payment strategies to see interest savings',
+      '✓ Estimating total monthly housing costs including property tax and condo fees for stress-test purposes',
+      '✓ Evaluating mortgage renewal scenarios when your term expires',
+      '✓ Understanding how a larger down payment eliminates CMHC insurance and changes your payment',
+      '✓ Planning the maximum home price you can afford given a target monthly payment',
+    ],
+    commonPitfalls: [
+      '⚠ Confusing the mortgage term (1–5 yr rate contract) with the amortization period (total payoff timeline) — they are different.',
+      '⚠ Forgetting that CMHC insurance is added to your mortgage principal, increasing both the loan size and total interest paid.',
+      '⚠ Assuming "bi-weekly" and "accelerated bi-weekly" are the same — only the accelerated option reduces amortization.',
+      '⚠ Ignoring closing costs: land transfer tax, legal fees, title insurance, and home inspection (typically $5,000–$25,000+).',
+      '⚠ Not accounting for the Canadian mortgage stress test — federally regulated lenders qualify you at the higher of your contract rate + 2% or 5.25%.',
+      '⚠ Comparing Canadian and US mortgage rates directly — semi-annual vs monthly compounding makes the Canadian rate effectively lower per month at the same quoted figure.',
+    ],
+    glossary: [
+      { term: 'Amortization Period', definition: 'The total length of time required to pay off the mortgage entirely through regular payments. Maximum 25 years with CMHC insurance; up to 30 years with 20%+ down.' },
+      { term: 'Mortgage Term', definition: 'The length of your current rate agreement with the lender, typically 1–5 years in Canada. At renewal, you renegotiate the rate for the remaining amortization.' },
+      { term: 'CMHC Insurance', definition: 'Canada Mortgage and Housing Corporation mortgage default insurance, mandatory for down payments under 20%. Premiums range from 2.80% to 4.00% of the insured loan amount.' },
+      { term: 'Semi-Annual Compounding', definition: 'The compounding frequency mandated by Canada\'s Interest Act for mortgages. Interest compounds twice per year, which is converted to an effective monthly rate for payment calculations.' },
+      { term: 'Accelerated Bi-Weekly', definition: 'A payment schedule where you pay half the monthly payment every two weeks (26 payments/year), effectively making 13 monthly payments per year and reducing amortization.' },
+      { term: 'Stress Test (OSFI B-20)', definition: 'A federal requirement that lenders qualify borrowers at the higher of their contract rate + 2% or 5.25%, ensuring they can manage higher rates at renewal.' },
+      { term: 'Land Transfer Tax', definition: 'A provincial tax paid at closing on the purchase of real estate. First-time buyers in Ontario and B.C. qualify for partial or full rebates.' },
+      { term: 'LTV (Loan-to-Value)', definition: 'The mortgage amount as a percentage of the property value. LTV above 80% triggers mandatory CMHC insurance for federally regulated lenders.' },
+    ],
+    sources: [
+      { title: 'Interest Act (RSC 1985, c I-15)', publisher: 'Government of Canada / Justice Laws', url: 'https://laws-lois.justice.gc.ca/eng/acts/I-15/', year: 2024 },
+      { title: 'CMHC Mortgage Loan Insurance Premiums', publisher: 'Canada Mortgage and Housing Corporation', url: 'https://www.cmhc-schl.gc.ca/consumers/home-buying/mortgage-loan-insurance-for-consumers/cmhc-mortgage-loan-insurance-cost', year: 2024 },
+      { title: 'Residential Mortgage Underwriting Practices — Guideline B-20', publisher: 'Office of the Superintendent of Financial Institutions (OSFI)', url: 'https://www.osfi-bsif.gc.ca/en/guidance/guidance-library/residential-mortgage-underwriting-practices-procedures', year: 2023 },
+      { title: 'Homebuying Step by Step', publisher: 'Canada Mortgage and Housing Corporation', url: 'https://www.cmhc-schl.gc.ca/consumers/home-buying/homebuying-calculators', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Canadian Finance Team',
+      credentials: 'Reviewed against CMHC and OSFI B-20 guidelines',
+      description: 'Canadian mortgage calculations verified against the Interest Act semi-annual compounding requirement, current CMHC premium schedules, and OSFI residential mortgage guidelines.',
+    },
+  },
+
+  // ── Personal Loan ─────────────────────────────────────────────────────────
+  'personal-loan': {
+    howToSteps: [
+      'Enter the loan amount you wish to borrow and the annual interest rate quoted by your lender.',
+      'Set the loan term in months (e.g. 36 for 3 years, 60 for 5 years). Your monthly payment and total interest update instantly.',
+      'Toggle "Include Origination Fee" if your lender charges one, and enter the fee as a dollar amount or percentage — the calculator adjusts your true APR automatically.',
+      'Review the amortization table to see exactly how much of each payment goes to principal vs interest, and track your remaining balance month by month.',
+    ],
+    faqs: [
+      {
+        question: 'What is the difference between the interest rate and APR on a personal loan?',
+        answer: 'The interest rate (also called the nominal rate) determines your monthly payment on the principal. APR (Annual Percentage Rate) includes the interest rate plus all mandatory fees — most importantly the origination fee — expressed as a single annualised cost. Because origination fees are typically deducted from your disbursement but you still repay the full loan amount, the APR is always higher than the stated rate. The calculator estimates APR using Newton-Raphson iteration on the true cash-flow sequence.',
+      },
+      {
+        question: 'How is the monthly payment on a personal loan calculated?',
+        answer: 'Personal loans use standard amortisation: M = P × [r(1+r)^n] / [(1+r)^n − 1], where P is the principal, r is the monthly rate (annual rate ÷ 12), and n is the number of months. Each month\'s payment covers first the interest on the remaining balance, then reduces principal — early payments are mostly interest; later payments are mostly principal.',
+      },
+      {
+        question: 'What is an origination fee and how does it affect my loan?',
+        answer: 'An origination fee (typically 1%–8% of the loan amount) is charged by lenders to process the loan. It is usually deducted from your disbursement — so if you borrow $10,000 with a 3% fee, you receive $9,700 but repay $10,000. This makes your true borrowing cost (APR) meaningfully higher than the quoted interest rate. Always compare loans using APR, not just the interest rate.',
+      },
+      {
+        question: 'Is it better to choose a shorter or longer loan term?',
+        answer: 'A shorter term means higher monthly payments but significantly less total interest paid. A longer term reduces monthly cash flow pressure but increases total cost substantially. Use the calculator to compare: a $15,000 loan at 12% for 36 months costs ~$2,931 in interest; stretched to 60 months, total interest rises to ~$4,896 — 67% more — for the same loan amount.',
+      },
+      {
+        question: 'Can I pay off a personal loan early?',
+        answer: 'Most unsecured personal loans allow early payoff with no prepayment penalty, though you should confirm with your lender. Paying extra toward principal reduces the remaining balance and cuts future interest. Even one extra payment per year on a 5-year loan can save hundreds of dollars and several months of repayment.',
+      },
+    ],
+    formula: {
+      expression:
+        'Monthly payment:\n  M = P × r × (1 + r)^n\n      ─────────────────────\n      (1 + r)^n − 1\n\nTrue APR (Newton-Raphson on cash flows):\n  Solve for i such that:\n  Net Proceeds = Σ [ M / (1 + i)^t ]  for t = 1 to n\n  where Net Proceeds = P − Origination Fee\n  APR = i × 12',
+      variables: [
+        { symbol: 'P', definition: 'Principal — full loan amount before any fees are deducted' },
+        { symbol: 'r', definition: 'Monthly interest rate = Annual Rate ÷ 12 ÷ 100' },
+        { symbol: 'n', definition: 'Loan term in months' },
+        { symbol: 'M', definition: 'Fixed monthly payment (principal + interest)' },
+        { symbol: 'i', definition: 'True monthly cost rate used to derive APR, solved iteratively' },
+        { symbol: 'APR', definition: 'Annual Percentage Rate — total annualised cost including origination fee' },
+      ],
+      notes:
+        'APR estimation uses Newton-Raphson iteration (typically converges in < 20 steps). The result matches the Truth in Lending Act (TILA / Regulation Z) definition used by U.S. lenders. For fee-free loans, APR equals the nominal annual rate exactly.',
+    },
+    examples: [
+      {
+        title: 'Debt consolidation loan — no origination fee',
+        scenario: '$15,000 loan at 9.5% APR, 48-month term, no origination fee.',
+        steps: [
+          'Monthly rate r = 9.5% / 12 / 100 = 0.7917%.',
+          'Monthly payment: $15,000 × 0.007917 × (1.007917)^48 / [(1.007917)^48 − 1] = $375.82.',
+          'Total paid: $375.82 × 48 = $18,039.36.',
+          'Total interest: $18,039.36 − $15,000 = $3,039.36.',
+        ],
+        result: '$375.82/month | $3,039 total interest | Effective APR = 9.50%',
+      },
+      {
+        title: 'Home improvement loan — 3% origination fee',
+        scenario: '$20,000 loan at 11.0% stated rate, 60-month term, 3% origination fee ($600).',
+        steps: [
+          'Monthly rate r = 11.0% / 12 / 100 = 0.9167%.',
+          'Monthly payment on $20,000: $20,000 × 0.009167 × (1.009167)^60 / [(1.009167)^60 − 1] = $434.85.',
+          'Net proceeds received: $20,000 − $600 = $19,400.',
+          'True APR via Newton-Raphson on [$19,400 disbursed, 60 × $434.85 repaid]: APR ≈ 12.15%.',
+          'Total interest (on stated principal): $434.85 × 60 − $20,000 = $6,091.',
+        ],
+        result: '$434.85/month | Stated rate 11.0% → True APR ≈ 12.15% | $6,091 total interest',
+      },
+    ],
+    useCases: [
+      '✓ Consolidating high-interest credit card debt into a single fixed monthly payment',
+      '✓ Financing home improvements, medical expenses, or major purchases without collateral',
+      '✓ Comparing loan offers from multiple lenders using APR as the apples-to-apples metric',
+      '✓ Planning monthly budget impact before accepting a loan offer',
+      '✓ Understanding the true cost of origination fees vs lower-rate but fee-free alternatives',
+      '✓ Evaluating whether a shorter term is affordable given the higher monthly payment',
+    ],
+    commonPitfalls: [
+      '⚠ Comparing loans by interest rate only — always compare APR, which includes origination and other mandatory fees.',
+      '⚠ Borrowing more than needed to cover the origination fee — if possible, pay the fee upfront instead of financing it.',
+      '⚠ Choosing the longest term to minimise payments without considering total interest — a 5-year term can cost 60–70% more in interest than a 3-year term.',
+      '⚠ Ignoring prepayment penalty clauses — some lenders charge a fee if you pay off the loan early.',
+      '⚠ Treating the monthly payment as the full cost — total interest is the actual price of borrowing and should always be reviewed.',
+      '⚠ Missing a payment: unsecured personal loans typically carry penalty rates and late fees that substantially increase the effective cost.',
+    ],
+    glossary: [
+      { term: 'Principal', definition: 'The original loan amount borrowed, before interest. All monthly payments reduce the outstanding principal.' },
+      { term: 'APR (Annual Percentage Rate)', definition: 'A standardised annual cost that includes interest plus mandatory fees. Required to be disclosed by lenders under TILA (Regulation Z) in the US.' },
+      { term: 'Origination Fee', definition: 'A one-time lender fee (typically 1–8% of the loan) charged to underwrite and fund the loan. Usually deducted from disbursement, not paid upfront.' },
+      { term: 'Amortisation', definition: 'The process of paying off a loan in equal periodic instalments, with each payment covering accrued interest first and then reducing principal.' },
+      { term: 'Unsecured Loan', definition: 'A loan backed only by the borrower\'s creditworthiness, with no collateral. Personal loans are typically unsecured, which means higher rates than secured alternatives.' },
+      { term: 'Soft vs Hard Credit Pull', definition: 'A soft pull (pre-qualification) does not affect your credit score; a hard pull (formal application) typically causes a temporary 5–10 point dip.' },
+      { term: 'Debt-to-Income Ratio (DTI)', definition: 'Total monthly debt payments divided by gross monthly income. Most lenders prefer DTI below 36%; above 43% typically disqualifies applicants.' },
+    ],
+    sources: [
+      { title: 'Truth in Lending Act (TILA) — Regulation Z', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/rules-policy/regulations/1026/', year: 2024 },
+      { title: 'What Is a Personal Loan?', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/ask-cfpb/what-is-a-personal-loan-en-1personal-loan/', year: 2024 },
+      { title: 'Understanding Loan Costs', publisher: 'Federal Reserve (FRB)', url: 'https://www.federalreserve.gov/pubs/shop/default.htm', year: 2023 },
+    ],
+    author: {
+      name: 'CalculatorFree Finance Team',
+      credentials: 'TILA/Regulation Z compliance review',
+      description: 'Personal loan APR methodology verified against CFPB Regulation Z requirements and standard amortisation schedules.',
+    },
+  },
+
+  // ── Auto Loan ─────────────────────────────────────────────────────────────
+  'auto-loan': {
+    howToSteps: [
+      'Enter the vehicle price, trade-in value (if any), and any down payment amount. The calculator shows the financed amount after deductions.',
+      'Enter your state/provincial sales tax rate — in most jurisdictions tax is calculated on the price after trade-in, reducing your tax bill.',
+      'Input dealer fees (documentation, destination, etc.), the lender\'s annual interest rate, and your loan term in months.',
+      'Review the Payment Breakdown showing the split between principal, interest, taxes, and fees — and scroll down for the full amortisation schedule.',
+    ],
+    faqs: [
+      {
+        question: 'How is sales tax calculated on an auto loan?',
+        answer: 'Most US states (and Canadian provinces) calculate sales tax on the vehicle\'s selling price after deducting the trade-in value. For example, a $35,000 car with a $10,000 trade-in is taxed on $25,000. However, some states (e.g. California, Michigan) tax the full vehicle price regardless of trade-in. Always verify your state\'s specific rule. The tax amount is typically rolled into the loan.',
+      },
+      {
+        question: 'Should I put more money down on a car loan?',
+        answer: 'A larger down payment reduces the amount financed, lowers your monthly payment, and reduces total interest paid. It also protects against "being underwater" (owing more than the car is worth) — cars typically depreciate 15–25% in the first year. A common rule of thumb is to put down at least 20% on a new car and 10% on a used car.',
+      },
+      {
+        question: 'What is the difference between the purchase price and the amount financed?',
+        answer: 'The amount financed (the actual loan principal) = Vehicle Price − Trade-in Value − Down Payment + Sales Tax + Dealer Fees. Taxes and fees are typically added to the loan, which is why your financed amount is often higher than the sticker price minus your down payment.',
+      },
+      {
+        question: 'Is a 72-month or 84-month auto loan a good idea?',
+        answer: 'Longer terms lower monthly payments but significantly increase total interest and the risk of negative equity. A 72-month loan at 7% on a $35,000 vehicle costs approximately $4,500 more in interest than a 48-month loan. Most financial advisors recommend keeping auto loan terms at 48–60 months for new cars and 36–48 months for used vehicles to stay ahead of depreciation.',
+      },
+      {
+        question: 'What is a good interest rate for a car loan?',
+        answer: 'Auto loan rates vary by credit tier, term, and lender. As of 2024, average rates for new cars range from ~5% (excellent credit, 720+) to ~14%+ (subprime, below 580). Used car rates are typically 1–3 percentage points higher due to greater lender risk. Credit unions often offer rates 1–2% lower than banks for the same credit profile.',
+      },
+    ],
+    formula: {
+      expression:
+        'Amount Financed:\n  A = (Vehicle Price − Trade-in − Down Payment)\n      + (Vehicle Price − Trade-in) × Tax Rate\n      + Dealer Fees\n\nMonthly Payment:\n  M = A × r × (1 + r)^n\n      ─────────────────────\n      (1 + r)^n − 1\n\nTotal Cost:\n  Total = M × n  (includes all interest)',
+      variables: [
+        { symbol: 'A', definition: 'Amount financed — the actual loan principal including tax and fees' },
+        { symbol: 'r', definition: 'Monthly interest rate = Annual Rate ÷ 12 ÷ 100' },
+        { symbol: 'n', definition: 'Loan term in months (e.g. 48, 60, 72)' },
+        { symbol: 'M', definition: 'Fixed monthly payment' },
+        { symbol: 'Tax Rate', definition: 'State/provincial sales tax as a decimal (e.g. 6% → 0.06)' },
+        { symbol: 'Trade-in', definition: 'Value the dealer credits for your current vehicle, applied before tax in most states' },
+      ],
+      notes:
+        'Sales tax is calculated on (Vehicle Price − Trade-in) in states that grant trade-in tax credits (39 US states + most Canadian provinces). In states without this credit (e.g. California prior to 2022), tax is calculated on the full vehicle price. Dealer fees (doc fee, destination, acquisition) are added after tax and are not typically taxed themselves.',
+    },
+    examples: [
+      {
+        title: 'New car purchase with trade-in',
+        scenario: '$38,500 new SUV, $8,000 trade-in, $2,000 down payment, 7% sales tax, $500 doc fee, 6.9% APR, 60-month term.',
+        steps: [
+          'Taxable amount: $38,500 − $8,000 = $30,500. Sales tax: $30,500 × 7% = $2,135.',
+          'Amount financed: ($38,500 − $8,000 − $2,000) + $2,135 + $500 = $31,135.',
+          'Monthly rate: 6.9% / 12 / 100 = 0.575%.',
+          'Monthly payment: $31,135 × 0.00575 × (1.00575)^60 / [(1.00575)^60 − 1] = $613.47.',
+          'Total paid: $613.47 × 60 = $36,808.20. Total interest: $36,808.20 − $31,135 = $5,673.20.',
+        ],
+        result: '$613.47/month | $5,673 total interest | $36,808 total repaid on $31,135 financed',
+      },
+      {
+        title: 'Used car — no trade-in, shorter term',
+        scenario: '$18,000 used car, no trade-in, $1,800 down (10%), 8% sales tax, $300 doc fee, 9.5% APR, 48 months.',
+        steps: [
+          'Sales tax: $18,000 × 8% = $1,440 (no trade-in to offset).',
+          'Amount financed: ($18,000 − $0 − $1,800) + $1,440 + $300 = $17,940.',
+          'Monthly rate: 9.5% / 12 / 100 = 0.7917%.',
+          'Monthly payment: $17,940 × 0.007917 × (1.007917)^48 / [(1.007917)^48 − 1] = $449.08.',
+          'Total interest: $449.08 × 48 − $17,940 = $3,616.',
+        ],
+        result: '$449.08/month | $3,616 total interest | Paid off in 4 years',
+      },
+    ],
+    useCases: [
+      '✓ Comparing total cost of different term lengths (48 vs 60 vs 72 months) on the same vehicle',
+      '✓ Calculating whether a larger down payment justifies the upfront cash reduction',
+      '✓ Assessing the value of a trade-in deal — understanding the tax savings it provides',
+      '✓ Stress-testing affordability at different interest rate scenarios before visiting a dealership',
+      '✓ Deciding between dealer financing and a pre-approved bank or credit union loan',
+      '✓ Planning your total monthly transportation budget including insurance and maintenance',
+    ],
+    commonPitfalls: [
+      '⚠ Focusing on monthly payment instead of total cost — dealers exploit this by stretching terms to 72–84 months.',
+      '⚠ Forgetting to include sales tax and dealer fees in the financed amount — they can add $2,000–$5,000+ to the loan.',
+      '⚠ Assuming the trade-in credit always reduces your taxable amount — check your state\'s rules, as some don\'t allow this deduction.',
+      '⚠ Accepting dealer financing without comparing pre-approved rates from a bank or credit union first.',
+      '⚠ Going underwater on the loan (owing more than the car\'s value) — especially risky with long-term loans on rapidly depreciating vehicles.',
+      '⚠ Not budgeting for insurance, registration, fuel, and maintenance — these can easily exceed the loan payment itself.',
+    ],
+    glossary: [
+      { term: 'Amount Financed', definition: 'The actual dollar amount of the loan, equal to vehicle price minus trade-in and down payment, plus taxes and fees that are rolled into the loan.' },
+      { term: 'Trade-in Credit', definition: 'The value a dealer applies toward your purchase in exchange for your current vehicle. Reduces the financed amount and, in most states, the taxable base.' },
+      { term: 'Dealer Documentation Fee', definition: 'A fee charged by dealers to process paperwork. Ranges from $50 to $900+ depending on state. Some states cap it; it is almost always negotiable.' },
+      { term: 'Negative Equity (Underwater)', definition: 'When you owe more on the loan than the vehicle\'s current market value. Common with long loan terms due to rapid early depreciation.' },
+      { term: 'Pre-Approved Loan', definition: 'A loan offer from a bank or credit union obtained before visiting the dealership, giving you a rate benchmark and stronger negotiating position.' },
+      { term: 'GAP Insurance', definition: 'Guaranteed Asset Protection — covers the difference between the insurance payout and remaining loan balance if the vehicle is totalled or stolen while you are underwater.' },
+      { term: 'Amortisation Schedule', definition: 'A complete table showing each payment split between interest and principal, and the remaining balance after each payment.' },
+    ],
+    sources: [
+      { title: 'Auto Loans', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/consumer-tools/auto-loans/', year: 2024 },
+      { title: 'Shopping for an Auto Loan', publisher: 'Federal Reserve (FRB)', url: 'https://www.federalreserve.gov/pubs/shop/default.htm', year: 2023 },
+      { title: 'State Motor Vehicle Sales Tax Rates', publisher: 'Federation of Tax Administrators', url: 'https://www.taxadmin.org/sales-tax-rates', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Auto Finance Team',
+      credentials: 'CFPB auto lending guidelines review',
+      description: 'Auto loan calculations verified against CFPB guidance. Sales tax methodology covers trade-in credit rules for all 50 US states.',
+    },
+  },
+
+  // ── Auto Lease ────────────────────────────────────────────────────────────
+  'auto-lease': {
+    howToSteps: [
+      'Enter the vehicle\'s MSRP — this determines the residual (buyout) value at lease end. Then enter the Negotiated Cap Cost (the price you\'ve agreed with the dealer, before fees).',
+      'Set the Down Payment / Cap Reduction and any trade-in. These reduce the adjusted cap cost and lower your monthly depreciation charge.',
+      'Enter the Money Factor (from your lender\'s lease sheet, e.g. 0.00125) or toggle to APR mode and enter the interest rate — the calculator converts automatically. Add the lease term and residual percentage.',
+      'Review the monthly payment breakdown showing your depreciation charge (how much the car loses each month) and finance charge (the cost of money), plus the due-at-signing summary.',
+    ],
+    faqs: [
+      {
+        question: 'What is a money factor and how does it relate to APR?',
+        answer: 'The money factor (MF) is the lease equivalent of an interest rate, expressed as a small decimal (e.g. 0.00125). To convert to APR, multiply by 2,400: 0.00125 × 2,400 = 3.0% APR. To convert APR to money factor, divide by 2,400. Lenders use money factor because it makes the finance charge calculation straightforward: Finance Charge = (Adjusted Cap Cost + Residual) × Money Factor.',
+      },
+      {
+        question: 'What is residual value and why does it matter?',
+        answer: 'Residual value is the projected worth of the vehicle at the end of the lease, set by the lender as a percentage of MSRP. A higher residual means you pay for less depreciation over the lease term, resulting in lower monthly payments. Vehicles with strong residuals (some Toyotas, Hondas, luxury brands) are typically cheaper to lease relative to their purchase price. You cannot negotiate the residual — it is set by the lender.',
+      },
+      {
+        question: 'What is the cap cost reduction and should I put money down on a lease?',
+        answer: 'Cap cost reduction (down payment on a lease) reduces your adjusted cap cost, which lowers monthly depreciation charges and therefore monthly payments. However, unlike a purchase, money put down on a lease is non-refundable if the car is totalled or stolen. Most financial advisors suggest keeping lease down payments minimal ($0–$2,000) and instead paying lower monthly amounts — this also reduces your risk exposure.',
+      },
+      {
+        question: 'What fees are typically due at lease signing?',
+        answer: 'Due-at-signing costs typically include: the first month\'s payment, acquisition fee ($400–$900, charged by the lender), security deposit (sometimes waived), cap cost reduction (your down payment), registration and title fees, and dealer documentation fee. The total is often $1,500–$5,000+ before any drive-off special deals.',
+      },
+      {
+        question: 'Is leasing or buying cheaper overall?',
+        answer: 'Leasing almost always has lower monthly payments but you build no equity. Over a long period (10+ years), buying and keeping a vehicle typically costs less. Leasing is financially advantageous when: you always drive a new car every 2–3 years; you use the vehicle for business (lease payments may be deductible); or you want to avoid repair costs beyond the warranty period. The auto lease vs. buy decision depends on your driving habits, mileage, and financial goals.',
+      },
+      {
+        question: 'What happens if I go over my mileage limit?',
+        answer: 'Excess mileage charges are specified in the lease contract, typically $0.15–$0.30 per mile over the allowed amount. On a 36-month lease with a 10,000 mile/year limit, driving 12,000 miles/year (6,000 excess miles) at $0.25/mile = $1,500 due at lease end. If you anticipate exceeding limits, negotiate additional miles upfront — pre-purchased miles are typically cheaper than excess charges at lease end.',
+      },
+    ],
+    formula: {
+      expression:
+        'Step 1 — Adjusted Cap Cost:\n  Adj Cap = Cap Cost − Cap Reduction − Trade-in + Acq Fee\n\nStep 2 — Depreciation charge (monthly):\n  Dep = (Adj Cap − Residual) / Term (months)\n\nStep 3 — Finance charge (monthly):\n  Fin = (Adj Cap + Residual) × Money Factor\n\nStep 4 — Pre-tax monthly payment:\n  M_pre = Dep + Fin\n\nStep 5 — After-tax monthly payment:\n  M = M_pre × (1 + Tax Rate)\n\nConversion:\n  Money Factor = APR / 2400\n  APR = Money Factor × 2400',
+      variables: [
+        { symbol: 'Cap Cost', definition: 'Negotiated selling price of the vehicle (your deal, before fees)' },
+        { symbol: 'Cap Reduction', definition: 'Your down payment — reduces the adjusted cap cost and monthly depreciation' },
+        { symbol: 'Trade-in', definition: 'Trade-in vehicle credit applied to cap cost reduction' },
+        { symbol: 'Acq Fee', definition: 'Acquisition fee charged by the lessor — typically added to the adjusted cap cost' },
+        { symbol: 'Residual', definition: 'Projected vehicle value at lease end = MSRP × Residual %' },
+        { symbol: 'Money Factor', definition: 'Lease finance rate; multiply by 2,400 to convert to approximate APR' },
+        { symbol: 'Term', definition: 'Lease duration in months (typically 24, 36, or 39 months)' },
+        { symbol: 'Tax Rate', definition: 'Sales tax on monthly lease payments (most states tax the payment, not the vehicle price)' },
+      ],
+      notes:
+        'Most US states tax lease payments monthly rather than the full vehicle value upfront, making leasing tax-efficient in high-tax states. Texas, Minnesota, and a few others tax the full vehicle value at inception. The acquisition fee is typically $400–$900 and is set by the captive finance company (e.g. BMW Financial Services, Toyota Financial), not the dealer.',
+    },
+    examples: [
+      {
+        title: '36-month lease on a mid-size SUV',
+        scenario: '$45,000 MSRP SUV, $43,000 negotiated cap cost, $3,000 down, $0 trade-in, $700 acq fee, 55% residual, money factor 0.00125, 8% tax, 36-month term.',
+        steps: [
+          'Residual value: $45,000 × 55% = $24,750.',
+          'Adjusted cap cost: $43,000 − $3,000 + $700 = $40,700.',
+          'Monthly depreciation: ($40,700 − $24,750) / 36 = $443.06.',
+          'Monthly finance charge: ($40,700 + $24,750) × 0.00125 = $81.81.',
+          'Pre-tax monthly: $443.06 + $81.81 = $524.87.',
+          'After-tax monthly: $524.87 × 1.08 = $566.86.',
+          'Effective APR: 0.00125 × 2,400 = 3.00%.',
+        ],
+        result: '$566.86/month (incl. 8% tax) | 3.00% APR | $24,750 buyout at lease end',
+      },
+      {
+        title: 'Comparing money factor markup by dealer',
+        scenario: 'Lender\'s buy rate money factor is 0.00100 (2.4% APR). Dealer marks it up to 0.00175 (4.2% APR). Same SUV as above, $43,000 cap cost, no down, no trade-in.',
+        steps: [
+          'At 0.00100: Finance charge = ($43,700 + $24,750) × 0.00100 = $68.45/mo.',
+          'At 0.00175: Finance charge = ($43,700 + $24,750) × 0.00175 = $119.79/mo.',
+          'Difference: $119.79 − $68.45 = $51.34/month more from dealer markup.',
+          'Over 36 months: $51.34 × 36 = $1,848.24 in extra finance charges.',
+          'Always ask the dealer for the "buy rate" money factor and compare to manufacturer published rates.',
+        ],
+        result: '$1,848 in extra cost from a 0.00075 money factor markup — always negotiate the money factor',
+      },
+    ],
+    useCases: [
+      '✓ Calculating exact monthly lease payments before visiting a dealership — preventing payment-focus negotiation tactics',
+      '✓ Converting a dealer-quoted money factor to APR to understand the true finance cost',
+      '✓ Comparing total lease cost vs. purchase cost for the same vehicle over the same period',
+      '✓ Evaluating the impact of different residual percentages across lenders and model years',
+      '✓ Determining optimal down payment amount on a lease given risk and cash flow preferences',
+      '✓ Identifying money factor markups by dealers and quantifying their multi-year cost',
+    ],
+    commonPitfalls: [
+      '⚠ Negotiating only the monthly payment — the cap cost (vehicle price) and money factor are equally important and both negotiable.',
+      '⚠ Not asking for the money factor — dealers are not required to disclose it unless asked. Always verify it against the manufacturer\'s published buy rate.',
+      '⚠ Putting too much money down on a lease — if the car is totalled, you lose your down payment (insurance pays the lender, not you).',
+      '⚠ Ignoring mileage limits — excess mileage charges ($0.15–$0.30/mile) can cost thousands at lease end if you drive more than the contract allows.',
+      '⚠ Conflating residual percentage with depreciation — a high residual (e.g. 60%) means lower payments, not that the car won\'t lose value.',
+      '⚠ Forgetting acquisition fee — this lender fee ($400–$900) is typically added to the cap cost and financed, increasing your monthly payment.',
+    ],
+    glossary: [
+      { term: 'Money Factor (MF)', definition: 'The lease equivalent of an interest rate, expressed as a small decimal. Multiply by 2,400 to convert to approximate APR.' },
+      { term: 'Residual Value', definition: 'The projected market value of the vehicle at lease end, set by the lessor as a percentage of MSRP. Determines the buyout price and monthly depreciation cost.' },
+      { term: 'Cap Cost (Capitalised Cost)', definition: 'The agreed-upon price of the vehicle being leased — equivalent to the purchase price in a sale. Negotiating a lower cap cost directly reduces monthly payments.' },
+      { term: 'Cap Cost Reduction', definition: 'Any upfront payment (down payment, trade-in credit, or rebate) that reduces the capitalised cost and thus the monthly depreciation charge.' },
+      { term: 'Acquisition Fee', definition: 'A lender fee ($400–$900) charged by the captive finance company to initiate the lease. Set by the finance arm, not the dealer, and typically non-negotiable.' },
+      { term: 'Depreciation Charge', definition: 'The monthly portion of your lease payment that covers the vehicle\'s value loss: (Adj. Cap Cost − Residual) / Term.' },
+      { term: 'Finance Charge', definition: 'The monthly interest component: (Adj. Cap Cost + Residual) × Money Factor. This is the cost of the money used to finance the vehicle during the lease.' },
+      { term: 'Disposition Fee', definition: 'A fee charged at lease end if you return the vehicle and do not buy it or lease/buy another from the same brand. Typically $300–$500.' },
+    ],
+    sources: [
+      { title: 'Auto Leases', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/consumer-tools/auto-loans/', year: 2024 },
+      { title: 'Keys to Vehicle Leasing', publisher: 'Federal Reserve (FRB)', url: 'https://www.federalreserve.gov/pubs/leasing/', year: 2023 },
+      { title: 'Consumer Leasing Act — Regulation M', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/rules-policy/regulations/213/', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Auto Finance Team',
+      credentials: 'Consumer Leasing Act / Regulation M compliance review',
+      description: 'Auto lease calculations verified against CFPB Regulation M disclosure requirements and standard captive-finance lease structures.',
+    },
+  },
 };
