@@ -882,7 +882,10 @@ export default function ArticlesPage() {
     setOpportunities([]);
     setDiscoveryError(null);
     try {
-      const res = await fetchAdmin('/api/admin/articles/discover', { signal: controller.signal });
+      const res = await fetchAdmin('/api/admin/articles/discover', {
+        signal: controller.signal,
+        cache: 'no-store',
+      });
       if (controller.signal.aborted) return;
       const data = await res.json() as { opportunities?: { title: string }[]; error?: string };
       if (!controller.signal.aborted) {

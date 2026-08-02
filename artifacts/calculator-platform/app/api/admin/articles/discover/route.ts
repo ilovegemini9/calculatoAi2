@@ -21,6 +21,11 @@ import { verifySession } from '@/lib/session';
 import { getAiProviderKey, getAiSettings, getProviderModels, getSerpApiKey } from '@/lib/ai';
 import { CALCULATORS } from '@/config/calculators';
 
+// Force dynamic rendering — never statically cache this route.
+// Each refresh must hit the live external signal fetchers and
+// the AI synthesis so users always see fresh, unique opportunities.
+export const dynamic = 'force-dynamic';
+
 // ─── Live signal fetchers ─────────────────────────────────────────────────────
 
 /**
