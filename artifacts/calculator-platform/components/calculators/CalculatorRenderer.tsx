@@ -22,6 +22,10 @@ import { DownPaymentCalculator } from './DownPaymentCalculator';
 import { RefinanceCalculator } from './RefinanceCalculator';
 import { MortgagePayoffCalculator } from './MortgagePayoffCalculator';
 import { MortgageUkCalculator } from './MortgageUkCalculator';
+import { CanadianMortgageCalculator } from './CanadianMortgageCalculator';
+import { PersonalLoanCalculator } from './PersonalLoanCalculator';
+import { AutoLoanCalculator } from './AutoLoanCalculator';
+import { AutoLeaseCalculator } from './AutoLeaseCalculator';
 
 interface Props {
   slug: string;
@@ -51,6 +55,10 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'refinance':            return <RefinanceCalculator />;
     case 'mortgage-payoff':      return <MortgagePayoffCalculator />;
     case 'mortgage-uk':          return <MortgageUkCalculator />;
+    case 'canadian-mortgage':    return <CanadianMortgageCalculator />;
+    case 'personal-loan':        return <PersonalLoanCalculator />;
+    case 'auto-loan':            return <AutoLoanCalculator />;
+    case 'auto-lease':           return <AutoLeaseCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }

@@ -229,6 +229,46 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['mortgage calculator uk', 'uk mortgage calculator', 'stamp duty calculator', 'sdlt calculator', 'uk home loan', 'first time buyer calculator uk', 'buy to let mortgage calculator'],
     icon: '🇬🇧',
   },
+  {
+    slug: 'canadian-mortgage',
+    name: 'Canadian Mortgage Calculator',
+    shortName: 'Canadian Mortgage',
+    category: 'financial',
+    description:
+      'Canadian mortgage calculator with semi-annual compounding (Interest Act), CMHC mortgage insurance, monthly and accelerated bi-weekly payment options.',
+    keywords: ['canadian mortgage calculator', 'canada mortgage calculator', 'cmhc calculator', 'canadian home loan', 'semi-annual compounding mortgage', 'canadian amortization', 'bi-weekly mortgage canada'],
+    icon: '🇨🇦',
+  },
+  {
+    slug: 'personal-loan',
+    name: 'Personal Loan Calculator',
+    shortName: 'Personal Loan',
+    category: 'financial',
+    description:
+      'Calculate monthly payments, total interest, and true APR for any personal loan. Supports origination fees to show the real cost of borrowing.',
+    keywords: ['personal loan calculator', 'personal loan payment calculator', 'loan apr calculator', 'origination fee calculator', 'unsecured loan calculator', 'personal loan interest'],
+    icon: '💳',
+  },
+  {
+    slug: 'auto-loan',
+    name: 'Auto Loan Calculator',
+    shortName: 'Auto Loan',
+    category: 'financial',
+    description:
+      'Calculate monthly car loan payments including sales tax, trade-in value, dealer fees, and down payment. See the full amortization schedule.',
+    keywords: ['auto loan calculator', 'car loan calculator', 'car payment calculator', 'vehicle loan calculator', 'auto loan payment', 'car financing calculator'],
+    icon: '🚗',
+  },
+  {
+    slug: 'auto-lease',
+    name: 'Auto Lease Calculator',
+    shortName: 'Auto Lease',
+    category: 'financial',
+    description:
+      'Calculate monthly car lease payments using money factor, residual value, and cap cost. Understand depreciation, finance charges, and total lease cost.',
+    keywords: ['auto lease calculator', 'car lease calculator', 'lease payment calculator', 'money factor calculator', 'residual value calculator', 'cap cost calculator', 'lease vs buy calculator'],
+    icon: '🔑',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
