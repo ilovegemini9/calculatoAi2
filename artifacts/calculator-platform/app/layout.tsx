@@ -63,9 +63,9 @@ export async function generateMetadata(): Promise<Metadata> {
       types: seo.rss.enabled ? { 'application/rss+xml': `${seo.canonicalUrl || siteConfig.url}/rss.xml` } : undefined,
     },
     verification: {
-      google: verification?.google || 'BLUYkfsXdAyXvsmpOT3gEjRUyCAsv5H94dV5P0IxW0E',
-      yandex: verification?.yandex || undefined,
-      me: verification?.bing || undefined,
+      google: verification?.googleSearchConsole?.verificationCode || 'BLUYkfsXdAyXvsmpOT3gEjRUyCAsv5H94dV5P0IxW0E',
+      yandex: verification?.yandex?.verificationCode || undefined,
+      me: verification?.bing?.verificationCode || undefined,
     },
     icons: {
       icon: '/icon.svg',

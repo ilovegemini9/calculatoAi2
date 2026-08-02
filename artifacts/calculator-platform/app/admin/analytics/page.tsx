@@ -141,29 +141,29 @@ export default function AnalyticsPage() {
         <StatCard
           label="Total Views (14d)"
           value={totalViews.toLocaleString()}
-          change="+14.2% vs prev period"
-          changeType="positive"
+          trend="up"
+          trendLabel="+14.2% vs prev period"
           icon={<TrendingUp className="w-4 h-4 text-blue-500" />}
         />
         <StatCard
           label="Unique Visitors"
           value={estimatedUsers.toLocaleString()}
-          change="+8.4% vs prev period"
-          changeType="positive"
+          trend="up"
+          trendLabel="+8.4% vs prev period"
           icon={<Users className="w-4 h-4 text-emerald-500" />}
         />
         <StatCard
           label="Active Calculators"
           value={data.calcStats.published}
-          change={`${data.calcStats.dynamicCount} custom tools`}
-          changeType="neutral"
+          trend="neutral"
+          trendLabel={`${data.calcStats.dynamicCount} custom tools`}
           icon={<Calculator className="w-4 h-4 text-amber-500" />}
         />
         <StatCard
           label="Published Articles"
           value={data.articleStats.published}
-          change={`${data.articleStats.total} total indexed`}
-          changeType="neutral"
+          trend="neutral"
+          trendLabel={`${data.articleStats.total} total indexed`}
           icon={<FileText className="w-4 h-4 text-purple-500" />}
         />
       </div>

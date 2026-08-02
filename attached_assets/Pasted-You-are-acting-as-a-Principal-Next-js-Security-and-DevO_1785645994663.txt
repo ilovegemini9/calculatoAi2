@@ -1,0 +1,53 @@
+You are acting as a Principal Next.js, Security, and DevOps Engineer. My Admin Panel deployed on Vercel with Neon PostgreSQL is experiencing severe systemic bugs caused by the difference between Replit (long-running process) and Vercel (Serverless functions).
+
+You must refactor the application to meet strict Vercel Serverless Production standards. Write clean, resilient, and production-ready code with NO placeholders.
+
+---
+
+### 1. PERSIST AI SETTINGS TO NEON DATABASE (Fix Reset on Refresh)
+- **Problem:** Saving API keys in `/admin/settings/ai` disappears after a browser refresh because data is kept in memory rather than persisted.
+- **Action:**
+  1. Refactor `/api/admin/settings/ai/route.ts` (GET & POST handlers).
+  2. Ensure `POST`/`PUT` writes the API key and models directly to the Neon PostgreSQL database (in a `settings` or `ai_config` table).
+  3. Ensure `GET` reads directly from Neon DB so the UI stays populated on page refresh.
+  4. Fallback to `process.env.OPENROUTER_API_KEY` or `process.env.OPENAI_API_KEY` if DB settings are empty.
+
+---
+
+### 2. AUTHENTICATION & COOKIE PERSISTENCE FOR VERCEL (Fix 401 Unauthorized)
+- **Problem:** Requests to `/api/admin/articles/analyze`, `/api/admin/articles/discovery`, and sub-routes return `401 Unauthorized` on Vercel because cookies lose scope across HTTPS subdomains.
+- **Action:**
+  1. Inspect `middleware.ts` and your auth cookie setup. Enforce production-ready cookie settings:
+     `httpOnly: true`, `secure: process.env.NODE_ENV === 'production'`, `sameSite: 'lax'`, `path: '/'`.
+  2. Ensure all client-side API requests inside `components/admin/smart-workflow.tsx` and admin components include `credentials: 'include'` and pass the Authorization Bearer header.
+  3. Ensure `middleware.ts` permits all nested `/admin/(.*)` and `/api/admin/(.*)` paths without stripping authorization tokens.
+
+---
+
+### 3. DYNAMIC ROUTE EXECUTION & DONT-CACHE RULES
+- **Problem:** Vercel statically caches API responses at build time, causing "Unable to load" or frozen data.
+- **Action:**
+  1. Add `export const dynamic = 'force-dynamic';` and `export const revalidate = 0;` to the top of EVERY route file under `app/api/admin/`.
+  2. Ensure all database fetch calls use `{ cache: 'no-store' }`.
+
+---
+
+### 4. ADMIN NAVIGATION & SIDEBAR UI REFACTOR
+- **Problem:** Sidebar menu links drop context or crash navigation.
+- **Action:**
+  1. Inspect `components/admin/sidebar.tsx` (or equivalent).
+  2. Update the Brand/Logo link to point to `/admin` instead of the public home page `/`.
+  3. Add an explicit "View External Site" button with `target="_blank"` for opening `/`.
+  4. Use Next.js `usePathname()` to dynamically highlight active sidebar links.
+
+---
+
+### 5. ERROR HANDLING & VERBOSE LOGGING
+- Wrap ALL route handlers in `try { ... } catch (error) { console.error('[API ERROR]:', error); return NextResponse.json({ success: false, error: String(error) }, { status: 500 }); }` so database and auth errors are printed clearly in Vercel/Replit logs.
+
+---
+
+### EXECUTION & DELIVERABLES:
+1. Provide the complete code for `middleware.ts`, `/api/admin/settings/ai/route.ts`, and `components/admin/sidebar.tsx`.
+2. Ensure `npm run build` or `bun run build` passes with zero TypeScript or Linting errors.
+3. Confirm that saving an API key writes to Neon DB and survives a page refresh.

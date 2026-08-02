@@ -98,6 +98,7 @@ export default async function DashboardPage() {
 
   const viewsByCalc: Record<string, number> = {};
   for (const entry of db.analytics) {
+    if (!entry.calculatorId) continue;
     viewsByCalc[entry.calculatorId] =
       (viewsByCalc[entry.calculatorId] ?? 0) + entry.views;
   }

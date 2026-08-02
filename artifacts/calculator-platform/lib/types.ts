@@ -243,9 +243,10 @@ export interface Redirect {
 
 export interface Analytic {
   id: string;
-  calculatorId: string;
+  calculatorId?: string;
   date: string;
   views: number;
+  uniqueVisitors?: number;
 }
 
 export interface SystemSettings {

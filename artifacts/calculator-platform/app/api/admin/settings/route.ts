@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextResponse } from 'next/server';
 import { getDb, saveDb } from '@/lib/db';
 import { verifySession } from '@/lib/session';
@@ -9,12 +12,17 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDb();
-  return NextResponse.json({
-    ...db.settings,
-    openrouterApiKey: undefined,
-    ai: getPublicAiSettings(getAiSettings(db.settings.ai, db.settings.openrouterApiKey)),
-  });
+  try {
+    const db = getDb();
+    return NextResponse.json({
+      ...db.settings,
+      openrouterApiKey: undefined,
+      ai: getPublicAiSettings(getAiSettings(db.settings.ai, db.settings.openrouterApiKey)),
+    });
+  } catch (err) {
+    console.error('[API ERROR - GET /api/admin/settings]:', err);
+    return NextResponse.json({ error: 'Failed to load settings' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {

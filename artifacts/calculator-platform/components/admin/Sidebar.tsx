@@ -16,6 +16,7 @@ import {
   Bot,
   X,
   LogOut,
+  ExternalLink,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
@@ -107,7 +108,16 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer */}
-        <div className="px-2 py-3 border-t shrink-0" style={{ borderColor: 'var(--border)' }}>
+        <div className="px-2 py-3 border-t shrink-0 space-y-0.5" style={{ borderColor: 'var(--border)' }}>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)] transition w-full"
+          >
+            <ExternalLink className="w-4 h-4 shrink-0" />
+            View External Site
+          </a>
           <Link
             href="/api/admin/logout"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-500/10 transition w-full"
