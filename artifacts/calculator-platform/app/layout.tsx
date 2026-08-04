@@ -24,8 +24,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = getSeoSettings((await getDb()).settings.seo);
-  const verification = getVerificationSettings((await getDb()).settings.verification);
+  const db = await getDb();
+  const seo = getSeoSettings(db.settings.seo);
+  const verification = getVerificationSettings(db.settings.verification);
   return {
     metadataBase: new URL(seo.canonicalUrl || siteConfig.url),
     title: {

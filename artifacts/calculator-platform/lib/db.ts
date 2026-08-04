@@ -15,9 +15,15 @@ const globalForDb = globalThis as typeof globalThis & {
 function getPool(): Pool {
   if (globalForDb.calculatorPlatformPool) return globalForDb.calculatorPlatformPool;
 
-  const connectionString = process.env.DATABASE_URL;
+  const connectionString =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.POSTGRES_URL_NON_POOLING;
+
   if (!connectionString) {
-    throw new Error('DATABASE_URL is required for durable admin storage.');
+    throw new Error('A Neon Postgres connection URL is required for durable admin storage.');
   }
 
   const pool = new Pool({
@@ -76,15 +82,14 @@ function generateInitialLogs(): AppSchema['logs'] {
 function createInitialDb(): AppSchema {
   const username = process.env.ADMIN_USERNAME || 'admin';
   const password = process.env.ADMIN_PASSWORD;
-  if (!password) throw new Error('ADMIN_PASSWORD is required to initialize the admin dashboard.');
 
   return {
-    adminUsers: [{
+    adminUsers: password ? [{
       id: 'admin-id',
       username,
       passwordHash: bcrypt.hashSync(password, 10),
       createdAt: new Date().toISOString(),
-    }],
+    }] : [],
     calculators: [],
     articles: [],
     articleVersions: [],
@@ -134,6 +139,19 @@ async function ensureState(): Promise<AppSchema> {
 }
 
 export async function getDb(): Promise<AppSchema> {
+  const hasDatabaseUrl = Boolean(
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.POSTGRES_URL_NON_POOLING,
+  );
+
+  if (!hasDatabaseUrl) {
+    console.warn('[db] Neon connection URL is unavailable; rendering read-only defaults.');
+    return createInitialDb();
+  }
+
   try {
     const result = await getPool().query<{ data: AppSchema }>('SELECT data FROM app_state WHERE id = $1', [1]);
     if (result.rows[0]) return applyDefaults(result.rows[0].data);
