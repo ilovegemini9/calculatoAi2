@@ -19,7 +19,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDb();
+  const db = await getDb();
   const seo = getSeoSettings(db.settings.seo);
   const indexing = [
     statusFor(seo.sitemap.enabled, seo.sitemap.includeCalculators || seo.sitemap.customUrls.length > 0, 'XML Sitemap'),
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 
   try {
     const payload = (await req.json()) as Partial<SeoSettings>;
-    const db = getDb();
+    const db = await getDb();
     const current = getSeoSettings(db.settings.seo);
     const next = getSeoSettings({
       ...current,
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     }
 
     db.settings.seo = next;
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ success: true, seo: next });
   } catch (error) {
     console.error('Save SEO settings error:', error);

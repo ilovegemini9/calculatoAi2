@@ -10,7 +10,7 @@ export async function GET() {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = getDb();
+    const db = await getDb();
     return NextResponse.json(db.backups || []);
   } catch (err) {
     console.error('[API ERROR - GET /api/admin/backups]:', err);
@@ -23,7 +23,7 @@ export async function POST() {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = getDb();
+    const db = await getDb();
     const rawJson = JSON.stringify(db);
     const sizeKB = Math.round(Buffer.byteLength(rawJson, 'utf8') / 1024);
 
@@ -36,7 +36,7 @@ export async function POST() {
     };
 
     db.backups = [backup, ...(db.backups || [])].slice(0, 30);
-    saveDb(db);
+    await saveDb(db);
 
     return NextResponse.json(backup);
   } catch (err) {

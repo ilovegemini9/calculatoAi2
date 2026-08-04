@@ -7,7 +7,7 @@ import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = getSeoSettings(getDb().settings.seo);
+  const seo = getSeoSettings((await getDb()).settings.seo);
   return {
     title: seo.metaTitle,
     description: seo.metaDescription,
@@ -52,11 +52,11 @@ const TRUST_ITEMS = [
   },
 ];
 
-export default function HomePage() {
+export default async function () {
   const categories = ['financial', 'fitness', 'math', 'lifestyle'] as const;
 
   // Retrieve dynamic calculators and merge
-  const db = getDb();
+  const db = await getDb();
   const dynamicCalcs = db.calculators.map((c) => ({
     slug: c.slug,
     name: c.name,

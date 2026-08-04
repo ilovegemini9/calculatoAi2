@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   try {
-    const db = getDb();
+    const db = await getDb();
     return NextResponse.json({
       ...db.settings,
       openrouterApiKey: undefined,
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
   try {
     const payload = await req.json();
-    const db = getDb();
+    const db = await getDb();
 
     db.settings = {
       ...db.settings,
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       }
     };
 
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({
       success: true,
       settings: {

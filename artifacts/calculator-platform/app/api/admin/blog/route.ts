@@ -12,7 +12,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDb();
+  const db = await getDb();
   return NextResponse.json(db.articles);
 }
 
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
   try {
     const payload = await req.json();
-    const db = getDb();
+    const db = await getDb();
 
     if (!payload.title || !payload.content) {
       return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       db.articles.push(articleData);
     }
 
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ success: true, article: articleData });
   } catch (err) {
     console.error('Blog route error:', err);
@@ -89,9 +89,9 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDb();
     db.articles = db.articles.filter((a) => a.id !== id);
-    saveDb(db);
+    await saveDb(db);
 
     return NextResponse.json({ success: true });
   } catch {

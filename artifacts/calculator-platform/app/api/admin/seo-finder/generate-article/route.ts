@@ -198,7 +198,7 @@ export async function POST(req: Request) {
 
     if (!keyword?.trim()) return NextResponse.json({ error: 'keyword is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const orKey =
       getAiProviderKey(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter') ||
       process.env.OPENROUTER_API_KEY ||
@@ -338,7 +338,7 @@ CRITICAL STYLE RULES:
     };
 
     // Save to DB
-    const freshDb = getDb();
+    const freshDb = await getDb();
     const artId = `seo_${Date.now()}`;
     const newArticle: Article = {
       id: artId,
@@ -365,7 +365,7 @@ CRITICAL STYLE RULES:
       content,
       createdAt: new Date().toISOString(),
     });
-    saveDb(freshDb);
+    await saveDb(freshDb);
 
     return NextResponse.json({
       success: true,

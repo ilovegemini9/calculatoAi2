@@ -10,18 +10,18 @@ import type { Article } from '@/lib/types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function resolveBase(): string {
+async function resolveBase(): Promise<string> {
   try {
-    const seo = getSeoSettings(getDb().settings.seo);
+    const seo = getSeoSettings((await getDb()).settings.seo);
     return seo.canonicalUrl?.replace(/\/$/, '') || siteConfig.url.replace(/\/$/, '');
   } catch {
     return siteConfig.url.replace(/\/$/, '');
   }
 }
 
-function getArticle(slug: string): Article | undefined {
+async function getArticle(slug: string): Promise<Article | undefined> {
   try {
-    const db = getDb();
+    const db = await getDb();
     return db.articles.find((a) => a.slug === slug);
   } catch {
     return undefined;
@@ -69,10 +69,10 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const article = await getArticle(slug);
   if (!article) return {};
 
-  const base = resolveBase();
+  const base = await resolveBase();
   const url = `${base}/blog/${slug}`;
   const canonicalUrl = article.seoData?.canonicalUrl?.trim()
     ? article.seoData.canonicalUrl
@@ -163,7 +163,7 @@ function buildFaqJsonLd(article: Article): object | null {
 
 export default async function BlogArticlePage({ params }: Props) {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const article = await getArticle(slug);
 
   if (!article) notFound();
 
@@ -172,7 +172,7 @@ export default async function BlogArticlePage({ params }: Props) {
     notFound();
   }
 
-  const base = resolveBase();
+  const base = await resolveBase();
   const toc = extractToc(article.content);
   const bodyHtml = stripScripts(stripToc(article.content));
 

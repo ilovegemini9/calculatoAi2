@@ -417,7 +417,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'keyword is required' }, { status: 400 });
     if (!rawSlug?.trim()) return NextResponse.json({ error: 'slug is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
 
     // Resolve AI key
     const orKey =
@@ -615,7 +615,7 @@ RULES:
       .map((c) => c.slug);
 
     // Save to DB as draft
-    const freshDb = getDb();
+    const freshDb = await getDb();
     const artId = `art_${Date.now()}`;
     const newArticle: Article = {
       id: artId,
@@ -666,7 +666,7 @@ RULES:
       content,
       createdAt: new Date().toISOString(),
     });
-    saveDb(freshDb);
+    await saveDb(freshDb);
 
     return NextResponse.json({
       success: true,

@@ -18,6 +18,7 @@
 
 import { NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
+import { getDb } from '@/lib/db';
 import { getAiProviderKey, getAiSettings, getProviderModels, getSerpApiKey } from '@/lib/ai';
 import { CALCULATORS } from '@/config/calculators';
 
@@ -232,7 +233,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = (await import('@/lib/db')).getDb();
+    const db = await getDb();
 
     // Always prefer PostgreSQL-persisted AI settings over the JSON file so
     // a key saved via the Settings UI is visible to the discovery route even

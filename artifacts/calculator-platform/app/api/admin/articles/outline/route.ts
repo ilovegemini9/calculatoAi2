@@ -3,6 +3,7 @@ export const revalidate = 0;
 
 import { NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
+import { getDb } from '@/lib/db';
 import { getAiProviderKey, getAiSettings, getProviderModels } from '@/lib/ai';
 import type { ArticleAutoSeoData, ArticleOutlineSection, ArticleResearchSummary } from '@/lib/types';
 
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'title and keyword are required' }, { status: 400 });
     }
 
-    const db = (await import('@/lib/db')).getDb();
+    const db = await getDb();
     const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
     const apiKey = getAiProviderKey(aiSettings, 'openrouter') || process.env.OPENROUTER_API_KEY || '';
     if (!apiKey) {

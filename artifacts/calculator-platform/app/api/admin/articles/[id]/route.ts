@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const db = getDb();
+  const db = await getDb();
   const article = db.articles.find((a) => a.id === id);
   if (!article) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(article);
@@ -24,7 +24,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   try {
     const updates = (await req.json()) as Partial<Article>;
-    const db = getDb();
+    const db = await getDb();
     const idx = db.articles.findIndex((a) => a.id === id);
     if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
@@ -64,7 +64,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     };
 
     db.articles[idx] = updated;
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ success: true, article: updated });
   } catch (err: unknown) {
     console.error('[articles/:id PATCH]', err);
@@ -80,12 +80,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { id } = await params;
-  const db = getDb();
+  const db = await getDb();
   const idx = db.articles.findIndex((a) => a.id === id);
   if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   db.articles.splice(idx, 1);
   db.articleVersions = (db.articleVersions ?? []).filter((v) => v.articleId !== id);
-  saveDb(db);
+  await saveDb(db);
   return NextResponse.json({ success: true });
 }

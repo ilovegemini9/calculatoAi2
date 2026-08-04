@@ -1,8 +1,10 @@
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 
-export function GET() {
-  const seo = getSeoSettings(getDb().settings.seo);
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
+  const seo = getSeoSettings((await getDb()).settings.seo);
   if (!seo.llmsTxt.enabled) return new Response('llms.txt is disabled', { status: 404 });
 
   return new Response(seo.llmsTxt.content, {

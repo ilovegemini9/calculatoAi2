@@ -11,7 +11,7 @@ export async function GET() {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-  const db = getDb();
+  const db = await getDb();
   const calcs = db.calculators;
   const logs  = db.logs ?? [];
 

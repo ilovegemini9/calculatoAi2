@@ -16,7 +16,7 @@ export async function GET() {
   let dbError: string | null = null;
   try {
     const t0 = Date.now();
-    getDb();
+    await getDb();
     dbPingMs = Date.now() - t0;
   } catch (err) {
     dbStatus = 'error';

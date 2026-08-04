@@ -135,7 +135,7 @@ export async function POST(req: Request) {
     const { prompt } = await req.json();
     if (!prompt) return NextResponse.json({ error: 'Description prompt is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
     const orKey = getAiProviderKey(aiSettings, 'openrouter') || process.env.OPENROUTER_API_KEY || '';
     const openRouterModels = getProviderModels(aiSettings, 'openrouter', [

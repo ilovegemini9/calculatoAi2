@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     const keyword = body.keyword?.trim() ?? '';
     if (!keyword) return NextResponse.json({ error: 'keyword is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const serpKey = getSerpApiKey(db.settings);
     const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
     const orKey =

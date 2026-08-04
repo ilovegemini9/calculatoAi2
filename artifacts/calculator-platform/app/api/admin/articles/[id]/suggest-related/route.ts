@@ -258,7 +258,7 @@ export async function POST(_req: Request, { params }: Params) {
   const { id } = await params;
 
   try {
-    const db = getDb();
+    const db = await getDb();
     const article = db.articles.find((a) => a.id === id);
     if (!article) return NextResponse.json({ error: 'Article not found' }, { status: 404 });
 

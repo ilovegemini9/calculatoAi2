@@ -10,7 +10,7 @@ export async function GET() {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = getDb();
+    const db = await getDb();
     return NextResponse.json(db.redirects || []);
   } catch (err) {
     console.error('[API ERROR - GET /api/admin/redirects]:', err);
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'oldUrl and newUrl are required' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDb();
     const redirect = {
       id: Date.now().toString(),
       oldUrl,
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.redirects.push(redirect);
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json(redirect);
   } catch (err) {
     console.error('[API ERROR - POST /api/admin/redirects]:', err);
@@ -60,8 +60,8 @@ export async function DELETE(request: NextRequest) {
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
 
-  const db = getDb();
+  const db = await getDb();
   db.redirects = db.redirects.filter((r) => r.id !== id);
-  saveDb(db);
+  await saveDb(db);
   return NextResponse.json({ ok: true });
 }

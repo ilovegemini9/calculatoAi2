@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDb();
     const slug = payload.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     const existingIndex = db.calculators.findIndex((c) => c.slug === slug);
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
       db.calculators.push(calcData);
     }
 
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ success: true, calculator: calcData });
   } catch (err: unknown) {
     console.error('Save dynamic calculator error:', err);
@@ -90,7 +90,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const db = getDb();
+  const db = await getDb();
   return NextResponse.json(db.calculators);
 }
 
@@ -108,9 +108,9 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDb();
     db.calculators = db.calculators.filter((c) => c.slug !== slug);
-    saveDb(db);
+    await saveDb(db);
 
     return NextResponse.json({ success: true });
   } catch {

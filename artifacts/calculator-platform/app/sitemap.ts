@@ -4,13 +4,14 @@ import { CALCULATORS } from '@/config/calculators';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let db;
   let seo;
   try {
-    db = getDb();
+    db = await getDb();
     seo = getSeoSettings(db.settings.seo);
   } catch {
     // Return a minimal sitemap if the DB is unavailable (e.g. cold Vercel start)

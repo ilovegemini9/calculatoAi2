@@ -13,7 +13,7 @@ export async function PATCH(req: Request) {
     const { slug, enabled } = await req.json();
     if (!slug) return NextResponse.json({ error: 'slug is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const idx = db.calculators.findIndex((c) => c.slug === slug);
     if (idx === -1) return NextResponse.json({ error: 'Calculator not found' }, { status: 404 });
 
@@ -26,7 +26,7 @@ export async function PATCH(req: Request) {
     }
 
     db.calculators[idx].status = enabled ? 'active' : 'inactive';
-    saveDb(db);
+    await saveDb(db);
 
     return NextResponse.json({ success: true, status: db.calculators[idx].status });
   } catch (err: unknown) {

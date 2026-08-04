@@ -9,7 +9,7 @@ import type { AdsSettings } from '@/lib/types';
 
 export async function GET() {
   if (!(await verifySession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const db = getDb();
+  const db = await getDb();
   return NextResponse.json({ ads: getAdsSettings(db.settings.ads) });
 }
 
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   if (!(await verifySession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const payload = (await req.json()) as Partial<AdsSettings>;
-    const db = getDb();
+    const db = await getDb();
     const current = getAdsSettings(db.settings.ads);
     const next = getAdsSettings({
       ...current,
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     }
 
     db.settings.ads = next;
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ success: true, ads: next });
   } catch (error) {
     console.error('Save ads settings error:', error);
