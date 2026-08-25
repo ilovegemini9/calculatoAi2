@@ -322,6 +322,9 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'credit-utilization', name: 'Credit Utilization Calculator', shortName: 'Credit Utilization', category: 'financial', description: 'Calculate revolving balance as a percentage of available credit.', keywords: ['credit utilization calculator','credit card utilization ratio'], icon: '📊' },
   { slug: 'debt-snowball', name: 'Debt Snowball Calculator', shortName: 'Debt Snowball', category: 'financial', description: 'Order debts from smallest balance to largest for a payoff strategy estimate.', keywords: ['debt snowball calculator','snowball debt payoff'], icon: '❄️' },
   { slug: 'debt-avalanche', name: 'Debt Avalanche Calculator', shortName: 'Debt Avalanche', category: 'financial', description: 'Order debts from highest APR to lowest for a payoff strategy estimate.', keywords: ['debt avalanche calculator','avalanche debt payoff'], icon: '📉' },
+  { slug: 'amortization', name: 'Amortization Calculator', shortName: 'Amortization', category: 'financial', description: 'Calculate fixed loan payment, total interest, and total cost.', keywords: ['amortization calculator','loan amortization'], icon: '📅' },
+  { slug: 'bond', name: 'Bond Calculator', shortName: 'Bond', category: 'financial', description: 'Estimate a coupon bond price from face value, coupon rate, yield, and term.', keywords: ['bond calculator','bond price calculator'], icon: '📜' },
+  { slug: 'mutual-fund', name: 'Mutual Fund Calculator', shortName: 'Mutual Fund', category: 'financial', description: 'Project mutual-fund value with contributions, return, and expense ratio.', keywords: ['mutual fund calculator','fund growth calculator'], icon: '📈' },
   {
     slug: 'credit-card',
     name: 'Credit Card Calculator',

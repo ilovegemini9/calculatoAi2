@@ -29,6 +29,7 @@ import { AutoLeaseCalculator } from './AutoLeaseCalculator';
 import { BoatLoanCalculator } from './BoatLoanCalculator';
 import { PaymentCalculator, RepaymentCalculator, StudentLoanCalculator } from './LoanProductCalculator';
 import { CollegeCostCalculator } from './CollegeCostCalculator';
+import { AmortizationCalculatorAdvanced, BondCalculator, MutualFundCalculator } from './FinancialAdvancedCalculator';
 import { CreditUtilizationCalculator, DebtSnowballCalculator, DebtAvalancheCalculator } from './CreditAdvancedCalculator';
 import { CreditCardCalculator, CreditCardsPayoffCalculator, DebtPayoffCalculator, DebtConsolidationCalculator, DtiCalculator } from './DebtToolsCalculator';
 import { CashBackLowInterestCalculator, InterestCalculator, SimpleInterestCalculator, CompoundInterestCalculator, InterestRateCalculator } from './InterestToolsCalculator';
@@ -83,6 +84,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'repayment':            return <RepaymentCalculator />;
     case 'student-loan':         return <StudentLoanCalculator />;
     case 'college-cost':         return <CollegeCostCalculator />;
+    case 'amortization':         return <AmortizationCalculatorAdvanced />;
+    case 'bond':                 return <BondCalculator />;
+    case 'mutual-fund':          return <MutualFundCalculator />;
     case 'credit-utilization':     return <CreditUtilizationCalculator />;
     case 'debt-snowball':         return <DebtSnowballCalculator />;
     case 'debt-avalanche':        return <DebtAvalancheCalculator />;
