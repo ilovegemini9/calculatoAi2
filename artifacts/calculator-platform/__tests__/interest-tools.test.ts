@@ -21,4 +21,6 @@ assert.ok(choice.better === 'low-interest' || choice.better === 'cash-back');
 
 for (const value of [calculateSimpleInterest(-1, Number.NaN, Number.POSITIVE_INFINITY).total, calculateCompoundInterest(-1, Number.NaN, Number.NaN, 0, -1).total, calculateInterestRate(0, 100, 0, 0).rate]) assert.ok(Number.isFinite(value));
 assert.equal(calculateSimpleInterest(100, 0, 5).interest, 0);
+assert.equal(calculateCompoundInterest(1000, 0, 2, 12, 50).contributions, 1200);
+assert.equal(calculateCompoundInterest(1000, 0, 2, 12, 50).total, 2200);
 console.log('Interest tools tests passed');

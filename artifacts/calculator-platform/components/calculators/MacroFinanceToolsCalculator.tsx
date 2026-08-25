@@ -14,7 +14,7 @@ export function MacroFinanceToolsCalculator({ mode }: { mode: Mode }) {
   const result = useMemo(() => {
     if (mode === 'estate-tax') { const taxable = Math.max(a - b, 0); return { primary: taxable * r / 100, secondary: taxable, label: 'Estimated Estate Tax' }; }
     if (mode === 'finance') { const monthly = r / 100 / 12; const n = Math.max(t * 12, 0); const payment = monthly === 0 ? (n ? a / n : 0) : (n ? a * monthly / (1 - (1 + monthly) ** -n) : 0); return { primary: payment, secondary: payment * n - a, label: 'Monthly Payment' }; }
-    if (mode === 'pension') { const monthly = a * (1 + r / 100 / 12) ** (t * 12) + b * (((1 + r / 100 / 12) ** (t * 12) - 1) / (r / 100 / 12 || 1)); return { primary: monthly, secondary: monthly * 0.04 / 12, label: 'Projected Pension Fund' }; }
+    if (mode === 'pension') { const i = r / 100 / 12; const n = Math.max(t * 12, 0); const growth = (1 + i) ** n; const contributions = i === 0 ? b * n : b * ((growth - 1) / i); const fund = a * growth + contributions; return { primary: fund, secondary: fund * 0.04 / 12, label: 'Projected Pension Fund' }; }
     if (mode === 'social-security') { const capped = Math.min(a, b); return { primary: capped * r / 100 / 12, secondary: capped, label: 'Estimated Monthly Benefit' }; }
     return { primary: a * r, secondary: a * (r - 1), label: 'Converted Amount' };
   }, [mode, a, b, r, t]);
