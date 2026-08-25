@@ -21,13 +21,6 @@ function buildInstallmentResult(principal: number, financedAmount: number, termM
   }
   return { principal: cents(principal), financedAmount: cents(financedAmount), termMonths, monthlyPayment: cents(scheduledPayment), totalInterest: cents(totalInterest), totalCost: cents(financedAmount + totalInterest), amortization: rows };
 }
-function estimateMonthlyRate(principal: number, months: number, payment: number): number {
-  if (payment * months <= principal + 0.000001) return 0;
-  let low = 0; let high = 1;
-  for (let i = 0; i < 80; i += 1) { const mid = (low + high) / 2; const factor = Math.pow(1 + mid, months); const projected = principal * (mid * factor) / (factor - 1); if (projected > payment) high = mid; else low = mid; }
-  return (low + high) / 2;
-}
-
 export interface RepaymentInput { balance: number; annualRate: number; monthlyPayment: number }
 export interface RepaymentResult { balance: number; monthlyRate: number; monthlyPayment: number; payments: number; totalPayments: number; totalInterest: number; status: 'payable' | 'payment-too-low' | 'no-balance'; amortization: InstallmentRow[] }
 export function calculateRepayment(input: RepaymentInput): RepaymentResult {
