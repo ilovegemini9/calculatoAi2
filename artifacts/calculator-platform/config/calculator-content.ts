@@ -2469,4 +2469,49 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
     ],
     author: { name: 'CalculatorFree Debt Planning Review Team', credentials: 'Amortization and Payoff Review', description: 'Repayment arithmetic is reviewed against a fixed-rate declining-balance model; actual lender policies, fees, and rate changes may alter a payoff result.' },
   },
+
+  // ── Student Loan ──────────────────────────────────────────────────────────
+  'student-loan': {
+    howToSteps: [
+      'Enter the student loan principal and annual interest rate.',
+      'Choose the planned repayment term and enter any origination fee percentage.',
+      'Optionally add an extra monthly payment above the scheduled amount.',
+      'Review the monthly payment, total interest, payoff months, interest savings, and schedule snapshot.',
+    ],
+    faqs: [
+      { question: 'What does the origination fee do?', answer: 'The entered origination fee percentage is applied to the principal and added to the financed amount before the scheduled payment is calculated.' },
+      { question: 'How does an extra payment affect the result?', answer: 'The extra monthly payment is added to the scheduled payment in the monthly amortization loop. The dashboard shows the resulting payoff months and estimated interest saved versus the scheduled payment alone.' },
+      { question: 'Does this calculate federal income-driven repayment?', answer: 'No. This implementation models a fixed-rate amortizing balance. Income-driven plans, capitalization events, forgiveness, and servicer rules require separate terms.' },
+      { question: 'What if the interest rate is 0%?', answer: 'The fixed-rate engine uses the zero-interest branch and divides the financed amount across the selected term; extra payments can still shorten the payoff.' },
+    ],
+    formula: {
+      expression: 'Fee = Principal × Fee Rate | P = Principal + Fee | M = P × [r(1+r)^n] / [(1+r)^n − 1] | Payment = M + Extra',
+      variables: [
+        { symbol: 'P', definition: 'Financed student loan balance including origination fee' },
+        { symbol: 'r', definition: 'Monthly interest rate = annual rate ÷ 1,200' },
+        { symbol: 'n', definition: 'Scheduled payment periods = term years × 12' },
+        { symbol: 'M', definition: 'Scheduled monthly payment before any extra payment' },
+        { symbol: 'Extra', definition: 'Optional additional monthly amount used in payoff simulation' },
+      ],
+      notes: 'The payoff simulation caps the final payment at the remaining balance plus interest and stops at zero balance or a protective maximum period.',
+    },
+    examples: [
+      { title: 'Scheduled student loan plan', scenario: '$30,000 principal, 5.5% APR, 10-year term, 1% origination fee, and $0 extra.', steps: ['Origination fee = $30,000 × 1% = $300.', 'Financed balance P = $30,300.', 'Monthly rate r = 5.5% ÷ 1,200 and n = 120.', 'The fixed-rate payment is simulated across the schedule.'], result: 'The dashboard shows the scheduled monthly payment and the total cost of the fixed-rate plan.' },
+      { title: 'Using an extra monthly payment', scenario: 'The same loan with an additional $100 paid each month.', steps: ['The scheduled payment is calculated first.', 'The simulation adds $100 to each regular payment until the final period.', 'The balance reaches zero earlier than the scheduled term.', 'Interest saved is the scheduled-plan interest minus the accelerated-plan interest.'], result: 'The dashboard reports the shorter payoff time and estimated interest saved.' },
+    ],
+    useCases: ['✓ Compare standard terms before requesting a student-loan quote.', '✓ See the effect of an origination fee on the financed amount.', '✓ Test an extra-payment budget.', '✓ Compare total interest rather than looking only at monthly payment.', '✓ Review the balance trend in the amortization snapshot.'],
+    commonPitfalls: ['⚠ Assuming a fixed-rate result represents every federal or private loan plan.', '⚠ Forgetting that an origination fee can be withheld or financed differently by a lender.', '⚠ Entering a monthly rate instead of annual APR.', '⚠ Treating optional extra payments as guaranteed savings when the loan has prepayment rules.', '⚠ Ignoring deferment, capitalization, grants, and forgiveness provisions.'],
+    glossary: [
+      { term: 'Student Loan Principal', definition: 'The starting amount borrowed for education before the modeled origination fee.' },
+      { term: 'Origination Fee', definition: 'A percentage applied here to the principal and added to the financed balance.' },
+      { term: 'Scheduled Payment', definition: 'The fixed monthly payment calculated from the financed balance, rate, and term.' },
+      { term: 'Extra Payment', definition: 'An optional monthly amount added to the scheduled payment in the payoff simulation.' },
+      { term: 'Interest Saved', definition: 'The difference between interest under the scheduled payment and interest under the accelerated payment in this model.' },
+    ],
+    sources: [
+      { title: 'Student Loan Repayment Plans', publisher: 'Federal Student Aid', url: 'https://studentaid.gov/manage-loans/repayment/plans', year: 2024 },
+      { title: 'Paying for College', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/paying-for-college/', year: 2024 },
+    ],
+    author: { name: 'CalculatorFree Education Finance Review Team', credentials: 'Fixed-Rate Student Loan Review', description: 'The displayed estimate is checked against fixed-rate amortization arithmetic; official loan terms and repayment-plan rules should be confirmed with the servicer.' },
+  },
 };

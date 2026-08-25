@@ -299,6 +299,16 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['repayment calculator', 'debt repayment calculator', 'loan repayment calculator', 'payoff calculator', 'monthly repayment calculator'],
     icon: '🔁',
   },
+  {
+    slug: 'student-loan',
+    name: 'Student Loan Calculator',
+    shortName: 'Student Loan',
+    category: 'financial',
+    description:
+      'Estimate student loan payments, origination fees, total interest, payoff time, and savings from an extra monthly payment.',
+    keywords: ['student loan calculator', 'student loan payment calculator', 'college loan calculator', 'student debt calculator', 'student loan interest calculator'],
+    icon: '🎓',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

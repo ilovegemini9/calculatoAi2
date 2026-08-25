@@ -27,7 +27,7 @@ import { PersonalLoanCalculator } from './PersonalLoanCalculator';
 import { AutoLoanCalculator } from './AutoLoanCalculator';
 import { AutoLeaseCalculator } from './AutoLeaseCalculator';
 import { BoatLoanCalculator } from './BoatLoanCalculator';
-import { PaymentCalculator, RepaymentCalculator } from './LoanProductCalculator';
+import { PaymentCalculator, RepaymentCalculator, StudentLoanCalculator } from './LoanProductCalculator';
 
 interface Props {
   slug: string;
@@ -64,6 +64,7 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'boat-loan':            return <BoatLoanCalculator />;
     case 'payment':              return <PaymentCalculator />;
     case 'repayment':            return <RepaymentCalculator />;
+    case 'student-loan':         return <StudentLoanCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
