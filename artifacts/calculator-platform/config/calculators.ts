@@ -379,6 +379,11 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'annuity-payout', name: 'Annuity Payout Calculator', shortName: 'Annuity Payout', category: 'financial', description: 'Estimate a periodic payout from an annuity balance, rate, and term.', keywords: ['annuity payout calculator', 'annuity income calculator', 'annuity withdrawal calculator'], icon: '💰' },
   { slug: 'savings', name: 'Savings Calculator', shortName: 'Savings', category: 'financial', description: 'Project savings growth with starting balance, monthly contributions, rate, and time.', keywords: ['savings calculator', 'savings interest calculator', 'savings growth calculator'], icon: '🐖' },
   { slug: 'cd', name: 'CD Calculator', shortName: 'CD', category: 'financial', description: 'Estimate certificate of deposit growth from principal, rate, and term.', keywords: ['cd calculator', 'certificate of deposit calculator', 'cd interest calculator'], icon: '🏛️' },
+  { slug: 'income-tax', name: 'Income Tax Calculator', shortName: 'Income Tax', category: 'financial', description: 'Estimate income tax from amount and tax-rate assumption.', keywords: ['income tax calculator','income tax estimate'], icon: '🧾' },
+  { slug: 'salary', name: 'Salary Calculator', shortName: 'Salary', category: 'financial', description: 'Estimate salary after a tax-rate assumption.', keywords: ['salary calculator','salary after tax'], icon: '💼' },
+  { slug: 'take-home-paycheck', name: 'Take-Home-Paycheck Calculator', shortName: 'Take Home Paycheck', category: 'financial', description: 'Estimate take-home amount from gross pay and tax-rate assumption.', keywords: ['take home paycheck calculator','paycheck calculator'], icon: '💵' },
+  { slug: 'sales-tax', name: 'Sales Tax Calculator', shortName: 'Sales Tax', category: 'financial', description: 'Calculate sales tax and total purchase amount.', keywords: ['sales tax calculator','tax calculator'], icon: '🛒' },
+  { slug: 'marriage-tax', name: 'Marriage Tax Calculator', shortName: 'Marriage Tax', category: 'financial', description: 'Estimate combined tax from two incomes and a shared rate assumption.', keywords: ['marriage tax calculator','married tax calculator'], icon: '💍' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
