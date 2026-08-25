@@ -38,6 +38,7 @@ import { InflationCalculator, DepreciationCalculator, AverageReturnCalculator, M
 import { PercentOffCalculator, BusinessLoanCalculator, LeaseCalculator, BudgetCalculator, IrrCalculator } from './CommercialToolsCalculator';
 import { RoiCalculator, AprCalculator, PaybackPeriodCalculator, PresentValueCalculator, FutureValueCalculator } from './ValuationToolsCalculator';
 import { EstateTaxCalculator, FinanceCalculator, PensionCalculator, SocialSecurityCalculator, CurrencyCalculator } from './MacroFinanceToolsCalculator';
+import { CommissionCalculator, VatCalculator, AnorexicBmiCalculator } from './HealthSalesToolsCalculator';
 
 interface Props {
   slug: string;
@@ -121,6 +122,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'pension':                 return <PensionCalculator />;
     case 'social-security':         return <SocialSecurityCalculator />;
     case 'currency':                return <CurrencyCalculator />;
+    case 'commission':              return <CommissionCalculator />;
+    case 'vat':                     return <VatCalculator />;
+    case 'anorexic-bmi':            return <AnorexicBmiCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }

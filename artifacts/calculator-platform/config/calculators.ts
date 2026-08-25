@@ -404,6 +404,9 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'pension', name: 'Pension Calculator', shortName: 'Pension', category: 'financial', description: 'Project a pension fund from current savings, contributions, return, and years.', keywords: ['pension calculator','pension fund calculator','retirement pension'], icon: '🧓' },
   { slug: 'social-security', name: 'Social Security Calculator', shortName: 'Social Security', category: 'financial', description: 'Estimate a monthly benefit from average earnings, a cap, and a replacement-rate assumption.', keywords: ['social security calculator','social security benefits calculator','retirement benefit'], icon: '🛡️' },
   { slug: 'currency', name: 'Currency Calculator', shortName: 'Currency', category: 'financial', description: 'Convert an amount using a user-supplied exchange rate.', keywords: ['currency calculator','currency converter','exchange rate calculator'], icon: '💱' },
+  { slug: 'commission', name: 'Commission Calculator', shortName: 'Commission', category: 'financial', description: 'Calculate sales commission and total earnings from a base amount and commission rate.', keywords: ['commission calculator','sales commission calculator','commission rate'], icon: '💼' },
+  { slug: 'vat', name: 'VAT Calculator', shortName: 'VAT', category: 'financial', description: 'Calculate VAT amount and total price from a base amount and VAT rate.', keywords: ['vat calculator','value added tax calculator','vat rate'], icon: '🧾' },
+  { slug: 'anorexic-bmi', name: 'Anorexic BMI Calculator', shortName: 'Anorexic BMI', category: 'fitness', description: 'Calculate BMI and flag values below the standard underweight threshold; it is not a diagnosis.', keywords: ['anorexic bmi calculator','low bmi calculator','bmi underweight'], icon: '⚖️' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
