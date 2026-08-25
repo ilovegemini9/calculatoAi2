@@ -328,6 +328,15 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['credit card calculator', 'credit card payment calculator', 'credit card interest calculator', 'minimum payment calculator', 'credit card payoff time'],
     icon: '💳',
   },
+  {
+    slug: 'credit-cards-payoff',
+    name: 'Credit Cards Payoff Calculator',
+    shortName: 'Credit Cards Payoff',
+    category: 'financial',
+    description: 'Combine three card balances and payment assumptions to estimate total interest and the longest payoff period.',
+    keywords: ['credit cards payoff calculator', 'multiple credit card payoff calculator', 'credit card debt payoff', 'pay off multiple credit cards'],
+    icon: '💳',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
