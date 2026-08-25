@@ -1,0 +1,5 @@
+export interface DebtLine { balance:number; apr:number; payment:number; limit?:number }
+const nn=(v:number)=>Number.isFinite(v)?Math.max(0,v):0;
+export function creditUtilization(balance:number,limit:number){const b=nn(balance),l=nn(limit);return{balance:b,limit:l,ratio:l>0?b/l*100:0,available:Math.max(0,l-b)}}
+function months(line:DebtLine){const b=nn(line.balance),p=nn(line.payment),r=nn(line.apr)/1200;if(!b)return 0;if(p<=0||(r>0&&p<=b*r))return Infinity;let rem=b,m=0;while(rem>.005&&m<1200){m++;const interest=rem*r;const paid=Math.min(p,rem+interest);rem=Math.max(0,rem-(paid-interest))}return rem>.005?Infinity:m}
+export function comparePayoffStrategy(lines:DebtLine[],strategy:'snowball'|'avalanche'){const ordered=[...lines].sort((a,b)=>strategy==='snowball'?nn(a.balance)-nn(b.balance):nn(b.apr)-nn(a.apr));const totalBalance=ordered.reduce((s,x)=>s+nn(x.balance),0);const totalPayment=ordered.reduce((s,x)=>s+nn(x.payment),0);return{strategy,order:ordered.map(x=>({balance:nn(x.balance),apr:nn(x.apr)})),totalBalance,totalPayment,individualMonths:ordered.map(months),estimatedMonths:Math.max(0,...ordered.map(months).filter(Number.isFinite))}}

@@ -319,6 +319,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['college cost calculator', 'college tuition calculator', 'future college cost calculator', 'education savings calculator', 'college savings calculator'],
     icon: '🏫',
   },
+  { slug: 'credit-utilization', name: 'Credit Utilization Calculator', shortName: 'Credit Utilization', category: 'financial', description: 'Calculate revolving balance as a percentage of available credit.', keywords: ['credit utilization calculator','credit card utilization ratio'], icon: '📊' },
+  { slug: 'debt-snowball', name: 'Debt Snowball Calculator', shortName: 'Debt Snowball', category: 'financial', description: 'Order debts from smallest balance to largest for a payoff strategy estimate.', keywords: ['debt snowball calculator','snowball debt payoff'], icon: '❄️' },
+  { slug: 'debt-avalanche', name: 'Debt Avalanche Calculator', shortName: 'Debt Avalanche', category: 'financial', description: 'Order debts from highest APR to lowest for a payoff strategy estimate.', keywords: ['debt avalanche calculator','avalanche debt payoff'], icon: '📉' },
   {
     slug: 'credit-card',
     name: 'Credit Card Calculator',
