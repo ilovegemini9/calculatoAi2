@@ -480,6 +480,11 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'ovulation', name: 'Ovulation Calculator', shortName: 'Ovulation', category: 'fitness', description: 'Estimate ovulation cycle day from cycle length.', keywords: ['ovulation calculator','ovulation date calculator'], icon: '🗓️' },
   { slug: 'conception', name: 'Conception Calculator', shortName: 'Conception', category: 'fitness', description: 'Estimate a conception timing window from cycle inputs.', keywords: ['conception calculator','conception date'], icon: '🌱' },
   { slug: 'period', name: 'Period Calculator', shortName: 'Period', category: 'fitness', description: 'Estimate the next cycle day from cycle length.', keywords: ['period calculator','next period calculator','menstrual cycle calculator'], icon: '🩸' },
+  { slug: 'scientific-notation', name: 'Scientific Notation Calculator', shortName: 'Scientific Notation', category: 'math', description: 'Convert a number to normalized scientific notation with a coefficient and base-10 exponent.', keywords: ['scientific notation calculator','standard form calculator','exponent notation'], icon: '×10' },
+  { slug: 'big-number', name: 'Big Number Calculator', shortName: 'Big Number', category: 'math', description: 'Add arbitrarily large whole numbers without losing integer precision in the browser.', keywords: ['big number calculator','large number addition','arbitrary precision calculator'], icon: '∞' },
+  { slug: 'common-factor', name: 'Common Factor Calculator', shortName: 'Common Factor', category: 'math', description: 'List the positive integer factors shared by two whole numbers.', keywords: ['common factor calculator','common factors','shared factors'], icon: '∩' },
+  { slug: 'date', name: 'Date Calculator', shortName: 'Date', category: 'lifestyle', description: 'Add or subtract a whole number of calendar days from a chosen date.', keywords: ['date calculator','add days to date','days from date'], icon: '📅' },
+  { slug: 'time', name: 'Time Calculator', shortName: 'Time', category: 'lifestyle', description: 'Find the elapsed time in minutes between two clock times.', keywords: ['time calculator','time duration calculator','elapsed time'], icon: '⏱️' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
