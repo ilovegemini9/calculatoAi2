@@ -3,6 +3,7 @@
 import { PaceAdvancedCalculator, GfrAdvancedCalculator, BacAdvancedCalculator } from './ClinicalAdvancedCalculator';
 import { ScientificCoreCalculator, FractionCoreCalculator, StandardDeviationCalculator, RatioCoreCalculator, QuadraticFormulaCalculator } from './MathCoreCalculator';
 import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculator, RoundingCalculator } from './MathExtendedCalculator';
+import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryCalculator, HexCalculator, HalfLifeCalculator, SlopeCalculator } from './MathGeometryCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -61,6 +62,13 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'log':                  return <LogCalculator />;
     case 'percent-error':        return <PercentErrorCalculator />;
     case 'rounding':             return <RoundingCalculator />;
+    case 'triangle':             return <TriangleCalculator />;
+    case 'volume':               return <VolumeCalculator />;
+    case 'number-sequence':      return <NumberSequenceCalculator />;
+    case 'binary':               return <BinaryCalculator />;
+    case 'hex':                  return <HexCalculator />;
+    case 'half-life':            return <HalfLifeCalculator />;
+    case 'slope':                return <SlopeCalculator />;
     case 'scientific':           return <ScientificCoreCalculator />;
     case 'fraction':             return <FractionCoreCalculator />;
     case 'standard-deviation':   return <StandardDeviationCalculator />;

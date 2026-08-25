@@ -82,6 +82,13 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'log', name: 'Log Calculator', shortName: 'Log', category: 'math', description: 'Calculate a logarithm for a positive value and valid base.', keywords: ['log calculator','logarithm calculator'], icon: '㏒' },
   { slug: 'percent-error', name: 'Percent Error Calculator', shortName: 'Percent Error', category: 'math', description: 'Calculate absolute percent error against a theoretical value.', keywords: ['percent error calculator','percentage error'], icon: '%' },
   { slug: 'rounding', name: 'Rounding Calculator', shortName: 'Rounding', category: 'math', description: 'Round a value to a selected number of decimal places.', keywords: ['rounding calculator','round decimals'], icon: '≈' },
+  { slug: 'triangle', name: 'Triangle Calculator', shortName: 'Triangle', category: 'math', description: 'Calculate right-triangle area and hypotenuse.', keywords: ['triangle calculator'], icon: '∑' },
+  { slug: 'volume', name: 'Volume Calculator', shortName: 'Volume', category: 'math', description: 'Calculate rectangular-prism volume.', keywords: ['volume calculator'], icon: '∑' },
+  { slug: 'number-sequence', name: 'Number Sequence Calculator', shortName: 'Number Sequence', category: 'math', description: 'Generate an arithmetic sequence and sum.', keywords: ['number-sequence calculator'], icon: '∑' },
+  { slug: 'binary', name: 'Binary Calculator', shortName: 'Binary', category: 'math', description: 'Convert a non-negative integer to binary.', keywords: ['binary calculator'], icon: '∑' },
+  { slug: 'hex', name: 'Hex Calculator', shortName: 'Hex', category: 'math', description: 'Convert a non-negative integer to hexadecimal.', keywords: ['hex calculator'], icon: '∑' },
+  { slug: 'half-life', name: 'Half-Life Calculator', shortName: 'Half-Life', category: 'math', description: 'Calculate remaining quantity after radioactive-style decay.', keywords: ['half-life calculator'], icon: '∑' },
+  { slug: 'slope', name: 'Slope Calculator', shortName: 'Slope', category: 'math', description: 'Calculate slope and intercept from two points.', keywords: ['slope calculator'], icon: '∑' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',
