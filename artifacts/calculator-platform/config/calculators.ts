@@ -319,6 +319,15 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['college cost calculator', 'college tuition calculator', 'future college cost calculator', 'education savings calculator', 'college savings calculator'],
     icon: '🏫',
   },
+  {
+    slug: 'credit-card',
+    name: 'Credit Card Calculator',
+    shortName: 'Credit Card',
+    category: 'financial',
+    description: 'Estimate a credit-card minimum payment, payoff time, total payments, and interest from balance and APR.',
+    keywords: ['credit card calculator', 'credit card payment calculator', 'credit card interest calculator', 'minimum payment calculator', 'credit card payoff time'],
+    icon: '💳',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
