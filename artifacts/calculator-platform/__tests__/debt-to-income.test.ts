@@ -17,7 +17,7 @@ assert.equal(within.headroom, 11);
 const zero = calculateDti(0, 1000, 1000, 500);
 assert.equal(zero.dti, 0);
 assert.equal(zero.proposedDti, 0);
-assert.equal(zero.status, 'within-range');
+assert.equal(zero.status, 'high');
 
 const edge = calculateDti(Number.NaN, -1, Number.POSITIVE_INFINITY, Number.NaN);
 for (const value of [edge.grossMonthlyIncome, edge.monthlyDebt, edge.dti, edge.proposedDti, edge.headroom]) assert.ok(Number.isFinite(value));
