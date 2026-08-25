@@ -515,6 +515,8 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'molarity', name: 'Molarity Calculator', shortName: 'Molarity', category: 'math', description: 'Calculate solution molarity from moles of solute and final volume in liters.', keywords: ['molarity calculator','molar concentration calculator','moles per liter'], icon: '⚗️' },
   { slug: 'molecular-weight', name: 'Molecular Weight Calculator', shortName: 'Molecular Weight', category: 'math', description: 'Estimate molar mass for supported simple chemical formulas.', keywords: ['molecular weight calculator','molar mass calculator','chemical formula mass'], icon: '🧬' },
   { slug: 'roman-numeral-converter', name: 'Roman Numeral Converter', shortName: 'Roman Numeral', category: 'math', description: 'Convert supported integers to Roman numerals and decode Roman symbols.', keywords: ['roman numeral converter','number to roman numerals','roman numeral calculator'], icon: 'Ⅻ' },
+  { slug: 'golf-handicap', name: 'Golf Handicap Calculator', shortName: 'Golf Handicap', category: 'lifestyle', description: 'Calculate a one-round handicap differential from gross score, course rating, and slope rating.', keywords: ['golf handicap calculator','handicap differential calculator','golf score handicap'], icon: '⛳' },
+  { slug: 'tire-size', name: 'Tire Size Calculator', shortName: 'Tire Size', category: 'lifestyle', description: 'Calculate nominal tire sidewall, diameter, circumference, and revolutions per mile.', keywords: ['tire size calculator','tire diameter calculator','tire comparison calculator'], icon: '◉' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

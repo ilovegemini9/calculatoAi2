@@ -1,0 +1,3 @@
+function nonNegative(value:number){return Number.isFinite(value)?Math.max(0,value):0}
+export function golfHandicap(score:number,courseRating:number,slopeRating:number){const s=nonNegative(score),rating=nonNegative(courseRating),slope=nonNegative(slopeRating);return slope>0?(s-rating)*113/slope:0;}
+export function tireDimensions(widthMm:number,aspectPercent:number,rimInches:number){const width=nonNegative(widthMm),aspect=nonNegative(aspectPercent),rim=nonNegative(rimInches);if(width===0||aspect===0||rim===0)return{sidewallMm:0,diameterMm:0,circumferenceMm:0,revolutionsPerMile:0};const sidewall=width*aspect/100,diameter=2*sidewall+rim*25.4;return{sidewallMm:sidewall,diameterMm:diameter,circumferenceMm:diameter*Math.PI,revolutionsPerMile:1609344/(diameter*Math.PI)};}
