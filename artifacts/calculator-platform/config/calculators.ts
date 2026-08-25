@@ -346,6 +346,15 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['debt payoff calculator', 'debt payment calculator', 'payoff time calculator', 'debt interest calculator'],
     icon: '📉',
   },
+  {
+    slug: 'debt-consolidation',
+    name: 'Debt Consolidation Calculator',
+    shortName: 'Debt Consolidation',
+    category: 'financial',
+    description: 'Compare an existing debt payment and interest with a new fixed-rate consolidation payment, fees, and term.',
+    keywords: ['debt consolidation calculator', 'consolidation loan calculator', 'debt refinance calculator', 'debt consolidation savings'],
+    icon: '🔗',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

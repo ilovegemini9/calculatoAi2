@@ -29,7 +29,7 @@ import { AutoLeaseCalculator } from './AutoLeaseCalculator';
 import { BoatLoanCalculator } from './BoatLoanCalculator';
 import { PaymentCalculator, RepaymentCalculator, StudentLoanCalculator } from './LoanProductCalculator';
 import { CollegeCostCalculator } from './CollegeCostCalculator';
-import { CreditCardCalculator, CreditCardsPayoffCalculator, DebtPayoffCalculator } from './DebtToolsCalculator';
+import { CreditCardCalculator, CreditCardsPayoffCalculator, DebtPayoffCalculator, DebtConsolidationCalculator } from './DebtToolsCalculator';
 
 interface Props {
   slug: string;
@@ -71,6 +71,7 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'credit-card':           return <CreditCardCalculator />;
     case 'credit-cards-payoff':   return <CreditCardsPayoffCalculator />;
     case 'debt-payoff':           return <DebtPayoffCalculator />;
+    case 'debt-consolidation':    return <DebtConsolidationCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
