@@ -1,0 +1,4 @@
+function finite(value:number,fallback=0){return Number.isFinite(value)?value:fallback}
+export function windChill(tempF:number,windMph:number){const t=finite(tempF),v=Math.max(0,finite(windMph));if(t>50||v<3)return{value:t,applicable:false};return{value:35.74+0.6215*t-35.75*v**0.16+0.4275*t*v**0.16,applicable:true};}
+export function heatIndex(tempF:number,relativeHumidity:number){const t=finite(tempF),rh=Math.min(100,Math.max(0,finite(relativeHumidity)));if(t<80||rh<40)return{value:t,applicable:false};const value=-42.379+2.04901523*t+10.14333127*rh-0.22475541*t*rh-0.00683783*t*t-0.05481717*rh*rh+0.00122874*t*t*rh+0.00085282*t*rh*rh-0.00000199*t*t*rh*rh;return{value,applicable:true};}
+export function dewPoint(tempC:number,relativeHumidity:number){const t=finite(tempC),rh=Math.min(100,Math.max(0.1,finite(relativeHumidity)));const gamma=Math.log(rh/100)+(17.625*t)/(243.04+t);return(243.04*gamma)/(17.625-gamma);}

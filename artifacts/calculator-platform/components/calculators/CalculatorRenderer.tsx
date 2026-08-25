@@ -19,6 +19,7 @@ import { MileageCalculator, DensityCalculator, MassCalculator, WeightCalculator,
 import { MolarityCalculator, MolecularWeightCalculator, RomanNumeralConverter } from './ChemistryToolsCalculator';
 import { GolfHandicapCalculator, TireSizeCalculator } from './SportsToolsCalculator';
 import { SleepCalculator, RoofingCalculator, TileCalculator, MulchCalculator, GravelCalculator } from './HomeToolsCalculator';
+import { WindChillCalculator, HeatIndexCalculator, DewPointCalculator } from './WeatherToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -119,6 +120,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'tile': return <TileCalculator />;
     case 'mulch': return <MulchCalculator />;
     case 'gravel': return <GravelCalculator />;
+    case 'wind-chill': return <WindChillCalculator />;
+    case 'heat-index': return <HeatIndexCalculator />;
+    case 'dew-point': return <DewPointCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;
