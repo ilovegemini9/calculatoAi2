@@ -39,6 +39,7 @@ import { PercentOffCalculator, BusinessLoanCalculator, LeaseCalculator, BudgetCa
 import { RoiCalculator, AprCalculator, PaybackPeriodCalculator, PresentValueCalculator, FutureValueCalculator } from './ValuationToolsCalculator';
 import { EstateTaxCalculator, FinanceCalculator, PensionCalculator, SocialSecurityCalculator, CurrencyCalculator } from './MacroFinanceToolsCalculator';
 import { CommissionCalculator, VatCalculator, AnorexicBmiCalculator } from './HealthSalesToolsCalculator';
+import { BmrCalculator, TdeeCalculator, MacroCalculator, ProteinCalculator, CarbohydrateCalculator } from './MetabolicToolsCalculator';
 
 interface Props {
   slug: string;
@@ -125,6 +126,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'commission':              return <CommissionCalculator />;
     case 'vat':                     return <VatCalculator />;
     case 'anorexic-bmi':            return <AnorexicBmiCalculator />;
+    case 'bmr':                     return <BmrCalculator />;
+    case 'tdee':                    return <TdeeCalculator />;
+    case 'macro':                   return <MacroCalculator />;
+    case 'protein':                 return <ProteinCalculator />;
+    case 'carbohydrate':            return <CarbohydrateCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
