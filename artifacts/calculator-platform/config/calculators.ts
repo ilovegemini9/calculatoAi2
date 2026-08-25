@@ -355,6 +355,15 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['debt consolidation calculator', 'consolidation loan calculator', 'debt refinance calculator', 'debt consolidation savings'],
     icon: '🔗',
   },
+  {
+    slug: 'debt-to-income',
+    name: 'Debt-to-Income Ratio Calculator',
+    shortName: 'Debt-to-Income Ratio',
+    category: 'financial',
+    description: 'Calculate current and proposed debt-to-income ratios from gross monthly income, debts, housing, and new debt.',
+    keywords: ['debt to income ratio calculator', 'DTI calculator', 'debt-to-income calculator', 'monthly debt ratio'],
+    icon: '⚖️',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
