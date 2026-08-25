@@ -40,3 +40,16 @@ export function timeDifference(start:string,end:string){
   const a=clockMinutes(start),b=clockMinutes(end);
   return Number.isFinite(a)&&Number.isFinite(b)?b-a:0;
 }
+
+export function hoursWorked(start:string,end:string,breakMinutes:number){
+  const elapsed=timeDifference(start,end);
+  const adjusted=elapsed-Math.max(0,finite(breakMinutes));
+  return Math.max(0,adjusted)/60;
+}
+
+export function gradeResult(earned:number,total:number){
+  const e=Math.max(0,finite(earned)),t=Math.max(0,finite(total));
+  const percentage=t>0?Math.min(100,e/t*100):0;
+  const letter=percentage>=90?'A':percentage>=80?'B':percentage>=70?'C':percentage>=60?'D':'F';
+  return{percentage,letter};
+}

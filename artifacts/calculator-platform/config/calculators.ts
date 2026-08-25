@@ -485,6 +485,8 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'common-factor', name: 'Common Factor Calculator', shortName: 'Common Factor', category: 'math', description: 'List the positive integer factors shared by two whole numbers.', keywords: ['common factor calculator','common factors','shared factors'], icon: '∩' },
   { slug: 'date', name: 'Date Calculator', shortName: 'Date', category: 'lifestyle', description: 'Add or subtract a whole number of calendar days from a chosen date.', keywords: ['date calculator','add days to date','days from date'], icon: '📅' },
   { slug: 'time', name: 'Time Calculator', shortName: 'Time', category: 'lifestyle', description: 'Find the elapsed time in minutes between two clock times.', keywords: ['time calculator','time duration calculator','elapsed time'], icon: '⏱️' },
+  { slug: 'hours', name: 'Hours Calculator', shortName: 'Hours', category: 'lifestyle', description: 'Estimate net paid hours from a same-day shift and unpaid break.', keywords: ['hours calculator','work hours calculator','hours worked'], icon: '⌚' },
+  { slug: 'grade', name: 'Grade Calculator', shortName: 'Grade', category: 'math', description: 'Convert points earned out of points possible into a percentage and simple letter band.', keywords: ['grade calculator','percentage grade calculator','letter grade calculator'], icon: '🎓' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
