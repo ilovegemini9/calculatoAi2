@@ -20,6 +20,7 @@ import { MolarityCalculator, MolecularWeightCalculator, RomanNumeralConverter } 
 import { GolfHandicapCalculator, TireSizeCalculator } from './SportsToolsCalculator';
 import { SleepCalculator, RoofingCalculator, TileCalculator, MulchCalculator, GravelCalculator } from './HomeToolsCalculator';
 import { WindChillCalculator, HeatIndexCalculator, DewPointCalculator } from './WeatherToolsCalculator';
+import { BandwidthCalculator, Base64EncodeDecodeCalculator, UrlEncodeDecodeCalculator, TimeDurationCalculator, DayOfTheWeekCalculator } from './WebToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -123,6 +124,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'wind-chill': return <WindChillCalculator />;
     case 'heat-index': return <HeatIndexCalculator />;
     case 'dew-point': return <DewPointCalculator />;
+    case 'bandwidth': return <BandwidthCalculator />;
+    case 'base64-encode-decode': return <Base64EncodeDecodeCalculator />;
+    case 'url-encode-decode': return <UrlEncodeDecodeCalculator />;
+    case 'time-duration': return <TimeDurationCalculator />;
+    case 'day-of-the-week': return <DayOfTheWeekCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;
