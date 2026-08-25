@@ -2381,4 +2381,48 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
       description: 'The client-side loan arithmetic and edge-case handling are reviewed against the standard fixed-rate amortization model; local tax and lending rules should be confirmed with a qualified provider.',
     },
   },
+
+  // ── Payment ───────────────────────────────────────────────────────────────
+  payment: {
+    howToSteps: [
+      'Enter the amount borrowed and any fees that will be added to the balance.',
+      'Enter the annual interest rate and the repayment term in years.',
+      'Review the live monthly payment, total interest, and total cost.',
+      'Use the amortization snapshot to see how payments reduce principal over time.',
+    ],
+    faqs: [
+      { question: 'How is the monthly payment calculated?', answer: 'The calculator applies the standard fixed-rate amortization formula using the financed amount, monthly interest rate, and number of monthly payments. At 0% interest, it divides the financed amount evenly across the term.' },
+      { question: 'Are fees included in the payment?', answer: 'Yes. Fees entered in the Fees Added field are added to the principal before the monthly payment is calculated.' },
+      { question: 'Why does a longer term reduce the payment?', answer: 'A longer term spreads repayment across more monthly periods. It can reduce the monthly amount while increasing the number of periods during which interest accrues.' },
+      { question: 'Does this show a lender quote?', answer: 'No. It is a planning estimate based only on the values entered. Confirm lender-specific fees, taxes, insurance, and terms with the provider.' },
+    ],
+    formula: {
+      expression: 'P = Principal + Fees | r = APR ÷ 1,200 | n = Years × 12 | M = P × [r(1+r)^n] / [(1+r)^n − 1]',
+      variables: [
+        { symbol: 'P', definition: 'Financed amount including the entered fees' },
+        { symbol: 'r', definition: 'Monthly interest rate as a decimal' },
+        { symbol: 'n', definition: 'Total number of monthly payment periods' },
+        { symbol: 'M', definition: 'Fixed monthly payment' },
+      ],
+      notes: 'The 0% branch uses M = P ÷ n. Inputs are constrained to finite non-negative values in the client-side calculation module.',
+    },
+    examples: [
+      { title: 'Fixed-rate payment estimate', scenario: '$25,000 principal, $0 fees, 6.5% APR, and a 5-year term.', steps: ['Financed amount P = $25,000.', 'Monthly rate r = 6.5% ÷ 1,200.', 'Payment periods n = 5 × 12 = 60.', 'Apply the fixed-rate payment equation and review the schedule.'], result: 'The dashboard shows the monthly payment, total interest, total cost, and payment-by-payment balance.' },
+      { title: 'Fees included in financing', scenario: '$25,000 principal, $500 fees, 0% APR, and a 2-year term.', steps: ['Financed amount P = $25,500.', 'Payment periods n = 24.', 'At 0% APR, monthly payment = $25,500 ÷ 24.', 'Total interest remains $0.'], result: '$1,062.50 per month before any separate charges not entered in the calculator.' },
+    ],
+    useCases: ['✓ Compare monthly payments for multiple terms.', '✓ See the cost impact of adding financed fees.', '✓ Estimate total interest before requesting quotes.', '✓ Review how principal and interest change across the schedule.', '✓ Test a zero-interest promotion without a divide-by-zero error.'],
+    commonPitfalls: ['⚠ Entering a monthly APR instead of an annual percentage.', '⚠ Ignoring fees that are financed by the lender.', '⚠ Comparing monthly payments without comparing total cost.', '⚠ Using negative amounts to represent credits; enter credits separately in a lender quote.', '⚠ Treating an estimate as a binding offer.'],
+    glossary: [
+      { term: 'Principal', definition: 'The amount borrowed before interest is applied.' },
+      { term: 'Financed Amount', definition: 'Principal plus fees added to the loan balance.' },
+      { term: 'APR', definition: 'Annual interest percentage converted to a monthly rate for the formula.' },
+      { term: 'Amortization', definition: 'The allocation of each payment between interest and principal.' },
+      { term: 'Total Cost', definition: 'Financed amount plus the calculated interest over the selected term.' },
+    ],
+    sources: [
+      { title: 'Loan Estimate and Closing Disclosure', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/ask-cfpb/what-is-a-loan-estimate-en-1995/', year: 2024 },
+      { title: 'Consumer Credit', publisher: 'Federal Trade Commission (FTC)', url: 'https://consumer.ftc.gov/topics/credit-and-loans', year: 2024 },
+    ],
+    author: { name: 'CalculatorFree Financial Review Team', credentials: 'Fixed-Rate Amortization Review', description: 'Payment arithmetic is reviewed against the standard fixed-rate amortization model; lender terms and local charges should be confirmed independently.' },
+  },
 };

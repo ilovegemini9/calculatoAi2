@@ -279,6 +279,16 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['boat loan calculator', 'boat payment calculator', 'marine loan calculator', 'boat financing calculator', 'boat loan payment', 'boat interest calculator'],
     icon: '⛵',
   },
+  {
+    slug: 'payment',
+    name: 'Payment Calculator',
+    shortName: 'Payment',
+    category: 'financial',
+    description:
+      'Calculate a fixed-rate loan payment, total interest, total cost, and amortization schedule from the amount, rate, term, and fees.',
+    keywords: ['payment calculator', 'loan payment calculator', 'monthly payment calculator', 'fixed payment calculator', 'finance payment calculator'],
+    icon: '🧾',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
