@@ -309,6 +309,16 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['student loan calculator', 'student loan payment calculator', 'college loan calculator', 'student debt calculator', 'student loan interest calculator'],
     icon: '🎓',
   },
+  {
+    slug: 'college-cost',
+    name: 'College Cost Calculator',
+    shortName: 'College Cost',
+    category: 'financial',
+    description:
+      'Project future annual and four-year college costs with inflation, then compare them with current savings and growing annual contributions.',
+    keywords: ['college cost calculator', 'college tuition calculator', 'future college cost calculator', 'education savings calculator', 'college savings calculator'],
+    icon: '🏫',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

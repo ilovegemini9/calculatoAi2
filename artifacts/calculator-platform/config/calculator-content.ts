@@ -2514,4 +2514,48 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
     ],
     author: { name: 'CalculatorFree Education Finance Review Team', credentials: 'Fixed-Rate Student Loan Review', description: 'The displayed estimate is checked against fixed-rate amortization arithmetic; official loan terms and repayment-plan rules should be confirmed with the servicer.' },
   },
+
+  // ── College Cost ──────────────────────────────────────────────────────────
+  'college-cost': {
+    howToSteps: [
+      'Enter the current annual college cost you want to project.',
+      'Set the annual cost inflation rate and the number of years until college.',
+      'Enter current savings, annual contributions, and expected contribution growth.',
+      'Compare the projected four-year cost with future savings and review the funding-gap alert.',
+    ],
+    faqs: [
+      { question: 'How is future annual cost calculated?', answer: 'The calculator compounds the current annual cost by the entered inflation rate for the number of years until college.' },
+      { question: 'Why is four-year cost four times the future annual cost?', answer: 'This model uses four projected years as a simple planning assumption. Actual attendance length, annual increases, housing, aid, and program costs can differ.' },
+      { question: 'How are savings projected?', answer: 'Current savings grow by the same entered inflation rate in this planning model, while each annual contribution grows by the entered contribution-growth rate and is added during each year before college.' },
+      { question: 'Does this include financial aid or scholarships?', answer: 'No. The result compares projected cost with the savings and contributions entered. Grants, scholarships, loans, and family cash flow should be modelled separately.' },
+    ],
+    formula: {
+      expression: 'Future Annual Cost = Current Cost × (1 + Inflation)^Years | Four-Year Cost = Future Annual Cost × 4 | Gap = max(0, Four-Year Cost − Future Savings)',
+      variables: [
+        { symbol: 'Current Cost', definition: 'Annual education cost in today’s dollars' },
+        { symbol: 'Inflation', definition: 'Annual cost-growth percentage entered by the user' },
+        { symbol: 'Years', definition: 'Whole years until the projected start date' },
+        { symbol: 'Future Savings', definition: 'Current savings grown over time plus annual contributions with their entered growth rate' },
+      ],
+      notes: 'This is a planning projection, not a tuition quote or investment forecast. It does not model investment returns, taxes, aid, loans, or changes in enrollment.',
+    },
+    examples: [
+      { title: 'Projecting a four-year cost', scenario: '$30,000 current annual cost, 4% inflation, and 10 years until college.', steps: ['Future annual cost = $30,000 × (1.04)^10.', 'Four-year projected cost = future annual cost × 4.', 'Current savings and annual contributions are projected separately.', 'The dashboard compares the two totals and shows coverage percentage.'], result: 'The result gives a transparent planning estimate based on the entered assumptions.' },
+      { title: 'Testing a savings plan', scenario: '$10,000 current savings, $6,000 annual contribution, and 3% contribution growth.', steps: ['Start with current savings.', 'Grow the existing balance each year using the modelled rate.', 'Add that year’s contribution after applying contribution growth.', 'Repeat until the selected college start year.'], result: 'Use the funding gap to identify how much of the projected cost is not covered by the modelled savings.' },
+    ],
+    useCases: ['✓ Estimate the effect of education-cost inflation.', '✓ Compare different start dates and savings horizons.', '✓ Test annual contribution levels.', '✓ See the difference between a one-year and four-year planning target.', '✓ Communicate assumptions clearly when discussing an education plan.'],
+    commonPitfalls: ['⚠ Treating an inflation assumption as a guaranteed tuition increase.', '⚠ Assuming four years is correct for every program.', '⚠ Omitting room, board, books, transport, or fees from the current cost input.', '⚠ Counting projected savings as guaranteed investment returns.', '⚠ Forgetting scholarships, grants, aid, and loans are not included automatically.'],
+    glossary: [
+      { term: 'Current Annual Cost', definition: 'The one-year cost used as the starting point for the projection.' },
+      { term: 'Cost Inflation', definition: 'The annual percentage used to compound the future annual education cost.' },
+      { term: 'Future Annual Cost', definition: 'The projected cost for one year at the selected future start date.' },
+      { term: 'Projected Savings', definition: 'Current savings plus modelled annual growth and contributions by the start date.' },
+      { term: 'Funding Gap', definition: 'The positive difference between projected four-year cost and projected savings; zero when savings cover the modelled cost.' },
+    ],
+    sources: [
+      { title: 'Saving for College', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/paying-for-college/looking-for-a-school/saving-for-college/', year: 2024 },
+      { title: 'College Preparation Checklist', publisher: 'Federal Student Aid', url: 'https://studentaid.gov/articles/prepare-for-college/', year: 2024 },
+    ],
+    author: { name: 'CalculatorFree Education Planning Review Team', credentials: 'Education Cost Projection Review', description: 'The projection logic is reviewed for transparent compounding and funding-gap arithmetic; institution-specific costs and aid should be confirmed with official sources.' },
+  },
 };
