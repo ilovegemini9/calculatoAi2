@@ -7,6 +7,7 @@ import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryC
 import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCalculator, StatisticsCalculator, PermutationCombinationCalculator } from './MathStatsCalculator';
 import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, RightTriangleCalculator, LeastCommonMultipleCalculator, GreatestCommonFactorCalculator, PrimeFactorizationCalculator } from './GeometryAdvancedCalculator';
 import { ZScoreCalculator, ConfidenceIntervalCalculator, MeanMedianModeRangeCalculator } from './StatisticsAdvancedCalculator';
+import { FactorCalculator, MatrixCalculator, BasicCalculator, LongDivisionCalculator, AverageCalculator, PValueCalculator } from './NumberToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -65,6 +66,12 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'log':                  return <LogCalculator />;
     case 'percent-error':        return <PercentErrorCalculator />;
     case 'rounding':             return <RoundingCalculator />;
+    case 'factor': return <FactorCalculator />;
+    case 'matrix': return <MatrixCalculator />;
+    case 'basic': return <BasicCalculator />;
+    case 'long-division': return <LongDivisionCalculator />;
+    case 'average': return <AverageCalculator />;
+    case 'p-value': return <PValueCalculator />;
     case 'circle': return <CircleCalculator />;
     case 'surface-area': return <SurfaceAreaCalculator />;
     case 'pythagorean-theorem': return <PythagoreanTheoremCalculator />;

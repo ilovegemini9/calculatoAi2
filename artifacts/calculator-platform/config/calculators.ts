@@ -105,6 +105,12 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'z-score', name: 'Z-score Calculator', shortName: 'Z-score', category: 'math', description: 'Calculate z-score from explicit statistical inputs.', keywords: ['z-score calculator'], icon: 'σ' },
   { slug: 'confidence-interval', name: 'Confidence Interval Calculator', shortName: 'Confidence Interval', category: 'math', description: 'Calculate confidence interval from explicit statistical inputs.', keywords: ['confidence-interval calculator'], icon: 'σ' },
   { slug: 'mean-median-mode-range', name: 'Mean, Median, Mode, Range Calculator', shortName: 'Mean, Median, Mode, Range', category: 'math', description: 'Calculate mean, median, mode, range from explicit statistical inputs.', keywords: ['mean-median-mode-range calculator'], icon: 'σ' },
+  { slug: 'factor', name: 'Factor Calculator', shortName: 'Factor', category: 'math', description: 'Calculate factor with explicit client-side inputs.', keywords: ['factor calculator'], icon: '∑' },
+  { slug: 'matrix', name: 'Matrix Calculator', shortName: 'Matrix', category: 'math', description: 'Calculate matrix with explicit client-side inputs.', keywords: ['matrix calculator'], icon: '∑' },
+  { slug: 'basic', name: 'Basic Calculator', shortName: 'Basic', category: 'math', description: 'Calculate basic with explicit client-side inputs.', keywords: ['basic calculator'], icon: '∑' },
+  { slug: 'long-division', name: 'Long Division Calculator', shortName: 'Long Division', category: 'math', description: 'Calculate long division with explicit client-side inputs.', keywords: ['long-division calculator'], icon: '∑' },
+  { slug: 'average', name: 'Average Calculator', shortName: 'Average', category: 'math', description: 'Calculate average with explicit client-side inputs.', keywords: ['average calculator'], icon: '∑' },
+  { slug: 'p-value', name: 'P-value Calculator', shortName: 'P-value', category: 'math', description: 'Calculate p-value with explicit client-side inputs.', keywords: ['p-value calculator'], icon: '∑' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',
