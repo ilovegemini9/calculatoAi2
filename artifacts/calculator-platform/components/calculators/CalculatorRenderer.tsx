@@ -41,6 +41,7 @@ import { EstateTaxCalculator, FinanceCalculator, PensionCalculator, SocialSecuri
 import { CommissionCalculator, VatCalculator, AnorexicBmiCalculator } from './HealthSalesToolsCalculator';
 import { BmrCalculator, TdeeCalculator, MacroCalculator, ProteinCalculator, CarbohydrateCalculator } from './MetabolicToolsCalculator';
 import { FatIntakeCalculator, IdealWeightCalculator, HealthyWeightCalculator, LeanBodyMassCalculator, CaloriesBurnedCalculator } from './BodyCompositionToolsCalculator';
+import { TargetHeartRateCalculator, OneRepMaxCalculator, WeightWatcherPointsCalculator, OverweightCalculator, BodyFatCalculator } from './HeartStrengthToolsCalculator';
 
 interface Props {
   slug: string;
@@ -137,6 +138,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'healthy-weight':          return <HealthyWeightCalculator />;
     case 'lean-body-mass':          return <LeanBodyMassCalculator />;
     case 'calories-burned':         return <CaloriesBurnedCalculator />;
+    case 'target-heart-rate':       return <TargetHeartRateCalculator />;
+    case 'one-rep-max':             return <OneRepMaxCalculator />;
+    case 'weight-watcher-points':   return <WeightWatcherPointsCalculator />;
+    case 'overweight':              return <OverweightCalculator />;
+    case 'body-fat':                return <BodyFatCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
