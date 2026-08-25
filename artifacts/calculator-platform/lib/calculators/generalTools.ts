@@ -1,0 +1,5 @@
+function nonNegative(value:number){return Number.isFinite(value)?Math.max(0,value):0}
+export function braSize(underbustInches:number,bustInches:number){const band=Math.max(28,Math.round(nonNegative(underbustInches)/2)*2);const difference=Math.max(0,nonNegative(bustInches)-band);const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';const cupIndex=Math.max(0,Math.min(letters.length-1,Math.round(difference)-1));return{band,cup:letters[cupIndex],difference};}
+export function loveScore(first:string,second:string){const text=(first.trim()+'|'+second.trim()).toLowerCase();let hash=0;for(const char of text)hash=(hash*31+char.charCodeAt(0))%101;return{score:hash,label:hash>=70?'Playful high match':hash>=40?'Playful middle match':'Playful low match'};}
+export function gdp(consumerSpending:number,investment:number,governmentSpending:number,exports:number,imports:number){return nonNegative(consumerSpending)+nonNegative(investment)+nonNegative(governmentSpending)+nonNegative(exports)-nonNegative(imports);}
+export function gasMileage(distance:number,fuelUsed:number){const d=nonNegative(distance),f=nonNegative(fuelUsed);return f>0?d/f:0;}
