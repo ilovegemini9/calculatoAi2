@@ -8,7 +8,7 @@ import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCa
 import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, RightTriangleCalculator, LeastCommonMultipleCalculator, GreatestCommonFactorCalculator, PrimeFactorizationCalculator } from './GeometryAdvancedCalculator';
 import { ZScoreCalculator, ConfidenceIntervalCalculator, MeanMedianModeRangeCalculator } from './StatisticsAdvancedCalculator';
 import { FactorCalculator, MatrixCalculator, BasicCalculator, LongDivisionCalculator, AverageCalculator, PValueCalculator } from './NumberToolsCalculator';
-import { ScientificNotationCalculator, BigNumberCalculator, CommonFactorCalculator, DateCalculator, TimeCalculator, HoursCalculator, GradeCalculator } from './MiscToolsCalculator';
+import { ScientificNotationCalculator, BigNumberCalculator, CommonFactorCalculator, DateCalculator, TimeCalculator, HoursCalculator, GradeCalculator, HeightCalculator, ConcreteCalculator } from './MiscToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -74,6 +74,8 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'time': return <TimeCalculator />;
     case 'hours': return <HoursCalculator />;
     case 'grade': return <GradeCalculator />;
+    case 'height': return <HeightCalculator />;
+    case 'concrete': return <ConcreteCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;

@@ -487,6 +487,8 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'time', name: 'Time Calculator', shortName: 'Time', category: 'lifestyle', description: 'Find the elapsed time in minutes between two clock times.', keywords: ['time calculator','time duration calculator','elapsed time'], icon: '⏱️' },
   { slug: 'hours', name: 'Hours Calculator', shortName: 'Hours', category: 'lifestyle', description: 'Estimate net paid hours from a same-day shift and unpaid break.', keywords: ['hours calculator','work hours calculator','hours worked'], icon: '⌚' },
   { slug: 'grade', name: 'Grade Calculator', shortName: 'Grade', category: 'math', description: 'Convert points earned out of points possible into a percentage and simple letter band.', keywords: ['grade calculator','percentage grade calculator','letter grade calculator'], icon: '🎓' },
+  { slug: 'height', name: 'Height Calculator', shortName: 'Height', category: 'lifestyle', description: 'Convert feet and inches into total inches, centimeters, and meters.', keywords: ['height calculator','feet to cm','feet and inches converter'], icon: '📏' },
+  { slug: 'concrete', name: 'Concrete Calculator', shortName: 'Concrete', category: 'lifestyle', description: 'Estimate rectangular concrete volume in cubic feet and cubic yards from dimensions.', keywords: ['concrete calculator','concrete volume calculator','cubic yards concrete'], icon: '🧱' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

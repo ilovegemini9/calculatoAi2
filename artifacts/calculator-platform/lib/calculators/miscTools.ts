@@ -53,3 +53,14 @@ export function gradeResult(earned:number,total:number){
   const letter=percentage>=90?'A':percentage>=80?'B':percentage>=70?'C':percentage>=60?'D':'F';
   return{percentage,letter};
 }
+
+export function heightFromFeetInches(feet:number,inches:number){
+  const totalInches=Math.max(0,finite(feet))*12+Math.max(0,finite(inches));
+  return{totalInches,centimeters:totalInches*2.54,meters:totalInches*0.0254};
+}
+
+export function concreteVolume(lengthFeet:number,widthFeet:number,depthInches:number){
+  const length=Math.max(0,finite(lengthFeet)),width=Math.max(0,finite(widthFeet)),depth=Math.max(0,finite(depthInches))/12;
+  const cubicFeet=length*width*depth;
+  return{cubicFeet,cubicYards:cubicFeet/27};
+}
