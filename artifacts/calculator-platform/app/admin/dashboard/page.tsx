@@ -57,7 +57,7 @@ const LOG_LEVEL_STYLE: Record<string, string> = {
 
 export default async function DashboardPage() {
   // ── Read DB ───────────────────────────────────────────────────────────────
-  const db = getDb();
+  const db = await getDb();
 
   // ── Calculator stats ──────────────────────────────────────────────────────
   const staticCalcCount   = CALCULATORS.length;
@@ -136,7 +136,7 @@ export default async function DashboardPage() {
     } else {
       // Fallback: time a filesystem read so the value is non-trivially 0
       const t0 = Date.now();
-      getDb();
+      await getDb();
       dbPingMs = Date.now() - t0;
       dbHealthy = false; // DB unavailable
     }

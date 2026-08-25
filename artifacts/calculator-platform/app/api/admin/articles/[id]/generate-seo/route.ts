@@ -191,7 +191,7 @@ export async function POST(req: Request, { params }: Params) {
   try {
     const body = (await req.json()) as { focusKeyword?: string };
 
-    const db = getDb();
+    const db = await getDb();
     const article = db.articles.find((a) => a.id === id);
     if (!article) return NextResponse.json({ error: 'Article not found' }, { status: 404 });
 

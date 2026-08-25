@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = getDb();
+    const db = await getDb();
 
     // Prefer PostgreSQL-persisted logs so events written in previous serverless
     // invocations (where /tmp is ephemeral) are still visible.
@@ -49,9 +49,9 @@ export async function DELETE() {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = getDb();
+    const db = await getDb();
     db.logs = [];
-    saveDb(db);
+    await saveDb(db);
     // Also clear from pg-settings
     const { setSetting } = await import('@/lib/pg-settings');
     await setSetting('platform_logs', []).catch(() => { /* ignore */ });

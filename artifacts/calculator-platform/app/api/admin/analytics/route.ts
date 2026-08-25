@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   try {
-  const db = getDb();
+  const db = await getDb();
 
   // ── Calculator stats — static + dynamic ───────────────────────────────────
   const staticCount   = CALCULATORS.length;

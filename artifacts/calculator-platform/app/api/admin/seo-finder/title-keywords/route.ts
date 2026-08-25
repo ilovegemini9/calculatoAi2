@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
     if (!title?.trim()) return NextResponse.json({ error: 'title is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const orKey =
       getAiProviderKey(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter') ||
       process.env.OPENROUTER_API_KEY ||

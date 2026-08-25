@@ -34,7 +34,7 @@ export async function GET() {
   if (!(await verifySession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = getDb();
+    const db = await getDb();
 
     // Prefer PostgreSQL-persisted settings when available
     const pgAi = await getSetting<typeof db.settings.ai>(PG_AI_KEY);
@@ -45,7 +45,7 @@ export async function GET() {
 
     const settings = resetUsagePeriodIfNeeded(getAiSettings(db.settings.ai, db.settings.openrouterApiKey));
     db.settings.ai = settings;
-    saveDb(db);
+    await saveDb(db);
 
     // Only write usage-counter updates back to PostgreSQL when we successfully
     // read from it first. Writing when pgAi is null would silently overwrite a
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       provider?: AiProvider;
       serpApiKey?: string;
     };
-    const db = getDb();
+    const db = await getDb();
     let settings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
 
     // Merge in PostgreSQL-persisted settings so we never overwrite with stale json
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
         usage: { ...settings.usage, cacheVersion: settings.usage.cacheVersion + 1 },
       };
       db.settings.ai = settings;
-      saveDb(db);
+      await saveDb(db);
       await setSetting(PG_AI_KEY, settings);
       return publicResponse(settings, {
         message: 'AI cache reset.',
@@ -127,7 +127,7 @@ export async function POST(req: Request) {
           serpApiKeyConfigured: Boolean(getSerpApiKey(db.settings)),
       });
       db.settings.ai = recordAiUsage(settings, result.tokens);
-      saveDb(db);
+      await saveDb(db);
       await setSetting(PG_AI_KEY, db.settings.ai);
       return publicResponse(db.settings.ai, {
         success: true,
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
     }
 
     db.settings.ai = settings;
-    saveDb(db);
+    await saveDb(db);
     await setSetting(PG_AI_KEY, settings);
     return publicResponse(settings, {
       success: true,

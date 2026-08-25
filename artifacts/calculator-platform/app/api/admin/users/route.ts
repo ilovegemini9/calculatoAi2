@@ -11,7 +11,7 @@ export async function GET() {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const db = getDb();
+    const db = await getDb();
     // Never return passwordHash
     const sanitized = db.adminUsers.map(({ id, username, createdAt }) => ({
       id,
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'username and password are required' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDb();
     const exists = db.adminUsers.find((u) => u.username === username);
     if (exists) {
       return NextResponse.json({ error: 'Username already exists' }, { status: 409 });
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.adminUsers.push(user);
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ id: user.id, username: user.username, createdAt: user.createdAt });
   } catch (err) {
     console.error('[API ERROR - POST /api/admin/users]:', err);
@@ -70,7 +70,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     // Protect the first admin account
     const target = db.adminUsers.find((u) => u.id === id);
     if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -79,7 +79,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     db.adminUsers = db.adminUsers.filter((u) => u.id !== id);
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[API ERROR - DELETE /api/admin/users]:', err);

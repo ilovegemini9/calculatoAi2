@@ -3,6 +3,7 @@ export const revalidate = 0;
 
 import { NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
+import { getDb } from '@/lib/db';
 import { getAiProviderKey, getAiSettings, getProviderModels, getSerpApiKey } from '@/lib/ai';
 import type { ArticleResearchSummary, ResearchKeywordChip } from '@/lib/types';
 
@@ -112,7 +113,7 @@ export async function POST(req: Request) {
     const title = body.title?.trim() ?? '';
     if (!title) return NextResponse.json({ error: 'title is required' }, { status: 400 });
 
-    const db = (await import('@/lib/db')).getDb();
+    const db = await getDb();
     const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
     const apiKey = getAiProviderKey(aiSettings, 'openrouter') || process.env.OPENROUTER_API_KEY || '';
     if (!apiKey) return NextResponse.json({ error: 'Live keyword data unavailable.' }, { status: 503 });

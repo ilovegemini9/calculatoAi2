@@ -9,7 +9,7 @@ import type { VerificationSettings } from '@/lib/types';
 
 export async function GET() {
   if (!(await verifySession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const db = getDb();
+  const db = await getDb();
   return NextResponse.json({ verification: getVerificationSettings(db.settings.verification) });
 }
 
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   if (!(await verifySession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const payload = (await req.json()) as Partial<VerificationSettings>;
-    const db = getDb();
+    const db = await getDb();
     const current = getVerificationSettings(db.settings.verification);
     const next = getVerificationSettings({
       ...current,
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       yandex: { ...current.yandex, ...(payload.yandex ?? {}) },
     });
     db.settings.verification = next;
-    saveDb(db);
+    await saveDb(db);
     return NextResponse.json({ success: true, verification: next });
   } catch (error) {
     console.error('Save verification settings error:', error);

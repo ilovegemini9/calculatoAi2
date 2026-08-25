@@ -3,12 +3,14 @@ import { CALCULATORS } from '@/config/calculators';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 
+export const dynamic = 'force-dynamic';
+
 function escapeXml(value: string) {
   return value.replace(/[<>&'"]/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[character] ?? character));
 }
 
-export function GET() {
-  const seo = getSeoSettings(getDb().settings.seo);
+export async function GET() {
+  const seo = getSeoSettings((await getDb()).settings.seo);
   if (!seo.rss.enabled) return new Response('RSS is disabled', { status: 404 });
   const baseUrl = seo.canonicalUrl || siteConfig.url;
   const now = new Date().toUTCString();

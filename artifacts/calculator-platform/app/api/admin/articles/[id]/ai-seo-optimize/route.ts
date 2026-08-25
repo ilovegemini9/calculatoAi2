@@ -396,7 +396,7 @@ export async function POST(_req: Request, { params }: Params) {
   const { id } = await params;
 
   try {
-    const db = getDb();
+    const db = await getDb();
     const article = db.articles.find((a) => a.id === id);
     if (!article) return NextResponse.json({ error: 'Article not found' }, { status: 404 });
 
@@ -486,7 +486,7 @@ export async function POST(_req: Request, { params }: Params) {
     // Save to DB
     const idx = db.articles.findIndex((a) => a.id === id);
     db.articles[idx] = { ...db.articles[idx], ...patch };
-    saveDb(db);
+    await saveDb(db);
 
     return NextResponse.json({
       success: true,

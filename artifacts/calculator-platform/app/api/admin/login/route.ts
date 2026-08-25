@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     // Check DB users (bcrypt-hashed) — only reached when env var auth didn't match
     if (!matches) {
-      const db = getDb();
+      const db = await getDb();
       const admin = db.adminUsers.find(
         (u) => u.username.toLowerCase() === username.toLowerCase(),
       );
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     setSessionOnResponse(loginResponse, finalUsername);
     try {
       const { logEvent } = await import('@/lib/db');
-      logEvent('INFO', `Admin user '${finalUsername}' logged in successfully.`, '/api/admin/login');
+      await logEvent('INFO', `Admin user '${finalUsername}' logged in successfully.`, '/api/admin/login');
     } catch { /* ignore */ }
     return loginResponse;
   } catch (err) {

@@ -72,7 +72,7 @@ export async function POST(req: Request) {
     const { query } = await req.json();
     if (!query?.trim()) return NextResponse.json({ error: 'query is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const orKey =
       getAiProviderKey(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter') ||
       process.env.OPENROUTER_API_KEY ||

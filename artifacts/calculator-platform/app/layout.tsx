@@ -24,8 +24,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = getSeoSettings(getDb().settings.seo);
-  const verification = getVerificationSettings(getDb().settings.verification);
+  const db = await getDb();
+  const seo = getSeoSettings(db.settings.seo);
+  const verification = getVerificationSettings(db.settings.verification);
   return {
     metadataBase: new URL(seo.canonicalUrl || siteConfig.url),
     title: {
@@ -85,8 +86,10 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const db = getDb();
+export const dynamic = 'force-dynamic';
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const db = await getDb();
   const seo = getSeoSettings(db.settings.seo);
   const ads = getAdsSettings(db.settings.ads);
   const verification = getVerificationSettings(db.settings.verification);

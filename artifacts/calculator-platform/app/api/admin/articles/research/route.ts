@@ -123,7 +123,7 @@ export async function POST(req: Request) {
     const { topic } = await req.json() as { topic?: string };
     if (!topic?.trim()) return NextResponse.json({ error: 'topic is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
 
     // Prefer PostgreSQL-persisted AI settings over the JSON file so an API key
     // saved via the Settings UI is visible here even when the JSON file is stale

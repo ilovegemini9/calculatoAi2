@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     const { niche } = await req.json();
     if (!niche?.trim()) return NextResponse.json({ error: 'niche is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const orKey =
       getAiProviderKey(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter') ||
       process.env.OPENROUTER_API_KEY ||

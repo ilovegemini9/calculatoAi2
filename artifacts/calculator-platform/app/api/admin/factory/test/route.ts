@@ -106,13 +106,13 @@ export async function POST(req: Request) {
     // If a slug is provided, persist test results to the DB
     if (slug) {
       try {
-        const db = getDb();
+        const db = await getDb();
         const idx = db.calculators.findIndex((c) => c.slug === slug);
         if (idx > -1) {
           db.calculators[idx].metadata.testStatus = allPassed ? 'passed' : 'failed';
           db.calculators[idx].metadata.lastTestRun = new Date().toISOString();
           db.calculators[idx].metadata.testResults = results;
-          saveDb(db);
+          await saveDb(db);
         }
       } catch {
         // Non-fatal — still return results

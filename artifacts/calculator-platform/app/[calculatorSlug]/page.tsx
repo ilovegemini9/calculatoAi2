@@ -38,7 +38,7 @@ async function getCalculatorData(calculatorSlug: string) {
   }
 
   try {
-    const db = getDb();
+    const db = await getDb();
     // Only serve active calculators — inactive ones require passing tests first
     const dynamicCalc = db.calculators.find((c) => c.slug === baseSlug && c.status === 'active');
     if (dynamicCalc) {
@@ -157,7 +157,7 @@ export default async function CalculatorPage({ params }: Props) {
   const baseSlug = toBaseSlug(calculatorSlug);
   const colors = CATEGORY_COLORS[calc.category] || { bg: 'bg-blue-500/10', text: 'text-blue-500' };
 
-  const db = getDb();
+  const db = await getDb();
   const ads = getAdsSettings(db.settings.ads);
   const allCalculatorsList: CalculatorMeta[] = [
     ...CALCULATORS,

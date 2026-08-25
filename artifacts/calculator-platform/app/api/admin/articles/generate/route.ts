@@ -241,7 +241,7 @@ export async function POST(req: Request) {
     if (!selectedTitle?.trim())
       return NextResponse.json({ error: 'selectedTitle is required' }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDb();
     const orKey =
       getAiProviderKey(getAiSettings(db.settings.ai, db.settings.openrouterApiKey), 'openrouter') ||
       process.env.OPENROUTER_API_KEY ||
@@ -427,7 +427,7 @@ CRITICAL STYLE RULES:
       )?.slug ?? '';
 
     // Save to DB as draft — NEVER auto-publish
-    const freshDb = getDb();
+    const freshDb = await getDb();
     const artId = `art_${Date.now()}`;
     const newArticle: Article = {
       id: artId,
@@ -476,7 +476,7 @@ CRITICAL STYLE RULES:
       content,
       createdAt: new Date().toISOString(),
     });
-    saveDb(freshDb);
+    await saveDb(freshDb);
 
     return NextResponse.json({
       success: true,

@@ -12,7 +12,7 @@ export async function GET() {
   if (!isAuth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-  const db = getDb();
+  const db = await getDb();
   const dynamicCalcs = db.calculators;
 
   // ── Static calculator audit ───────────────────────────────────────────────

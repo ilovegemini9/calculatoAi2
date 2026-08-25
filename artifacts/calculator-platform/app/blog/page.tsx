@@ -14,7 +14,7 @@ export const revalidate = 0;
 export async function generateMetadata(): Promise<Metadata> {
   let base = siteConfig.url;
   try {
-    const seo = getSeoSettings(getDb().settings.seo);
+    const seo = getSeoSettings((await getDb()).settings.seo);
     base = seo.canonicalUrl?.replace(/\/$/, '') || siteConfig.url;
   } catch { /* fallback */ }
 
@@ -65,12 +65,12 @@ function getExcerpt(article: Article): string {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function BlogIndexPage() {
+export default async function () {
   let articles: Article[] = [];
   let base = siteConfig.url;
 
   try {
-    const db = getDb();
+    const db = await getDb();
     const seo = getSeoSettings(db.settings.seo);
     base = seo.canonicalUrl?.replace(/\/$/, '') || siteConfig.url;
     articles = db.articles

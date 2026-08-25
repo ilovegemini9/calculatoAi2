@@ -3,6 +3,7 @@ export const revalidate = 0;
 
 import { NextResponse } from 'next/server';
 import { verifySession } from '@/lib/session';
+import { getDb } from '@/lib/db';
 import { getAiProviderKey, getAiSettings, getProviderModels, getSerpApiKey } from '@/lib/ai';
 import type { TopicSuggestion } from '@/lib/types';
 
@@ -100,7 +101,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'query must be at least 3 characters' }, { status: 400 });
     }
 
-    const db = (await import('@/lib/db')).getDb();
+    const db = await getDb();
     const aiSettings = getAiSettings(db.settings.ai, db.settings.openrouterApiKey);
     const orKey = getAiProviderKey(aiSettings, 'openrouter') || process.env.OPENROUTER_API_KEY || '';
     // orKey is optional here — free autocomplete works without it
