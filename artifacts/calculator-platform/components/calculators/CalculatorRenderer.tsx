@@ -6,6 +6,7 @@ import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculat
 import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryCalculator, HexCalculator, HalfLifeCalculator, SlopeCalculator } from './MathGeometryCalculator';
 import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCalculator, StatisticsCalculator, PermutationCombinationCalculator } from './MathStatsCalculator';
 import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, RightTriangleCalculator, LeastCommonMultipleCalculator, GreatestCommonFactorCalculator, PrimeFactorizationCalculator } from './GeometryAdvancedCalculator';
+import { ZScoreCalculator, ConfidenceIntervalCalculator, MeanMedianModeRangeCalculator } from './StatisticsAdvancedCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -71,6 +72,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'least-common-multiple': return <LeastCommonMultipleCalculator />;
     case 'greatest-common-factor': return <GreatestCommonFactorCalculator />;
     case 'prime-factorization': return <PrimeFactorizationCalculator />;
+    case 'z-score':               return <ZScoreCalculator />;
+    case 'confidence-interval':   return <ConfidenceIntervalCalculator />;
+    case 'mean-median-mode-range': return <MeanMedianModeRangeCalculator />;
     case 'area':                        return <AreaCalculator />;
     case 'distance':                    return <DistanceCalculator />;
     case 'sample-size':                 return <SampleSizeCalculator />;

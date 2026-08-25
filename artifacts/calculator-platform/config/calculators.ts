@@ -102,6 +102,9 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'least-common-multiple', name: 'Least Common Multiple Calculator', shortName: 'Least Common Multiple', category: 'math', description: 'Calculate least common multiple with guarded client-side formulas.', keywords: ['least-common-multiple calculator'], icon: '△' },
   { slug: 'greatest-common-factor', name: 'Greatest Common Factor Calculator', shortName: 'Greatest Common Factor', category: 'math', description: 'Calculate greatest common factor with guarded client-side formulas.', keywords: ['greatest-common-factor calculator'], icon: '△' },
   { slug: 'prime-factorization', name: 'Prime Factorization Calculator', shortName: 'Prime Factorization', category: 'math', description: 'Calculate prime factorization with guarded client-side formulas.', keywords: ['prime-factorization calculator'], icon: '△' },
+  { slug: 'z-score', name: 'Z-score Calculator', shortName: 'Z-score', category: 'math', description: 'Calculate z-score from explicit statistical inputs.', keywords: ['z-score calculator'], icon: 'σ' },
+  { slug: 'confidence-interval', name: 'Confidence Interval Calculator', shortName: 'Confidence Interval', category: 'math', description: 'Calculate confidence interval from explicit statistical inputs.', keywords: ['confidence-interval calculator'], icon: 'σ' },
+  { slug: 'mean-median-mode-range', name: 'Mean, Median, Mode, Range Calculator', shortName: 'Mean, Median, Mode, Range', category: 'math', description: 'Calculate mean, median, mode, range from explicit statistical inputs.', keywords: ['mean-median-mode-range calculator'], icon: 'σ' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',
