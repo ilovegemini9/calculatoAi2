@@ -11,6 +11,7 @@ import { FactorCalculator, MatrixCalculator, BasicCalculator, LongDivisionCalcul
 import { ScientificNotationCalculator, BigNumberCalculator, CommonFactorCalculator, DateCalculator, TimeCalculator, HoursCalculator, GradeCalculator, HeightCalculator, ConcreteCalculator } from './MiscToolsCalculator';
 import { IpSubnetCalculator, ConversionCalculator } from './UtilityToolsCalculator';
 import { FuelCostCalculator, VoltageDropCalculator, BtuCalculator, SquareFootageCalculator } from './PracticalToolsCalculator';
+import { TimeCardCalculator, TimeZoneCalculator } from './TimeToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -84,6 +85,8 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'voltage-drop': return <VoltageDropCalculator />;
     case 'btu': return <BtuCalculator />;
     case 'square-footage': return <SquareFootageCalculator />;
+    case 'time-card': return <TimeCardCalculator />;
+    case 'time-zone': return <TimeZoneCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;

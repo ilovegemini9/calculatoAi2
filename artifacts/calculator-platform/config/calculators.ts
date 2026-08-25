@@ -495,6 +495,8 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'voltage-drop', name: 'Voltage Drop Calculator', shortName: 'Voltage Drop', category: 'lifestyle', description: 'Estimate round-trip voltage drop and remaining voltage from current, length, resistance, and supply.', keywords: ['voltage drop calculator','wire voltage drop','cable voltage loss'], icon: '⚡' },
   { slug: 'btu', name: 'BTU Calculator', shortName: 'BTU', category: 'lifestyle', description: 'Estimate a simplified heating load from area, temperature difference, and heat-loss factor.', keywords: ['btu calculator','heating load calculator','btu per hour calculator'], icon: '♨️' },
   { slug: 'square-footage', name: 'Square Footage Calculator', shortName: 'Square Footage', category: 'lifestyle', description: 'Calculate rectangular area in square feet from length and width.', keywords: ['square footage calculator','square feet calculator','room area calculator'], icon: '▧' },
+  { slug: 'time-card', name: 'Time Card Calculator', shortName: 'Time Card', category: 'lifestyle', description: 'Estimate regular hours, overtime hours, and gross pay from a simple work schedule.', keywords: ['time card calculator','timesheet calculator','overtime hours calculator'], icon: '🗂️' },
+  { slug: 'time-zone', name: 'Time Zone Calculator', shortName: 'Time Zone', category: 'lifestyle', description: 'Format a UTC instant in a selected IANA time zone with daylight-saving rules.', keywords: ['time zone calculator','timezone converter','world clock conversion'], icon: '🌍' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
