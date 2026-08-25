@@ -337,6 +337,15 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['credit cards payoff calculator', 'multiple credit card payoff calculator', 'credit card debt payoff', 'pay off multiple credit cards'],
     icon: '💳',
   },
+  {
+    slug: 'debt-payoff',
+    name: 'Debt Payoff Calculator',
+    shortName: 'Debt Payoff',
+    category: 'financial',
+    description: 'Estimate debt payoff months, total interest, and total payments from a balance, APR, and planned monthly payment.',
+    keywords: ['debt payoff calculator', 'debt payment calculator', 'payoff time calculator', 'debt interest calculator'],
+    icon: '📉',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
