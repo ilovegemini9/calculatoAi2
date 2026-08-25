@@ -399,6 +399,11 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'payback-period', name: 'Payback Period Calculator', shortName: 'Payback Period', category: 'financial', description: 'Estimate time to recover an investment.', keywords: ['payback period calculator','investment payback calculator'], icon: '⏱️' },
   { slug: 'present-value', name: 'Present Value Calculator', shortName: 'Present Value', category: 'financial', description: 'Calculate present value from future value and rate.', keywords: ['present value calculator','pv calculator'], icon: '💰' },
   { slug: 'future-value', name: 'Future Value Calculator', shortName: 'Future Value', category: 'financial', description: 'Calculate future value from principal and rate.', keywords: ['future value calculator','fv calculator'], icon: '🔮' },
+  { slug: 'estate-tax', name: 'Estate Tax Calculator', shortName: 'Estate Tax', category: 'financial', description: 'Estimate taxable estate and estate tax from an exemption and tax-rate assumption.', keywords: ['estate tax calculator','inheritance tax calculator','taxable estate'], icon: '🏛️' },
+  { slug: 'finance', name: 'Finance Calculator', shortName: 'Finance', category: 'financial', description: 'Calculate a fixed-rate finance payment and total interest.', keywords: ['finance calculator','loan finance calculator','payment finance'], icon: '💼' },
+  { slug: 'pension', name: 'Pension Calculator', shortName: 'Pension', category: 'financial', description: 'Project a pension fund from current savings, contributions, return, and years.', keywords: ['pension calculator','pension fund calculator','retirement pension'], icon: '🧓' },
+  { slug: 'social-security', name: 'Social Security Calculator', shortName: 'Social Security', category: 'financial', description: 'Estimate a monthly benefit from average earnings, a cap, and a replacement-rate assumption.', keywords: ['social security calculator','social security benefits calculator','retirement benefit'], icon: '🛡️' },
+  { slug: 'currency', name: 'Currency Calculator', shortName: 'Currency', category: 'financial', description: 'Convert an amount using a user-supplied exchange rate.', keywords: ['currency calculator','currency converter','exchange rate calculator'], icon: '💱' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

@@ -37,6 +37,7 @@ import { IncomeTaxCalculator, SalaryCalculator, TakeHomePaycheckCalculator, Sale
 import { InflationCalculator, DepreciationCalculator, AverageReturnCalculator, MarginCalculator, DiscountCalculator } from './BusinessMathToolsCalculator';
 import { PercentOffCalculator, BusinessLoanCalculator, LeaseCalculator, BudgetCalculator, IrrCalculator } from './CommercialToolsCalculator';
 import { RoiCalculator, AprCalculator, PaybackPeriodCalculator, PresentValueCalculator, FutureValueCalculator } from './ValuationToolsCalculator';
+import { EstateTaxCalculator, FinanceCalculator, PensionCalculator, SocialSecurityCalculator, CurrencyCalculator } from './MacroFinanceToolsCalculator';
 
 interface Props {
   slug: string;
@@ -115,6 +116,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'payback-period':          return <PaybackPeriodCalculator />;
     case 'present-value':           return <PresentValueCalculator />;
     case 'future-value':            return <FutureValueCalculator />;
+    case 'estate-tax':              return <EstateTaxCalculator />;
+    case 'finance':                 return <FinanceCalculator />;
+    case 'pension':                 return <PensionCalculator />;
+    case 'social-security':         return <SocialSecurityCalculator />;
+    case 'currency':                return <CurrencyCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
