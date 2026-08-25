@@ -5,6 +5,7 @@ import { ScientificCoreCalculator, FractionCoreCalculator, StandardDeviationCalc
 import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculator, RoundingCalculator } from './MathExtendedCalculator';
 import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryCalculator, HexCalculator, HalfLifeCalculator, SlopeCalculator } from './MathGeometryCalculator';
 import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCalculator, StatisticsCalculator, PermutationCombinationCalculator } from './MathStatsCalculator';
+import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, RightTriangleCalculator, LeastCommonMultipleCalculator, GreatestCommonFactorCalculator, PrimeFactorizationCalculator } from './GeometryAdvancedCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -63,6 +64,13 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'log':                  return <LogCalculator />;
     case 'percent-error':        return <PercentErrorCalculator />;
     case 'rounding':             return <RoundingCalculator />;
+    case 'circle': return <CircleCalculator />;
+    case 'surface-area': return <SurfaceAreaCalculator />;
+    case 'pythagorean-theorem': return <PythagoreanTheoremCalculator />;
+    case 'right-triangle': return <RightTriangleCalculator />;
+    case 'least-common-multiple': return <LeastCommonMultipleCalculator />;
+    case 'greatest-common-factor': return <GreatestCommonFactorCalculator />;
+    case 'prime-factorization': return <PrimeFactorizationCalculator />;
     case 'area':                        return <AreaCalculator />;
     case 'distance':                    return <DistanceCalculator />;
     case 'sample-size':                 return <SampleSizeCalculator />;

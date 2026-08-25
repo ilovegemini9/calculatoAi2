@@ -95,6 +95,13 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'probability', name: 'Probability Calculator', shortName: 'Probability', category: 'math', description: 'Calculate probability using explicit client-side inputs.', keywords: ['probability calculator'], icon: '∑' },
   { slug: 'statistics', name: 'Statistics Calculator', shortName: 'Statistics', category: 'math', description: 'Calculate statistics using explicit client-side inputs.', keywords: ['statistics calculator'], icon: '∑' },
   { slug: 'permutation-and-combination', name: 'Permutation and Combination Calculator', shortName: 'Permutation and Combination', category: 'math', description: 'Calculate permutation and combination using explicit client-side inputs.', keywords: ['permutation-and-combination calculator'], icon: '∑' },
+  { slug: 'circle', name: 'Circle Calculator', shortName: 'Circle', category: 'math', description: 'Calculate circle with guarded client-side formulas.', keywords: ['circle calculator'], icon: '△' },
+  { slug: 'surface-area', name: 'Surface Area Calculator', shortName: 'Surface Area', category: 'math', description: 'Calculate surface area with guarded client-side formulas.', keywords: ['surface-area calculator'], icon: '△' },
+  { slug: 'pythagorean-theorem', name: 'Pythagorean Theorem Calculator', shortName: 'Pythagorean Theorem', category: 'math', description: 'Calculate pythagorean theorem with guarded client-side formulas.', keywords: ['pythagorean-theorem calculator'], icon: '△' },
+  { slug: 'right-triangle', name: 'Right Triangle Calculator', shortName: 'Right Triangle', category: 'math', description: 'Calculate right triangle with guarded client-side formulas.', keywords: ['right-triangle calculator'], icon: '△' },
+  { slug: 'least-common-multiple', name: 'Least Common Multiple Calculator', shortName: 'Least Common Multiple', category: 'math', description: 'Calculate least common multiple with guarded client-side formulas.', keywords: ['least-common-multiple calculator'], icon: '△' },
+  { slug: 'greatest-common-factor', name: 'Greatest Common Factor Calculator', shortName: 'Greatest Common Factor', category: 'math', description: 'Calculate greatest common factor with guarded client-side formulas.', keywords: ['greatest-common-factor calculator'], icon: '△' },
+  { slug: 'prime-factorization', name: 'Prime Factorization Calculator', shortName: 'Prime Factorization', category: 'math', description: 'Calculate prime factorization with guarded client-side formulas.', keywords: ['prime-factorization calculator'], icon: '△' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',
