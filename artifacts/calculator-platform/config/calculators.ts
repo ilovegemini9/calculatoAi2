@@ -77,6 +77,11 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'standard-deviation', name: 'Standard Deviation Calculator', shortName: 'Standard Deviation', category: 'math', description: 'Calculate population standard deviation and mean for four inputs.', keywords: ['standard deviation calculator','population standard deviation'], icon: 'σ' },
   { slug: 'ratio', name: 'Ratio Calculator', shortName: 'Ratio', category: 'math', description: 'Simplify a ratio and show its decimal form.', keywords: ['ratio calculator','simplify ratio'], icon: '∶' },
   { slug: 'quadratic-formula', name: 'Quadratic Formula Calculator', shortName: 'Quadratic Formula', category: 'math', description: 'Solve a quadratic equation and report its discriminant.', keywords: ['quadratic formula calculator','quadratic equation solver'], icon: 'x²' },
+  { slug: 'exponent', name: 'Exponent Calculator', shortName: 'Exponent', category: 'math', description: 'Calculate a number raised to a power.', keywords: ['exponent calculator','power calculator'], icon: 'xʸ' },
+  { slug: 'root', name: 'Root Calculator', shortName: 'Root', category: 'math', description: 'Calculate an nth root.', keywords: ['root calculator','nth root calculator'], icon: '√' },
+  { slug: 'log', name: 'Log Calculator', shortName: 'Log', category: 'math', description: 'Calculate a logarithm for a positive value and valid base.', keywords: ['log calculator','logarithm calculator'], icon: '㏒' },
+  { slug: 'percent-error', name: 'Percent Error Calculator', shortName: 'Percent Error', category: 'math', description: 'Calculate absolute percent error against a theoretical value.', keywords: ['percent error calculator','percentage error'], icon: '%' },
+  { slug: 'rounding', name: 'Rounding Calculator', shortName: 'Rounding', category: 'math', description: 'Round a value to a selected number of decimal places.', keywords: ['rounding calculator','round decimals'], icon: '≈' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',

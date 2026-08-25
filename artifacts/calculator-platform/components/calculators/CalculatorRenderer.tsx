@@ -2,6 +2,7 @@
 
 import { PaceAdvancedCalculator, GfrAdvancedCalculator, BacAdvancedCalculator } from './ClinicalAdvancedCalculator';
 import { ScientificCoreCalculator, FractionCoreCalculator, StandardDeviationCalculator, RatioCoreCalculator, QuadraticFormulaCalculator } from './MathCoreCalculator';
+import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculator, RoundingCalculator } from './MathExtendedCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -55,6 +56,11 @@ interface Props {
 
 export function CalculatorRenderer({ slug }: Props) {
   switch (slug) {
+    case 'exponent':             return <ExponentCalculator />;
+    case 'root':                 return <RootCalculator />;
+    case 'log':                  return <LogCalculator />;
+    case 'percent-error':        return <PercentErrorCalculator />;
+    case 'rounding':             return <RoundingCalculator />;
     case 'scientific':           return <ScientificCoreCalculator />;
     case 'fraction':             return <FractionCoreCalculator />;
     case 'standard-deviation':   return <StandardDeviationCalculator />;
