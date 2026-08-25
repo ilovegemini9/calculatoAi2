@@ -89,6 +89,12 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'hex', name: 'Hex Calculator', shortName: 'Hex', category: 'math', description: 'Convert a non-negative integer to hexadecimal.', keywords: ['hex calculator'], icon: '∑' },
   { slug: 'half-life', name: 'Half-Life Calculator', shortName: 'Half-Life', category: 'math', description: 'Calculate remaining quantity after radioactive-style decay.', keywords: ['half-life calculator'], icon: '∑' },
   { slug: 'slope', name: 'Slope Calculator', shortName: 'Slope', category: 'math', description: 'Calculate slope and intercept from two points.', keywords: ['slope calculator'], icon: '∑' },
+  { slug: 'area', name: 'Area Calculator', shortName: 'Area', category: 'math', description: 'Calculate area using explicit client-side inputs.', keywords: ['area calculator'], icon: '∑' },
+  { slug: 'distance', name: 'Distance Calculator', shortName: 'Distance', category: 'math', description: 'Calculate distance using explicit client-side inputs.', keywords: ['distance calculator'], icon: '∑' },
+  { slug: 'sample-size', name: 'Sample Size Calculator', shortName: 'Sample Size', category: 'math', description: 'Calculate sample size using explicit client-side inputs.', keywords: ['sample-size calculator'], icon: '∑' },
+  { slug: 'probability', name: 'Probability Calculator', shortName: 'Probability', category: 'math', description: 'Calculate probability using explicit client-side inputs.', keywords: ['probability calculator'], icon: '∑' },
+  { slug: 'statistics', name: 'Statistics Calculator', shortName: 'Statistics', category: 'math', description: 'Calculate statistics using explicit client-side inputs.', keywords: ['statistics calculator'], icon: '∑' },
+  { slug: 'permutation-and-combination', name: 'Permutation and Combination Calculator', shortName: 'Permutation and Combination', category: 'math', description: 'Calculate permutation and combination using explicit client-side inputs.', keywords: ['permutation-and-combination calculator'], icon: '∑' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',

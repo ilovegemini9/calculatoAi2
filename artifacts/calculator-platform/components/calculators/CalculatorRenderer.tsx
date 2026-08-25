@@ -4,6 +4,7 @@ import { PaceAdvancedCalculator, GfrAdvancedCalculator, BacAdvancedCalculator } 
 import { ScientificCoreCalculator, FractionCoreCalculator, StandardDeviationCalculator, RatioCoreCalculator, QuadraticFormulaCalculator } from './MathCoreCalculator';
 import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculator, RoundingCalculator } from './MathExtendedCalculator';
 import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryCalculator, HexCalculator, HalfLifeCalculator, SlopeCalculator } from './MathGeometryCalculator';
+import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCalculator, StatisticsCalculator, PermutationCombinationCalculator } from './MathStatsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -62,6 +63,12 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'log':                  return <LogCalculator />;
     case 'percent-error':        return <PercentErrorCalculator />;
     case 'rounding':             return <RoundingCalculator />;
+    case 'area':                        return <AreaCalculator />;
+    case 'distance':                    return <DistanceCalculator />;
+    case 'sample-size':                 return <SampleSizeCalculator />;
+    case 'probability':                 return <ProbabilityCalculator />;
+    case 'statistics':                  return <StatisticsCalculator />;
+    case 'permutation-and-combination': return <PermutationCombinationCalculator />;
     case 'triangle':             return <TriangleCalculator />;
     case 'volume':               return <VolumeCalculator />;
     case 'number-sequence':      return <NumberSequenceCalculator />;
