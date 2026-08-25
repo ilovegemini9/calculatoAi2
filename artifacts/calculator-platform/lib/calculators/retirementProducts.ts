@@ -1,0 +1,6 @@
+function nn(v:number){return Number.isFinite(v)?Math.max(0,v):0} function rd(v:number){return Math.round((Number.isFinite(v)?v:0)*100)/100}
+export function projectInvestment(principal:number,contribution:number,rate:number,years:number,frequency:number){const p=nn(principal),c=nn(contribution),n=Math.max(1,Math.round(nn(frequency))),t=nn(years),r=nn(rate)/100;const periods=Math.round(n*t),growth=p*(1+r/n)**periods,contrib=r===0?c*periods:c*((1+r/n)**periods-1)/(r/n);return{principal:rd(p),contributions:rd(contrib),growth:rd(growth-p),total:rd(growth+contrib),periods}}
+export function projectRetirement(current:number,monthly:number,employer:number,rate:number,years:number){const r=projectInvestment(current,monthly+employer,rate,years,12);return{...r,monthlyContribution:rd(nn(monthly)),employerContribution:rd(nn(employer)),targetYears:nn(years)}}
+export function project401k(current:number,monthly:number,match:number,rate:number,years:number){const employer=nn(monthly)*nn(match)/100;return projectRetirement(current,monthly,employer,rate,years)}
+export function projectRothIra(current:number,monthly:number,rate:number,years:number){return projectInvestment(current,monthly,rate,years,12)}
+export function projectIra(current:number,monthly:number,rate:number,years:number){return projectInvestment(current,monthly,rate,years,12)}

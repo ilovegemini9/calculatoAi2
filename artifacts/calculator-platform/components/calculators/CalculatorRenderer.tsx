@@ -31,6 +31,7 @@ import { PaymentCalculator, RepaymentCalculator, StudentLoanCalculator } from '.
 import { CollegeCostCalculator } from './CollegeCostCalculator';
 import { CreditCardCalculator, CreditCardsPayoffCalculator, DebtPayoffCalculator, DebtConsolidationCalculator, DtiCalculator } from './DebtToolsCalculator';
 import { CashBackLowInterestCalculator, InterestCalculator, SimpleInterestCalculator, CompoundInterestCalculator, InterestRateCalculator } from './InterestToolsCalculator';
+import { InvestmentCalculator, RetirementCalculator, FourOhOneKCalculator, RothIraCalculator, IraCalculator } from './RetirementToolsCalculator';
 
 interface Props {
   slug: string;
@@ -79,6 +80,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'simple-interest':       return <SimpleInterestCalculator />;
     case 'compound-interest':     return <CompoundInterestCalculator />;
     case 'interest-rate':         return <InterestRateCalculator />;
+    case 'investment':            return <InvestmentCalculator />;
+    case 'retirement':            return <RetirementCalculator />;
+    case '401k':                  return <FourOhOneKCalculator />;
+    case 'roth-ira':              return <RothIraCalculator />;
+    case 'ira':                   return <IraCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
