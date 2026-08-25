@@ -42,6 +42,7 @@ import { CommissionCalculator, VatCalculator, AnorexicBmiCalculator } from './He
 import { BmrCalculator, TdeeCalculator, MacroCalculator, ProteinCalculator, CarbohydrateCalculator } from './MetabolicToolsCalculator';
 import { FatIntakeCalculator, IdealWeightCalculator, HealthyWeightCalculator, LeanBodyMassCalculator, CaloriesBurnedCalculator } from './BodyCompositionToolsCalculator';
 import { TargetHeartRateCalculator, OneRepMaxCalculator, WeightWatcherPointsCalculator, OverweightCalculator, BodyFatCalculator } from './HeartStrengthToolsCalculator';
+import { ArmyBodyFatCalculator, BodySurfaceAreaCalculator, BodyTypeCalculator, PregnancyCalculator, PregnancyWeightGainCalculator } from './ClinicalMetricsToolsCalculator';
 
 interface Props {
   slug: string;
@@ -143,6 +144,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'weight-watcher-points':   return <WeightWatcherPointsCalculator />;
     case 'overweight':              return <OverweightCalculator />;
     case 'body-fat':                return <BodyFatCalculator />;
+    case 'army-body-fat':            return <ArmyBodyFatCalculator />;
+    case 'body-surface-area':        return <BodySurfaceAreaCalculator />;
+    case 'body-type':                return <BodyTypeCalculator />;
+    case 'pregnancy':                return <PregnancyCalculator />;
+    case 'pregnancy-weight-gain':    return <PregnancyWeightGainCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
