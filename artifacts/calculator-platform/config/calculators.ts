@@ -489,6 +489,8 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'grade', name: 'Grade Calculator', shortName: 'Grade', category: 'math', description: 'Convert points earned out of points possible into a percentage and simple letter band.', keywords: ['grade calculator','percentage grade calculator','letter grade calculator'], icon: '🎓' },
   { slug: 'height', name: 'Height Calculator', shortName: 'Height', category: 'lifestyle', description: 'Convert feet and inches into total inches, centimeters, and meters.', keywords: ['height calculator','feet to cm','feet and inches converter'], icon: '📏' },
   { slug: 'concrete', name: 'Concrete Calculator', shortName: 'Concrete', category: 'lifestyle', description: 'Estimate rectangular concrete volume in cubic feet and cubic yards from dimensions.', keywords: ['concrete calculator','concrete volume calculator','cubic yards concrete'], icon: '🧱' },
+  { slug: 'ip-subnet', name: 'IP Subnet Calculator', shortName: 'IP Subnet', category: 'math', description: 'Calculate IPv4 network, broadcast, host range, and address capacity from CIDR notation.', keywords: ['ip subnet calculator','cidr calculator','ipv4 subnet calculator'], icon: '🌐' },
+  { slug: 'conversion', name: 'Conversion Calculator', shortName: 'Conversion', category: 'math', description: 'Convert length values between metric and imperial units with explicit source and target labels.', keywords: ['conversion calculator','unit conversion calculator','length converter'], icon: '⇄' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

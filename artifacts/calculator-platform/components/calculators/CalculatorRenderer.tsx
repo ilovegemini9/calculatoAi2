@@ -9,6 +9,7 @@ import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, 
 import { ZScoreCalculator, ConfidenceIntervalCalculator, MeanMedianModeRangeCalculator } from './StatisticsAdvancedCalculator';
 import { FactorCalculator, MatrixCalculator, BasicCalculator, LongDivisionCalculator, AverageCalculator, PValueCalculator } from './NumberToolsCalculator';
 import { ScientificNotationCalculator, BigNumberCalculator, CommonFactorCalculator, DateCalculator, TimeCalculator, HoursCalculator, GradeCalculator, HeightCalculator, ConcreteCalculator } from './MiscToolsCalculator';
+import { IpSubnetCalculator, ConversionCalculator } from './UtilityToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -76,6 +77,8 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'grade': return <GradeCalculator />;
     case 'height': return <HeightCalculator />;
     case 'concrete': return <ConcreteCalculator />;
+    case 'ip-subnet': return <IpSubnetCalculator />;
+    case 'conversion': return <ConversionCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;
