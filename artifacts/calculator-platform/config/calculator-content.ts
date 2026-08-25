@@ -2425,4 +2425,48 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
     ],
     author: { name: 'CalculatorFree Financial Review Team', credentials: 'Fixed-Rate Amortization Review', description: 'Payment arithmetic is reviewed against the standard fixed-rate amortization model; lender terms and local charges should be confirmed independently.' },
   },
+
+  // ── Repayment ─────────────────────────────────────────────────────────────
+  repayment: {
+    howToSteps: [
+      'Enter the current outstanding balance.',
+      'Enter the annual interest rate for the balance.',
+      'Enter the monthly payment you plan to make.',
+      'Review the estimated number of payments, total interest, total payments, and schedule snapshot.',
+    ],
+    faqs: [
+      { question: 'What does the Repayment Calculator solve?', answer: 'It estimates how many monthly payments are needed to clear a current balance when the annual rate and planned monthly payment are known.' },
+      { question: 'What if my payment is too low?', answer: 'If the payment does not exceed the first month interest charge, the calculator shows a warning instead of pretending the balance will be repaid.' },
+      { question: 'What happens at 0% interest?', answer: 'The balance is divided by the monthly payment because no interest accrues. A zero monthly payment is treated as too low when a balance remains.' },
+      { question: 'Does the last payment have to equal the regular payment?', answer: 'No. The final payment is capped at the remaining balance plus that period interest, so the schedule can show a smaller final payment.' },
+    ],
+    formula: {
+      expression: 'Interest_t = Balance_t × (APR ÷ 1,200) | Principal_t = Payment_t − Interest_t | Balance_(t+1) = max(0, Balance_t − Principal_t)',
+      variables: [
+        { symbol: 'Balance_t', definition: 'Outstanding balance at the beginning of period t' },
+        { symbol: 'APR', definition: 'Annual percentage interest rate entered by the user' },
+        { symbol: 'Payment_t', definition: 'Monthly payment, capped on the final period' },
+        { symbol: 'Principal_t', definition: 'Part of the payment reducing the balance' },
+      ],
+      notes: 'The engine stops at a zero balance or a protective 1,200-payment limit. If payment is zero or no greater than accruing interest, it returns an explicit payment-too-low status.',
+    },
+    examples: [
+      { title: 'Repaying a revolving balance', scenario: '$20,000 balance, 6.5% APR, and $500 monthly payment.', steps: ['Monthly interest is the balance multiplied by 6.5% ÷ 1,200.', 'The first payment is split into interest and principal.', 'Each next month recalculates interest on the reduced balance.', 'The schedule ends with the final payment when the balance reaches zero.'], result: 'The dashboard reports the estimated payoff payment count and total interest.' },
+      { title: 'Payment below interest', scenario: '$10,000 balance, 12% APR, and $50 monthly payment.', steps: ['First-month interest is $10,000 × 12% ÷ 1,200 = $100.', 'The $50 payment does not cover the $100 interest charge.', 'The calculator returns a warning rather than a misleading payoff date.'], result: 'Increase the monthly payment above the monthly interest to make repayment possible.' },
+    ],
+    useCases: ['✓ Estimate a payoff horizon for a known balance.', '✓ Compare different monthly payment plans.', '✓ Quantify interest cost over the repayment period.', '✓ Identify payment plans that cannot reduce principal.', '✓ Inspect the balance trend in the schedule snapshot.'],
+    commonPitfalls: ['⚠ Entering a monthly rate in the annual rate field.', '⚠ Choosing a payment that is below monthly interest.', '⚠ Assuming the result includes future fees, penalties, or new borrowing.', '⚠ Treating a fixed-rate estimate as a variable-rate forecast.', '⚠ Ignoring the difference between scheduled payment and final payment.'],
+    glossary: [
+      { term: 'Outstanding Balance', definition: 'The amount still owed at the start of the repayment calculation.' },
+      { term: 'Monthly Interest', definition: 'Interest for one period, calculated from the opening balance and monthly rate.' },
+      { term: 'Principal Reduction', definition: 'The portion of a payment that lowers the outstanding balance.' },
+      { term: 'Payoff Period', definition: 'The count of monthly payment periods required to reach a zero balance under the model.' },
+      { term: 'Payment-Too-Low Status', definition: 'An explicit warning used when the payment cannot cover the interest that accrues.' },
+    ],
+    sources: [
+      { title: 'Credit and Loans', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/consumer-tools/credit-cards/', year: 2024 },
+      { title: 'Managing Debt', publisher: 'Federal Trade Commission (FTC)', url: 'https://consumer.ftc.gov/articles/getting-out-debt', year: 2024 },
+    ],
+    author: { name: 'CalculatorFree Debt Planning Review Team', credentials: 'Amortization and Payoff Review', description: 'Repayment arithmetic is reviewed against a fixed-rate declining-balance model; actual lender policies, fees, and rate changes may alter a payoff result.' },
+  },
 };

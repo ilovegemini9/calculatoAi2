@@ -289,6 +289,16 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['payment calculator', 'loan payment calculator', 'monthly payment calculator', 'fixed payment calculator', 'finance payment calculator'],
     icon: '🧾',
   },
+  {
+    slug: 'repayment',
+    name: 'Repayment Calculator',
+    shortName: 'Repayment',
+    category: 'financial',
+    description:
+      'Find how many payments you need to clear a balance from your interest rate and planned monthly repayment, with a warning when payment is too low.',
+    keywords: ['repayment calculator', 'debt repayment calculator', 'loan repayment calculator', 'payoff calculator', 'monthly repayment calculator'],
+    icon: '🔁',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));
