@@ -193,10 +193,10 @@ export function AutoLeaseCalculator() {
 
       {/* Lease info note */}
       <div className="rounded-xl border border-blue-200 dark:border-blue-800/40 bg-blue-50 dark:bg-blue-950/20 px-4 py-3 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
-        <strong>How lease payments work:</strong> Your payment covers the vehicle's
+        <strong>How lease payments work:</strong> Your payment covers the vehicle&apos;s
         depreciation ({formatCurrency(result.monthlyDepreciation)}/mo) plus the finance charge
         ({formatCurrency(result.monthlyFinanceCharge)}/mo). The residual value (
-        {formatCurrency(result.residualValue)}) is what you'd pay to buy the vehicle at lease end.
+        {formatCurrency(result.residualValue)}) is what you&apos;d pay to buy the vehicle at lease end.
         Negotiating a lower cap cost and a higher residual both lower your monthly payment.
       </div>
     </div>

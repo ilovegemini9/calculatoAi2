@@ -52,7 +52,7 @@ const TRUST_ITEMS = [
   },
 ];
 
-export default async function () {
+export default async function HomePage() {
   const categories = ['financial', 'fitness', 'math', 'lifestyle'] as const;
 
   // Retrieve dynamic calculators and merge

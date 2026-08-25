@@ -65,7 +65,7 @@ function getExcerpt(article: Article): string {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default async function () {
+export default async function BlogPage() {
   let articles: Article[] = [];
   let base = siteConfig.url;
 
