@@ -69,6 +69,9 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['age calculator', 'birthday calculator', 'how old am i', 'age in days'],
     icon: '🎂',
   },
+  { slug: 'pace', name: 'Pace Calculator', shortName: 'Pace', category: 'fitness', description: 'Calculate running pace from distance and elapsed time.', keywords: ['pace calculator','running pace calculator'], icon: '🏃' },
+  { slug: 'gfr', name: 'GFR Calculator', shortName: 'GFR', category: 'fitness', description: 'Estimate adult eGFR with the race-free CKD-EPI 2021 creatinine equation.', keywords: ['gfr calculator','egfr calculator','ckd epi 2021'], icon: '🧪' },
+  { slug: 'bac', name: 'BAC Calculator', shortName: 'BAC', category: 'fitness', description: 'Estimate blood alcohol concentration using a Widmark-style model.', keywords: ['bac calculator','blood alcohol calculator'], icon: '⚠️' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',

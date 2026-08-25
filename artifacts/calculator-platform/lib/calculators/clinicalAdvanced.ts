@@ -1,0 +1,4 @@
+function nn(v:number){return Number.isFinite(v)?Math.max(0,v):0}
+export function pace(distanceKm:number,durationMinutes:number){const d=nn(distanceKm),m=nn(durationMinutes);return{pace:d>0?m/d:0,distance:d,minutes:m}}
+export function egfrCkdEpi2021(creatinineMgDl:number,age:number,sex:'male'|'female'){const scr=Math.max(nn(creatinineMgDl),.01),a=Math.max(1,nn(age)),female=sex==='female',k=female?.7:.9,alpha=female?-.241:-.302,ratio=scr/k;return 142*Math.min(ratio,1)**alpha*Math.max(ratio,1)**-1.2*.9938**a*(female?1.012:1)}
+export function widmarkBac(alcoholGrams:number,weightKg:number,hours:number,sex:'male'|'female'){const grams=nn(alcoholGrams),weight=nn(weightKg),r=sex==='female'?.55:.68;return{peak:weight>0?grams/(weight*1000*r)*100:0,estimated:Math.max(0,weight>0?grams/(weight*1000*r)*100-.015*nn(hours):0)}}

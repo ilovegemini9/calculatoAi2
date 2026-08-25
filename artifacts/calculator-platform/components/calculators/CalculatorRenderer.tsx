@@ -1,5 +1,6 @@
 'use client';
 
+import { PaceAdvancedCalculator, GfrAdvancedCalculator, BacAdvancedCalculator } from './ClinicalAdvancedCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -53,6 +54,9 @@ interface Props {
 
 export function CalculatorRenderer({ slug }: Props) {
   switch (slug) {
+    case 'pace':                 return <PaceAdvancedCalculator />;
+    case 'gfr':                  return <GfrAdvancedCalculator />;
+    case 'bac':                  return <BacAdvancedCalculator />;
     case 'age':                  return <AgeCalculator />;
     case 'bmi':                  return <BMICalculator />;
     case 'calorie':              return <CalorieCalculator />;
