@@ -1,0 +1,5 @@
+function n(v:number){return Number.isFinite(v)?Math.max(0,v):0}function r(v:number){return Math.round((Number.isFinite(v)?v:0)*100)/100}
+export function savings(principal:number,monthly:number,rate:number,years:number){const p=n(principal),c=n(monthly),t=n(years),m=12,x=n(rate)/1200,periods=Math.round(t*m),growth=p*(1+x)**periods,contrib=x===0?c*periods:c*((1+x)**periods-1)/x;return{principal:r(p),contributions:r(contrib),interest:r(growth+contrib-p-contrib),total:r(growth+contrib),periods}}
+export function annuity(pv:number,rate:number,years:number){const p=n(pv),t=n(years),x=n(rate)/1200,periods=Math.max(1,Math.round(t*12)),pay=x===0?p/periods:p*x/(1-(1+x)**-periods);return{payment:r(pay),total:r(pay*periods),interest:r(pay*periods-p),periods}}
+export function rmd(balance:number,divisor:number){const b=n(balance),d=Math.max(1,n(divisor));return{distribution:r(b/d),balance:r(b),divisor:d}}
+export function cd(principal:number,rate:number,years:number){return savings(principal,0,rate,years)}
