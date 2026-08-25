@@ -501,6 +501,9 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'love', name: 'Love Calculator', shortName: 'Love', category: 'lifestyle', description: 'Generate a repeatable entertainment-only name score with a clear non-predictive disclaimer.', keywords: ['love calculator','compatibility calculator','love match game'], icon: '♡' },
   { slug: 'gdp', name: 'GDP Calculator', shortName: 'GDP', category: 'math', description: 'Estimate GDP using consumer spending, investment, government spending, exports, and imports.', keywords: ['gdp calculator','gross domestic product calculator','expenditure approach gdp'], icon: '∑' },
   { slug: 'gas-mileage', name: 'Gas Mileage Calculator', shortName: 'Gas Mileage', category: 'lifestyle', description: 'Calculate observed miles per gallon from trip distance and fuel used.', keywords: ['gas mileage calculator','mpg calculator','fuel economy calculator'], icon: '⛽' },
+  { slug: 'horsepower', name: 'Horsepower Calculator', shortName: 'Horsepower', category: 'math', description: 'Convert watts to named mechanical and electrical horsepower conventions.', keywords: ['horsepower calculator','watts to horsepower','power conversion'], icon: '⚙️' },
+  { slug: 'engine-horsepower', name: 'Engine Horsepower Calculator', shortName: 'Engine Horsepower', category: 'lifestyle', description: 'Estimate engine horsepower from torque in lb-ft and rotational speed in RPM.', keywords: ['engine horsepower calculator','torque rpm horsepower','car horsepower formula'], icon: '🏎️' },
+  { slug: 'stair', name: 'Stair Calculator', shortName: 'Stair', category: 'lifestyle', description: 'Estimate riser count, tread count, run, and angle for a simple straight stair layout.', keywords: ['stair calculator','stair rise run calculator','stair stringer calculator'], icon: '🪜' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

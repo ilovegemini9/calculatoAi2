@@ -13,6 +13,7 @@ import { IpSubnetCalculator, ConversionCalculator } from './UtilityToolsCalculat
 import { FuelCostCalculator, VoltageDropCalculator, BtuCalculator, SquareFootageCalculator } from './PracticalToolsCalculator';
 import { TimeCardCalculator, TimeZoneCalculator } from './TimeToolsCalculator';
 import { BraSizeCalculator, LoveCalculator, GdpCalculator, GasMileageCalculator } from './GeneralToolsCalculator';
+import { HorsepowerCalculator, EngineHorsepowerCalculator, StairCalculator } from './MechanicalToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -92,6 +93,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'love': return <LoveCalculator />;
     case 'gdp': return <GdpCalculator />;
     case 'gas-mileage': return <GasMileageCalculator />;
+    case 'horsepower': return <HorsepowerCalculator />;
+    case 'engine-horsepower': return <EngineHorsepowerCalculator />;
+    case 'stair': return <StairCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;

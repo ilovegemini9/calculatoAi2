@@ -1,0 +1,4 @@
+function positive(value:number){return Number.isFinite(value)?Math.max(0,value):0}
+export function horsepowerFromWatts(watts:number){const w=positive(watts);return{mechanicalHp:w/745.699872,electricalHp:w/746};}
+export function engineHorsepower(torqueLbFt:number,rpm:number){const torque=positive(torqueLbFt),speed=positive(rpm);return torque*speed/5252;}
+export function stairLayout(totalRiseInches:number,riserInches:number,treadInches:number){const rise=positive(totalRiseInches),riser=positive(riserInches),tread=positive(treadInches);const risers=riser>0?Math.max(0,Math.ceil(rise/riser)):0;const actualRiser=risers>0?rise/risers:0;const treads=Math.max(0,risers-1),totalRun=treads*tread,angle=tread>0?Math.atan2(actualRiser,tread)*180/Math.PI:0;return{risers,treads,actualRiser,totalRun,angle};}
