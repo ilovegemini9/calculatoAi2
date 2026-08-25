@@ -427,6 +427,11 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'body-type', name: 'Body Type Calculator', shortName: 'Body Type', category: 'fitness', description: 'Classify a BMI-based body type for educational screening.', keywords: ['body type calculator','somatotype calculator','bmi type'], icon: '🧍' },
   { slug: 'pregnancy', name: 'Pregnancy Calculator', shortName: 'Pregnancy', category: 'fitness', description: 'Estimate weeks remaining from a pregnancy-week input.', keywords: ['pregnancy calculator','pregnancy weeks calculator','gestation calculator'], icon: '🤰' },
   { slug: 'pregnancy-weight-gain', name: 'Pregnancy Weight Gain Calculator', shortName: 'Pregnancy Weight Gain', category: 'fitness', description: 'Estimate a simplified pregnancy weight-gain range by pregnancy week.', keywords: ['pregnancy weight gain calculator','pregnancy weight chart','gestational weight gain'], icon: '⚖️' },
+  { slug: 'pregnancy-conception', name: 'Pregnancy Conception Calculator', shortName: 'Pregnancy Conception', category: 'fitness', description: 'Estimate pregnancy timing from cycle and gestational assumptions.', keywords: ['pregnancy conception calculator','conception date calculator'], icon: '🤰' },
+  { slug: 'due-date', name: 'Due Date Calculator', shortName: 'Due Date', category: 'fitness', description: 'Estimate pregnancy timing and remaining days from completed weeks.', keywords: ['due date calculator','pregnancy due date'], icon: '📅' },
+  { slug: 'ovulation', name: 'Ovulation Calculator', shortName: 'Ovulation', category: 'fitness', description: 'Estimate ovulation cycle day from cycle length.', keywords: ['ovulation calculator','ovulation date calculator'], icon: '🗓️' },
+  { slug: 'conception', name: 'Conception Calculator', shortName: 'Conception', category: 'fitness', description: 'Estimate a conception timing window from cycle inputs.', keywords: ['conception calculator','conception date'], icon: '🌱' },
+  { slug: 'period', name: 'Period Calculator', shortName: 'Period', category: 'fitness', description: 'Estimate the next cycle day from cycle length.', keywords: ['period calculator','next period calculator','menstrual cycle calculator'], icon: '🩸' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

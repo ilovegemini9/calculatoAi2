@@ -43,6 +43,7 @@ import { BmrCalculator, TdeeCalculator, MacroCalculator, ProteinCalculator, Carb
 import { FatIntakeCalculator, IdealWeightCalculator, HealthyWeightCalculator, LeanBodyMassCalculator, CaloriesBurnedCalculator } from './BodyCompositionToolsCalculator';
 import { TargetHeartRateCalculator, OneRepMaxCalculator, WeightWatcherPointsCalculator, OverweightCalculator, BodyFatCalculator } from './HeartStrengthToolsCalculator';
 import { ArmyBodyFatCalculator, BodySurfaceAreaCalculator, BodyTypeCalculator, PregnancyCalculator, PregnancyWeightGainCalculator } from './ClinicalMetricsToolsCalculator';
+import { PregnancyConceptionCalculator, DueDateCalculator, OvulationCalculator, ConceptionCalculator, PeriodCalculator } from './CycleToolsCalculator';
 
 interface Props {
   slug: string;
@@ -149,6 +150,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'body-type':                return <BodyTypeCalculator />;
     case 'pregnancy':                return <PregnancyCalculator />;
     case 'pregnancy-weight-gain':    return <PregnancyWeightGainCalculator />;
+    case 'pregnancy-conception':     return <PregnancyConceptionCalculator />;
+    case 'due-date':                 return <DueDateCalculator />;
+    case 'ovulation':                return <OvulationCalculator />;
+    case 'conception':               return <ConceptionCalculator />;
+    case 'period':                   return <PeriodCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
