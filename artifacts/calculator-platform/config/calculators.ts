@@ -364,6 +364,11 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['debt to income ratio calculator', 'DTI calculator', 'debt-to-income calculator', 'monthly debt ratio'],
     icon: '⚖️',
   },
+  { slug: 'cash-back-low-interest', name: 'Cash Back or Low Interest Calculator', shortName: 'Cash Back or Low Interest', category: 'financial', description: 'Compare a cash-back option with a low-interest option over a selected term.', keywords: ['cash back or low interest calculator', 'cash back calculator', 'low interest calculator'], icon: '💸' },
+  { slug: 'interest', name: 'Interest Calculator', shortName: 'Interest', category: 'financial', description: 'Calculate simple interest and total value from principal, rate, and time.', keywords: ['interest calculator', 'interest earned calculator', 'interest formula calculator'], icon: '📈' },
+  { slug: 'simple-interest', name: 'Simple Interest Calculator', shortName: 'Simple Interest', category: 'financial', description: 'Calculate simple interest using principal, annual rate, and years.', keywords: ['simple interest calculator', 'simple interest formula', 'simple interest rate calculator'], icon: '➕' },
+  { slug: 'compound-interest', name: 'Compound Interest Calculator', shortName: 'Compound Interest', category: 'financial', description: 'Project compound growth with compounding frequency and recurring contributions.', keywords: ['compound interest calculator', 'compound growth calculator', 'investment compound interest'], icon: '📊' },
+  { slug: 'interest-rate', name: 'Interest Rate Calculator', shortName: 'Interest Rate', category: 'financial', description: 'Solve the annual compound rate required to grow a principal to a final value.', keywords: ['interest rate calculator', 'required rate calculator', 'annual interest rate calculator'], icon: '％' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

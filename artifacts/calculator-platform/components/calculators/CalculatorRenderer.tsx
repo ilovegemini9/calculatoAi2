@@ -30,6 +30,7 @@ import { BoatLoanCalculator } from './BoatLoanCalculator';
 import { PaymentCalculator, RepaymentCalculator, StudentLoanCalculator } from './LoanProductCalculator';
 import { CollegeCostCalculator } from './CollegeCostCalculator';
 import { CreditCardCalculator, CreditCardsPayoffCalculator, DebtPayoffCalculator, DebtConsolidationCalculator, DtiCalculator } from './DebtToolsCalculator';
+import { CashBackLowInterestCalculator, InterestCalculator, SimpleInterestCalculator, CompoundInterestCalculator, InterestRateCalculator } from './InterestToolsCalculator';
 
 interface Props {
   slug: string;
@@ -73,6 +74,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'debt-payoff':           return <DebtPayoffCalculator />;
     case 'debt-consolidation':    return <DebtConsolidationCalculator />;
     case 'debt-to-income':        return <DtiCalculator />;
+    case 'cash-back-low-interest': return <CashBackLowInterestCalculator />;
+    case 'interest':              return <InterestCalculator />;
+    case 'simple-interest':       return <SimpleInterestCalculator />;
+    case 'compound-interest':     return <CompoundInterestCalculator />;
+    case 'interest-rate':         return <InterestRateCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
