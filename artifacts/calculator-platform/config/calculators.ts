@@ -512,6 +512,9 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'mass', name: 'Mass Calculator', shortName: 'Mass', category: 'math', description: 'Convert kilograms to grams and pounds with labeled mass units.', keywords: ['mass calculator','kg to pounds','mass conversion calculator'], icon: '⚖️' },
   { slug: 'weight', name: 'Weight Calculator', shortName: 'Weight', category: 'math', description: 'Convert mass in kilograms to gravitational force in newtons using standard gravity.', keywords: ['weight calculator','mass to force','newton weight calculator'], icon: '⬇️' },
   { slug: 'speed', name: 'Speed Calculator', shortName: 'Speed', category: 'math', description: 'Calculate average speed from distance in miles and elapsed time in hours.', keywords: ['speed calculator','average speed calculator','distance time speed'], icon: '🚀' },
+  { slug: 'molarity', name: 'Molarity Calculator', shortName: 'Molarity', category: 'math', description: 'Calculate solution molarity from moles of solute and final volume in liters.', keywords: ['molarity calculator','molar concentration calculator','moles per liter'], icon: '⚗️' },
+  { slug: 'molecular-weight', name: 'Molecular Weight Calculator', shortName: 'Molecular Weight', category: 'math', description: 'Estimate molar mass for supported simple chemical formulas.', keywords: ['molecular weight calculator','molar mass calculator','chemical formula mass'], icon: '🧬' },
+  { slug: 'roman-numeral-converter', name: 'Roman Numeral Converter', shortName: 'Roman Numeral', category: 'math', description: 'Convert supported integers to Roman numerals and decode Roman symbols.', keywords: ['roman numeral converter','number to roman numerals','roman numeral calculator'], icon: 'Ⅻ' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

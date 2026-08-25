@@ -16,6 +16,7 @@ import { BraSizeCalculator, LoveCalculator, GdpCalculator, GasMileageCalculator 
 import { HorsepowerCalculator, EngineHorsepowerCalculator, StairCalculator } from './MechanicalToolsCalculator';
 import { ResistorCalculator, OhmsLawCalculator, ElectricityCalculator } from './ElectricalToolsCalculator';
 import { MileageCalculator, DensityCalculator, MassCalculator, WeightCalculator, SpeedCalculator } from './ScienceToolsCalculator';
+import { MolarityCalculator, MolecularWeightCalculator, RomanNumeralConverter } from './ChemistryToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -106,6 +107,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'mass': return <MassCalculator />;
     case 'weight': return <WeightCalculator />;
     case 'speed': return <SpeedCalculator />;
+    case 'molarity': return <MolarityCalculator />;
+    case 'molecular-weight': return <MolecularWeightCalculator />;
+    case 'roman-numeral-converter': return <RomanNumeralConverter />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;
