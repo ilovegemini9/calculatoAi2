@@ -389,6 +389,16 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'average-return', name: 'Average Return Calculator', shortName: 'Average Return', category: 'financial', description: 'Estimate annualized return.', keywords: ['average return calculator','annualized return calculator'], icon: '📊' },
   { slug: 'margin', name: 'Margin Calculator', shortName: 'Margin', category: 'financial', description: 'Calculate margin from revenue and cost.', keywords: ['margin calculator','profit margin calculator'], icon: '📐' },
   { slug: 'discount', name: 'Discount Calculator', shortName: 'Discount', category: 'financial', description: 'Calculate sale price and discount savings.', keywords: ['discount calculator','sale price calculator'], icon: '🏷️' },
+  { slug: 'percent-off', name: 'Percent Off Calculator', shortName: 'Percent Off', category: 'financial', description: 'Calculate sale price after a percentage discount.', keywords: ['percent off calculator','discount percentage calculator'], icon: '🏷️' },
+  { slug: 'business-loan', name: 'Business Loan Calculator', shortName: 'Business Loan', category: 'financial', description: 'Estimate business loan payments.', keywords: ['business loan calculator','commercial loan calculator'], icon: '🏢' },
+  { slug: 'lease', name: 'Lease Calculator', shortName: 'Lease', category: 'financial', description: 'Estimate lease payments.', keywords: ['lease calculator','lease payment calculator'], icon: '🔑' },
+  { slug: 'budget', name: 'Budget Calculator', shortName: 'Budget', category: 'financial', description: 'Calculate remaining budget after costs.', keywords: ['budget calculator','budget planner'], icon: '📒' },
+  { slug: 'irr', name: 'IRR Calculator', shortName: 'IRR', category: 'financial', description: 'Estimate an annualized internal rate of return.', keywords: ['irr calculator','internal rate of return calculator'], icon: '📈' },
+  { slug: 'roi', name: 'ROI Calculator', shortName: 'ROI', category: 'financial', description: 'Calculate return on investment.', keywords: ['roi calculator','return on investment calculator'], icon: '📈' },
+  { slug: 'apr', name: 'APR Calculator', shortName: 'APR', category: 'financial', description: 'Estimate annual percentage rate.', keywords: ['apr calculator','annual percentage rate calculator'], icon: '💳' },
+  { slug: 'payback-period', name: 'Payback Period Calculator', shortName: 'Payback Period', category: 'financial', description: 'Estimate time to recover an investment.', keywords: ['payback period calculator','investment payback calculator'], icon: '⏱️' },
+  { slug: 'present-value', name: 'Present Value Calculator', shortName: 'Present Value', category: 'financial', description: 'Calculate present value from future value and rate.', keywords: ['present value calculator','pv calculator'], icon: '💰' },
+  { slug: 'future-value', name: 'Future Value Calculator', shortName: 'Future Value', category: 'financial', description: 'Calculate future value from principal and rate.', keywords: ['future value calculator','fv calculator'], icon: '🔮' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

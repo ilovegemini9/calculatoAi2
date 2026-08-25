@@ -35,6 +35,8 @@ import { InvestmentCalculator, RetirementCalculator, FourOhOneKCalculator, RothI
 import { RmdCalculator, AnnuityCalculator, AnnuityPayoutCalculator, SavingsCalculator, CdCalculator } from './SavingsToolsCalculator';
 import { IncomeTaxCalculator, SalaryCalculator, TakeHomePaycheckCalculator, SalesTaxCalculator, MarriageTaxCalculator } from './TaxToolsCalculator';
 import { InflationCalculator, DepreciationCalculator, AverageReturnCalculator, MarginCalculator, DiscountCalculator } from './BusinessMathToolsCalculator';
+import { PercentOffCalculator, BusinessLoanCalculator, LeaseCalculator, BudgetCalculator, IrrCalculator } from './CommercialToolsCalculator';
+import { RoiCalculator, AprCalculator, PaybackPeriodCalculator, PresentValueCalculator, FutureValueCalculator } from './ValuationToolsCalculator';
 
 interface Props {
   slug: string;
@@ -103,6 +105,16 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'average-return':         return <AverageReturnCalculator />;
     case 'margin':                 return <MarginCalculator />;
     case 'discount':               return <DiscountCalculator />;
+    case 'percent-off':             return <PercentOffCalculator />;
+    case 'business-loan':           return <BusinessLoanCalculator />;
+    case 'lease':                   return <LeaseCalculator />;
+    case 'budget':                  return <BudgetCalculator />;
+    case 'irr':                     return <IrrCalculator />;
+    case 'roi':                     return <RoiCalculator />;
+    case 'apr':                     return <AprCalculator />;
+    case 'payback-period':          return <PaybackPeriodCalculator />;
+    case 'present-value':           return <PresentValueCalculator />;
+    case 'future-value':            return <FutureValueCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
