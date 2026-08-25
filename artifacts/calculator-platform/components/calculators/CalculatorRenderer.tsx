@@ -1,6 +1,7 @@
 'use client';
 
 import { PaceAdvancedCalculator, GfrAdvancedCalculator, BacAdvancedCalculator } from './ClinicalAdvancedCalculator';
+import { ScientificCoreCalculator, FractionCoreCalculator, StandardDeviationCalculator, RatioCoreCalculator, QuadraticFormulaCalculator } from './MathCoreCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -54,6 +55,11 @@ interface Props {
 
 export function CalculatorRenderer({ slug }: Props) {
   switch (slug) {
+    case 'scientific':           return <ScientificCoreCalculator />;
+    case 'fraction':             return <FractionCoreCalculator />;
+    case 'standard-deviation':   return <StandardDeviationCalculator />;
+    case 'ratio':                return <RatioCoreCalculator />;
+    case 'quadratic-formula':    return <QuadraticFormulaCalculator />;
     case 'pace':                 return <PaceAdvancedCalculator />;
     case 'gfr':                  return <GfrAdvancedCalculator />;
     case 'bac':                  return <BacAdvancedCalculator />;

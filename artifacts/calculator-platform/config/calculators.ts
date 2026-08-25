@@ -72,6 +72,11 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'pace', name: 'Pace Calculator', shortName: 'Pace', category: 'fitness', description: 'Calculate running pace from distance and elapsed time.', keywords: ['pace calculator','running pace calculator'], icon: '🏃' },
   { slug: 'gfr', name: 'GFR Calculator', shortName: 'GFR', category: 'fitness', description: 'Estimate adult eGFR with the race-free CKD-EPI 2021 creatinine equation.', keywords: ['gfr calculator','egfr calculator','ckd epi 2021'], icon: '🧪' },
   { slug: 'bac', name: 'BAC Calculator', shortName: 'BAC', category: 'fitness', description: 'Estimate blood alcohol concentration using a Widmark-style model.', keywords: ['bac calculator','blood alcohol calculator'], icon: '⚠️' },
+  { slug: 'scientific', name: 'Scientific Calculator', shortName: 'Scientific', category: 'math', description: 'Evaluate common scientific functions with safe client-side inputs.', keywords: ['scientific calculator','sin cos log calculator'], icon: '🧮' },
+  { slug: 'fraction', name: 'Fraction Calculator', shortName: 'Fraction', category: 'math', description: 'Add and reduce two fractions.', keywords: ['fraction calculator','fraction addition'], icon: '½' },
+  { slug: 'standard-deviation', name: 'Standard Deviation Calculator', shortName: 'Standard Deviation', category: 'math', description: 'Calculate population standard deviation and mean for four inputs.', keywords: ['standard deviation calculator','population standard deviation'], icon: 'σ' },
+  { slug: 'ratio', name: 'Ratio Calculator', shortName: 'Ratio', category: 'math', description: 'Simplify a ratio and show its decimal form.', keywords: ['ratio calculator','simplify ratio'], icon: '∶' },
+  { slug: 'quadratic-formula', name: 'Quadratic Formula Calculator', shortName: 'Quadratic Formula', category: 'math', description: 'Solve a quadratic equation and report its discriminant.', keywords: ['quadratic formula calculator','quadratic equation solver'], icon: 'x²' },
   {
     slug: 'bmi',
     name: 'BMI Calculator',
