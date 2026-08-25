@@ -2299,4 +2299,86 @@ export const CALCULATOR_CONTENT: Record<string, CalcContent> = {
       description: 'Auto lease calculations verified against CFPB Regulation M disclosure requirements and standard captive-finance lease structures.',
     },
   },
+
+  // ── Boat Loan ─────────────────────────────────────────────────────────────
+  'boat-loan': {
+    howToSteps: [
+      'Enter the boat purchase price before taxes and fees.',
+      'Add your down payment, trade-in value, sales tax rate, and lender or dealer fees.',
+      'Enter the annual interest rate and repayment term in years.',
+      'Review the instant monthly payment, financed amount, total interest, total cost, and annual amortization snapshot.',
+    ],
+    faqs: [
+      { question: 'What does a boat loan payment include?', answer: 'The estimated payment is based on the amount financed, annual interest rate, and repayment term. The financed amount includes the taxable balance, calculated sales tax, and entered fees after down payment and trade-in value.' },
+      { question: 'Does a trade-in reduce the taxable amount?', answer: 'This calculator treats the entered trade-in value as reducing the taxable balance. Tax rules vary by jurisdiction, so compare the result with the lender or dealer quote for your location.' },
+      { question: 'What happens when the interest rate is zero?', answer: 'The calculator uses a zero-interest branch and divides the financed amount evenly across the selected number of monthly payments. Total interest is zero.' },
+      { question: 'Why is the total cost higher than the boat price?', answer: 'Total cost includes the upfront down payment and trade-in credit treatment plus all scheduled loan payments. Interest, sales tax, and fees can make the financed purchase cost differ from the advertised boat price.' },
+    ],
+    formula: {
+      expression: 'Taxable Balance = max(0, Price − Down Payment − Trade-In) | Tax = Taxable Balance × Tax Rate | M = P × [r(1+r)^n] / [(1+r)^n − 1]',
+      variables: [
+        { symbol: 'Price', definition: 'Boat purchase price entered by the user' },
+        { symbol: 'P', definition: 'Amount financed after down payment, trade-in, tax, and fees' },
+        { symbol: 'r', definition: 'Monthly interest rate = annual rate ÷ 1,200' },
+        { symbol: 'n', definition: 'Number of monthly payments = term in years × 12' },
+        { symbol: 'M', definition: 'Scheduled monthly payment for a fixed-rate loan' },
+      ],
+      notes: 'When r = 0, the payment is P ÷ n. Input values are clamped to finite non-negative values in the client-side formula, and the down payment and trade-in cannot reduce the taxable balance below zero.',
+    },
+    examples: [
+      {
+        title: 'Typical financed boat purchase',
+        scenario: '$65,000 boat, $10,000 down payment, no trade-in, 6.5% sales tax, $1,500 fees, 7.25% APR, and a 10-year term.',
+        steps: [
+          'Taxable balance = $65,000 − $10,000 − $0 = $55,000.',
+          'Sales tax = $55,000 × 6.5% = $3,575.',
+          'Amount financed = $55,000 + $3,575 + $1,500 = $60,075.',
+          'The fixed-rate monthly payment formula is applied with r = 7.25% ÷ 1,200 and n = 120.',
+        ],
+        result: 'The results panel shows the payment, total interest, total cost, and balance by year for this scenario.',
+      },
+      {
+        title: 'Zero-interest comparison',
+        scenario: '$24,000 financed at 0% interest over 5 years with no additional tax or fees.',
+        steps: [
+          'Monthly rate r = 0, so the zero-interest branch is selected.',
+          'Number of payments n = 5 × 12 = 60.',
+          'Monthly payment = $24,000 ÷ 60 = $400.',
+          'Total interest = $0 because no interest accrues.',
+        ],
+        result: '$400 per month and $24,000 in scheduled payments before any upfront cash.',
+      },
+    ],
+    useCases: [
+      '✓ Compare monthly affordability across different boat prices and repayment terms.',
+      '✓ Quantify how a larger down payment or trade-in changes the financed balance.',
+      '✓ Separate tax and fees from principal and interest when reviewing a dealer quote.',
+      '✓ Compare the long-term cost of a short term against a lower monthly payment on a longer term.',
+      '✓ Inspect the annual schedule to see how the balance declines over time.',
+    ],
+    commonPitfalls: [
+      '⚠ Entering a monthly rate in the annual interest-rate field; the calculator converts an annual percentage to a monthly rate internally.',
+      '⚠ Treating a quoted monthly payment as the full ownership cost without checking taxes, fees, insurance, storage, and maintenance separately.',
+      '⚠ Assuming every jurisdiction calculates sales tax on the same taxable base; local rules can differ.',
+      '⚠ Using a negative value to represent a credit; enter trade-in value and down payment as non-negative amounts.',
+      '⚠ Choosing a long term only because the monthly payment is lower; total interest can increase with more payments.',
+    ],
+    glossary: [
+      { term: 'Amount Financed', definition: 'The balance used in the payment formula after the entered down payment and trade-in reduction, plus calculated sales tax and fees.' },
+      { term: 'APR / Interest Rate', definition: 'The annual percentage rate entered for the fixed-rate loan. The calculator divides it by 1,200 to obtain a monthly rate.' },
+      { term: 'Amortization', definition: 'The process of allocating each payment between interest and principal until the balance reaches zero.' },
+      { term: 'Trade-In Value', definition: 'The value entered for an existing boat or asset applied as a reduction to the taxable balance in this model.' },
+      { term: 'Total Interest', definition: 'Scheduled payments minus the amount financed, floored at zero for the displayed result.' },
+      { term: 'Term', definition: 'The number of years selected for repayment; the formula converts it to monthly payment periods.' },
+    ],
+    sources: [
+      { title: 'Consumer Credit - Credit Cards and Loans', publisher: 'Consumer Financial Protection Bureau (CFPB)', url: 'https://www.consumerfinance.gov/consumer-tools/credit-cards/', year: 2024 },
+      { title: 'Understanding Auto and Boat Loans', publisher: 'Federal Trade Commission (FTC)', url: 'https://consumer.ftc.gov/articles/auto-loans', year: 2024 },
+    ],
+    author: {
+      name: 'CalculatorFree Financial Review Team',
+      credentials: 'Fixed-Rate Amortization Review',
+      description: 'The client-side loan arithmetic and edge-case handling are reviewed against the standard fixed-rate amortization model; local tax and lending rules should be confirmed with a qualified provider.',
+    },
+  },
 };

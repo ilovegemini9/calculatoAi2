@@ -269,6 +269,16 @@ export const CALCULATORS: CalculatorMeta[] = [
     keywords: ['auto lease calculator', 'car lease calculator', 'lease payment calculator', 'money factor calculator', 'residual value calculator', 'cap cost calculator', 'lease vs buy calculator'],
     icon: '🔑',
   },
+  {
+    slug: 'boat-loan',
+    name: 'Boat Loan Calculator',
+    shortName: 'Boat Loan',
+    category: 'financial',
+    description:
+      'Estimate boat loan payments, total interest, financed amount, taxes, fees, and yearly amortization from your purchase price and loan terms.',
+    keywords: ['boat loan calculator', 'boat payment calculator', 'marine loan calculator', 'boat financing calculator', 'boat loan payment', 'boat interest calculator'],
+    icon: '⛵',
+  },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

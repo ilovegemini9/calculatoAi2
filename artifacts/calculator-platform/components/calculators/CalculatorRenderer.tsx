@@ -26,6 +26,7 @@ import { CanadianMortgageCalculator } from './CanadianMortgageCalculator';
 import { PersonalLoanCalculator } from './PersonalLoanCalculator';
 import { AutoLoanCalculator } from './AutoLoanCalculator';
 import { AutoLeaseCalculator } from './AutoLeaseCalculator';
+import { BoatLoanCalculator } from './BoatLoanCalculator';
 
 interface Props {
   slug: string;
@@ -59,6 +60,7 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'personal-loan':        return <PersonalLoanCalculator />;
     case 'auto-loan':            return <AutoLoanCalculator />;
     case 'auto-lease':           return <AutoLeaseCalculator />;
+    case 'boat-loan':            return <BoatLoanCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
