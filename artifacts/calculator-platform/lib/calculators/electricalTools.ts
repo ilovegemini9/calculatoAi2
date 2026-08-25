@@ -1,0 +1,4 @@
+function safe(value:number){return Number.isFinite(value)?Math.max(0,value):0}
+export function resistorFromBands(first:number,second:number,multiplier:number,tolerance:number){const a=Math.max(0,Math.min(9,Math.trunc(safe(first)))),b=Math.max(0,Math.min(9,Math.trunc(safe(second)))),m=Math.max(0,Math.min(9,Math.trunc(safe(multiplier))));const nominal=(a*10+b)*10**m;return{ohms:nominal,tolerancePercent:safe(tolerance),low:nominal*(1-safe(tolerance)/100),high:nominal*(1+safe(tolerance)/100)};}
+export function ohmsLaw(voltage:number,current:number){const v=safe(voltage),i=safe(current);return{resistance:i>0?v/i:0,power:v*i};}
+export function electricityCost(watts:number,hours:number,pricePerKwh:number){const energy=safe(watts)*safe(hours)/1000;return{kilowattHours:energy,cost:energy*safe(pricePerKwh)};}

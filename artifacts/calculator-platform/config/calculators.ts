@@ -504,6 +504,9 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'horsepower', name: 'Horsepower Calculator', shortName: 'Horsepower', category: 'math', description: 'Convert watts to named mechanical and electrical horsepower conventions.', keywords: ['horsepower calculator','watts to horsepower','power conversion'], icon: '⚙️' },
   { slug: 'engine-horsepower', name: 'Engine Horsepower Calculator', shortName: 'Engine Horsepower', category: 'lifestyle', description: 'Estimate engine horsepower from torque in lb-ft and rotational speed in RPM.', keywords: ['engine horsepower calculator','torque rpm horsepower','car horsepower formula'], icon: '🏎️' },
   { slug: 'stair', name: 'Stair Calculator', shortName: 'Stair', category: 'lifestyle', description: 'Estimate riser count, tread count, run, and angle for a simple straight stair layout.', keywords: ['stair calculator','stair rise run calculator','stair stringer calculator'], icon: '🪜' },
+  { slug: 'resistor', name: 'Resistor Calculator', shortName: 'Resistor', category: 'math', description: 'Calculate nominal resistance and tolerance range from two digits, a multiplier, and tolerance.', keywords: ['resistor calculator','resistance color code calculator','resistor value calculator'], icon: '▤' },
+  { slug: 'ohms-law', name: 'Ohm’s Law Calculator', shortName: 'Ohm’s Law', category: 'math', description: 'Calculate resistance and power from entered voltage and current.', keywords: ['ohms law calculator','voltage current resistance calculator','electrical power calculator'], icon: 'Ω' },
+  { slug: 'electricity', name: 'Electricity Calculator', shortName: 'Electricity', category: 'lifestyle', description: 'Estimate energy use and cost from appliance power, usage time, and electricity price.', keywords: ['electricity calculator','energy cost calculator','appliance electricity cost'], icon: '🔌' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

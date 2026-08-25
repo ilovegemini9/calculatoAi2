@@ -14,6 +14,7 @@ import { FuelCostCalculator, VoltageDropCalculator, BtuCalculator, SquareFootage
 import { TimeCardCalculator, TimeZoneCalculator } from './TimeToolsCalculator';
 import { BraSizeCalculator, LoveCalculator, GdpCalculator, GasMileageCalculator } from './GeneralToolsCalculator';
 import { HorsepowerCalculator, EngineHorsepowerCalculator, StairCalculator } from './MechanicalToolsCalculator';
+import { ResistorCalculator, OhmsLawCalculator, ElectricityCalculator } from './ElectricalToolsCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -96,6 +97,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'horsepower': return <HorsepowerCalculator />;
     case 'engine-horsepower': return <EngineHorsepowerCalculator />;
     case 'stair': return <StairCalculator />;
+    case 'resistor': return <ResistorCalculator />;
+    case 'ohms-law': return <OhmsLawCalculator />;
+    case 'electricity': return <ElectricityCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;
