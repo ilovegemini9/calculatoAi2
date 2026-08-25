@@ -384,6 +384,11 @@ export const CALCULATORS: CalculatorMeta[] = [
   { slug: 'take-home-paycheck', name: 'Take-Home-Paycheck Calculator', shortName: 'Take Home Paycheck', category: 'financial', description: 'Estimate take-home amount from gross pay and tax-rate assumption.', keywords: ['take home paycheck calculator','paycheck calculator'], icon: '💵' },
   { slug: 'sales-tax', name: 'Sales Tax Calculator', shortName: 'Sales Tax', category: 'financial', description: 'Calculate sales tax and total purchase amount.', keywords: ['sales tax calculator','tax calculator'], icon: '🛒' },
   { slug: 'marriage-tax', name: 'Marriage Tax Calculator', shortName: 'Marriage Tax', category: 'financial', description: 'Estimate combined tax from two incomes and a shared rate assumption.', keywords: ['marriage tax calculator','married tax calculator'], icon: '💍' },
+  { slug: 'inflation', name: 'Inflation Calculator', shortName: 'Inflation', category: 'financial', description: 'Estimate future value after inflation.', keywords: ['inflation calculator','inflation rate calculator'], icon: '📈' },
+  { slug: 'depreciation', name: 'Depreciation Calculator', shortName: 'Depreciation', category: 'financial', description: 'Estimate declining book value.', keywords: ['depreciation calculator','asset depreciation calculator'], icon: '📉' },
+  { slug: 'average-return', name: 'Average Return Calculator', shortName: 'Average Return', category: 'financial', description: 'Estimate annualized return.', keywords: ['average return calculator','annualized return calculator'], icon: '📊' },
+  { slug: 'margin', name: 'Margin Calculator', shortName: 'Margin', category: 'financial', description: 'Calculate margin from revenue and cost.', keywords: ['margin calculator','profit margin calculator'], icon: '📐' },
+  { slug: 'discount', name: 'Discount Calculator', shortName: 'Discount', category: 'financial', description: 'Calculate sale price and discount savings.', keywords: ['discount calculator','sale price calculator'], icon: '🏷️' },
 ];
 
 export const CALCULATOR_BY_SLUG = Object.fromEntries(CALCULATORS.map((c) => [c.slug, c]));

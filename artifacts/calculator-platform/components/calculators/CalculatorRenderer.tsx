@@ -34,6 +34,7 @@ import { CashBackLowInterestCalculator, InterestCalculator, SimpleInterestCalcul
 import { InvestmentCalculator, RetirementCalculator, FourOhOneKCalculator, RothIraCalculator, IraCalculator } from './RetirementToolsCalculator';
 import { RmdCalculator, AnnuityCalculator, AnnuityPayoutCalculator, SavingsCalculator, CdCalculator } from './SavingsToolsCalculator';
 import { IncomeTaxCalculator, SalaryCalculator, TakeHomePaycheckCalculator, SalesTaxCalculator, MarriageTaxCalculator } from './TaxToolsCalculator';
+import { InflationCalculator, DepreciationCalculator, AverageReturnCalculator, MarginCalculator, DiscountCalculator } from './BusinessMathToolsCalculator';
 
 interface Props {
   slug: string;
@@ -97,6 +98,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'take-home-paycheck':    return <TakeHomePaycheckCalculator />;
     case 'sales-tax':              return <SalesTaxCalculator />;
     case 'marriage-tax':           return <MarriageTaxCalculator />;
+    case 'inflation':              return <InflationCalculator />;
+    case 'depreciation':           return <DepreciationCalculator />;
+    case 'average-return':         return <AverageReturnCalculator />;
+    case 'margin':                 return <MarginCalculator />;
+    case 'discount':               return <DiscountCalculator />;
     default:                     return <div className="p-8 text-slate-500 text-center">Calculator not found.</div>;
   }
 }
