@@ -2,7 +2,10 @@ export const siteConfig = {
   name: 'CalculatorFree',
   description:
     'Free online calculators for finance, math, health, and everyday life. Instant, accurate, and easy to use with no signup required. All tools run in-browser.',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://luckyhoroscope.online',
+  // Production is intentionally pinned to the www host. The middleware also
+  // redirects the apex host so metadata, sitemap URLs, and admin cookies use
+  // one origin consistently.
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.luckyhoroscope.online',
   ogImage: '/og-image.png',
   links: {
     github: '',
