@@ -6,7 +6,7 @@ export const siteConfig = {
   // redirects the apex host so metadata, sitemap URLs, and admin cookies use
   // one origin consistently.
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.luckyhoroscope.online',
-  ogImage: '/og-image.png',
+  ogImage: '/icon.svg',
   links: {
     github: '',
   },
