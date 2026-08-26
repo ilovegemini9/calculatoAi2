@@ -23,6 +23,7 @@ import { WindChillCalculator, HeatIndexCalculator, DewPointCalculator } from './
 import { BandwidthCalculator, Base64EncodeDecodeCalculator, UrlEncodeDecodeCalculator, TimeDurationCalculator, DayOfTheWeekCalculator } from './WebToolsCalculator';
 import { RandomNumberCalculator, PasswordGeneratorCalculator, DiceRollerCalculator, ShoeSizeCalculator } from './ReferenceUtilityCalculators';
 import { DayCounterCalculator } from './DayCounterCalculator';
+import { EmergencyFundCalculator } from './EmergencyFundCalculator';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -136,6 +137,7 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'dice-roller': return <DiceRollerCalculator />;
     case 'shoe-size': return <ShoeSizeCalculator />;
     case 'day-counter': return <DayCounterCalculator />;
+    case 'emergency-fund': return <EmergencyFundCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;

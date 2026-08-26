@@ -28,6 +28,9 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'loan payoff calculator',
       'monthly debt payment calculator',
       'credit card interest calculator',
+      'emergency fund calculator',
+      'emergency savings target',
+      'months of expenses calculator',
     ],
     routes: [
       'credit-utilization',
@@ -37,6 +40,7 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'debt-to-income',
       'debt-snowball',
       'debt-avalanche',
+      'emergency-fund',
     ],
   },
   {
