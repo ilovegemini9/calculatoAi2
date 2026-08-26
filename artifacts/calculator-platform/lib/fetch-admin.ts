@@ -6,14 +6,25 @@
  * same-origin cookie behaviour is unreliable across Vercel edge / Cloudflare
  * proxy hops that set additional CORS headers.
  */
+function pause(milliseconds: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
 export async function fetchAdmin(
   url: string,
   options: RequestInit = {},
 ): Promise<Response> {
-  const response = await fetch(url, {
-    ...options,
-    credentials: 'include',
-  });
+  const requestInit: RequestInit = { ...options, credentials: 'include' };
+  let response = await fetch(url, requestInit);
+
+  // A freshly issued session cookie can take one edge turn to become visible
+  // to a follow-up request. Retry one transient 401 before treating the
+  // session as stale; this prevents a successful login from immediately
+  // bouncing the user back to the login page during client navigation.
+  if (response.status === 401) {
+    await pause(120);
+    response = await fetch(url, requestInit);
+  }
 
   // A stale/expired session should never leave an admin page stuck on a
   // generic "Unable to load" state. Return the user to the login screen and

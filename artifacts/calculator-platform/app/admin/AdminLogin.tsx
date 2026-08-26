@@ -26,6 +26,20 @@ export function AdminLogin() {
       });
 
       if (res.ok) {
+        // Confirm that the freshly set cookie is accepted by the same API
+        // layer used by admin sections before navigating away from login.
+        // This absorbs a short serverless edge propagation delay and avoids
+        // an immediate 401 -> login bounce on the destination page.
+        let sessionReady = false;
+        for (let attempt = 0; attempt < 3 && !sessionReady; attempt += 1) {
+          if (attempt > 0) await new Promise((resolve) => window.setTimeout(resolve, 120));
+          const probe = await fetch('/api/admin/system', { credentials: 'include', cache: 'no-store' });
+          sessionReady = probe.ok;
+        }
+        if (!sessionReady) {
+          setError('Login succeeded, but the admin session could not be confirmed. Please try again.');
+          return;
+        }
         // Return to the page that triggered re-authentication when it is an
         // internal admin path; otherwise open the main dashboard.
         const returnTo = new URLSearchParams(window.location.search).get('returnTo');
