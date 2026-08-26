@@ -26,8 +26,11 @@ export function AdminLogin() {
       });
 
       if (res.ok) {
-        // Force full page reload to trigger server session refresh
-        window.location.reload();
+        // Return to the page that triggered re-authentication when it is an
+        // internal admin path; otherwise open the main dashboard.
+        const returnTo = new URLSearchParams(window.location.search).get('returnTo');
+        const nextPath = returnTo?.startsWith('/admin') ? returnTo : '/admin/dashboard';
+        window.location.replace(nextPath);
       } else {
         const data = await res.json();
         setError(data.error || 'Invalid credentials');
