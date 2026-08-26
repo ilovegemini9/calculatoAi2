@@ -2,7 +2,8 @@ import { cookies } from 'next/headers';
 import { createHmac, randomUUID, timingSafeEqual } from 'crypto';
 import type { NextResponse } from 'next/server';
 
-export const SESSION_COOKIE_NAME = 'admin_session';
+export const SESSION_COOKIE_NAME = 'admin_session_v2';
+export const LEGACY_SESSION_COOKIE_NAME = 'admin_session';
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60; // 30 days in seconds
 const SESSION_PREFIX = 'v3.';
 
@@ -87,7 +88,10 @@ export function sessionCookieOptions(maxAge = SESSION_MAX_AGE) {
 }
 
 export function setSessionTokenOnResponse(response: NextResponse, token: string) {
+  // Version the cookie so a stale token from an older deployment cannot win
+  // when browsers send multiple same-name cookies during a migration.
   response.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions());
+  response.cookies.set(LEGACY_SESSION_COOKIE_NAME, '', { ...sessionCookieOptions(0), maxAge: 0 });
 }
 
 /** Legacy helper retained for callers that still use it. */
@@ -97,6 +101,7 @@ export function setSessionOnResponse(response: NextResponse, username: string) {
 
 export function deleteSessionOnResponse(response: NextResponse) {
   response.cookies.set(SESSION_COOKIE_NAME, '', { ...sessionCookieOptions(0), maxAge: 0 });
+  response.cookies.set(LEGACY_SESSION_COOKIE_NAME, '', { ...sessionCookieOptions(0), maxAge: 0 });
 }
 
 /** Issue a portable session that every Vercel/serverless instance can verify. */
@@ -111,7 +116,7 @@ export async function revokeCurrentSession(): Promise<void> {
 
 export async function verifySession(): Promise<boolean> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value || cookieStore.get(LEGACY_SESSION_COOKIE_NAME)?.value;
   if (!token) return false;
   if (token.startsWith(SESSION_PREFIX)) return verifyStatelessToken(token);
   return verifyLegacyToken(token);
