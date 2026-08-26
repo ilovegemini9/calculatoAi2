@@ -125,6 +125,10 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'custom sided dice roller',
       'shoe size conversion',
       'foot length to shoe size',
+      'day counter',
+      'days between dates calculator',
+      'business days calculator',
+      'working days between dates',
     ],
     routes: [
       'scientific',
@@ -144,6 +148,7 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'password',
       'dice-roller',
       'shoe-size',
+      'day-counter',
     ],
   },
 ];
