@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
 import { CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS } from '@/config/calculators';
+import { getMenuCalculators, REFERENCE_MENU_GROUPS } from '@/config/menu';
 
 export const metadata: Metadata = {
   title: 'Sitemap',
@@ -42,6 +43,20 @@ export default function SitemapPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* Editorial menu map */}
+      <section className="mb-10" aria-labelledby="topic-directory-heading">
+        <h2 id="topic-directory-heading" className="text-xs font-black uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Browse by topic</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {REFERENCE_MENU_GROUPS.map((group) => <div key={group.id} id={`menu-${group.id}`} className="rounded-xl border p-4" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }}>
+            <h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{group.label}</h3>
+            <p className="text-xs mt-1 mb-2" style={{ color: 'var(--text-muted)' }}>{group.description}</p>
+            <ul className="space-y-1">
+              {getMenuCalculators(group, CALCULATORS, 3).map((calc) => <li key={calc.slug}><Link href={`/${calc.slug}-calculator`} className="text-xs text-blue-500 hover:underline">{calc.name}</Link></li>)}
+            </ul>
+          </div>)}
+        </div>
       </section>
 
       {/* Calculators by category */}

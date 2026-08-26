@@ -6,10 +6,12 @@ import { useState, useEffect } from 'react';
 import { siteConfig } from '@/config/site';
 import { CALCULATORS } from '@/config/calculators';
 import { ThemeToggle } from './ThemeToggle';
+import { getMenuCalculators, REFERENCE_MENU_GROUPS } from '@/config/menu';
 
 export function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [browseOpen, setBrowseOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -19,7 +21,10 @@ export function Header() {
   }, []);
 
   // Close menu on route change
-  useEffect(() => setMenuOpen(false), [pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+    setBrowseOpen(false);
+  }, [pathname]);
 
   if (pathname?.startsWith('/admin')) return null;
 
@@ -34,7 +39,7 @@ export function Header() {
           boxShadow: scrolled ? 'var(--shadow-hover)' : 'none',
         }}
       >
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4 relative">
           {/* Logo */}
           <Link
             href="/"
@@ -68,6 +73,31 @@ export function Header() {
             >
               About
             </Link>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setBrowseOpen((value) => !value)}
+                className={`px-3 py-1.5 rounded-lg transition hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)] ${browseOpen ? 'bg-[var(--bg-card-hover)] text-[var(--text-primary)] font-bold' : 'text-[var(--text-secondary)]'}`}
+                aria-expanded={browseOpen}
+                aria-haspopup="true"
+              >
+                Browse
+              </button>
+              {browseOpen && (
+                <div className="absolute right-0 top-10 z-50 w-[min(90vw,520px)] rounded-2xl border p-3 shadow-2xl grid grid-cols-2 gap-1" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                  {REFERENCE_MENU_GROUPS.map((group) => {
+                    const featured = getMenuCalculators(group, CALCULATORS, 3);
+                    return <div key={group.id} className="rounded-xl p-2 hover:bg-[var(--bg-card-hover)]">
+                      <Link href={`/#menu-${group.id}`} className="block text-sm font-bold text-blue-500 hover:underline">{group.label}</Link>
+                      <p className="mt-1 text-[10px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{group.description}</p>
+                      <div className="mt-1 flex flex-wrap gap-x-2 gap-y-1">
+                        {featured.map((calculator) => <Link key={calculator.slug} href={`/${calculator.slug}-calculator`} className="text-[10px] hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>{calculator.shortName}</Link>)}
+                      </div>
+                    </div>;
+                  })}
+                </div>
+              )}
+            </div>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -125,6 +155,11 @@ export function Header() {
               >
                 About
               </Link>
+
+              <p className="text-[10px] font-black uppercase tracking-widest px-3 pb-1 pt-3" style={{ color: 'var(--text-muted)' }}>Browse by category</p>
+              <div className="grid grid-cols-2 gap-1">
+                {REFERENCE_MENU_GROUPS.map((group) => <Link key={group.id} href={`/#menu-${group.id}`} className="px-3 py-2 rounded-lg text-sm transition hover:bg-[var(--bg-card-hover)]" style={{ color: 'var(--text-secondary)' }}>{group.label}</Link>)}
+              </div>
 
               <p className="text-[10px] font-black uppercase tracking-widest px-3 pb-1 pt-3" style={{ color: 'var(--text-muted)' }}>Calculators</p>
               <div className="grid grid-cols-2 gap-1">

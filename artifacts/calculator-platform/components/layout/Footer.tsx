@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { siteConfig } from '@/config/site';
 import { CALCULATORS } from '@/config/calculators';
+import { getMenuCalculators, REFERENCE_MENU_GROUPS } from '@/config/menu';
 
 export function Footer() {
   const pathname = usePathname();
@@ -23,7 +24,7 @@ export function Footer() {
               <span>{siteConfig.name}</span>
             </Link>
             <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Free online calculators for everyday decisions. Fast, private, and always accurate.
+              Free online calculators for everyday decisions. Client-side, transparent, and built with formula notes and source links on supported pages.
             </p>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-green-500 bg-green-500/10 px-2.5 py-1 rounded-full">
@@ -33,33 +34,29 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Calculators */}
+          {/* Grouped calculator menu */}
           <div>
-            <h3 className="font-bold text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-primary)' }}>Calculators</h3>
-            <ul className="space-y-2 text-sm">
-              {CALCULATORS.slice(0, 4).map((c) => (
-                <li key={c.slug}>
-                  <Link href={`/${c.slug}-calculator`} className="transition-colors flex items-center gap-1.5 hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>
-                    <span className="text-xs">{c.icon}</span>
-                    {c.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3 className="font-bold text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-primary)' }}>Browse by topic</h3>
+            {REFERENCE_MENU_GROUPS.slice(0, 5).map((group) => (
+              <div key={group.id} className="mb-3">
+                <Link href={`/#menu-${group.id}`} className="text-xs font-bold text-blue-500 hover:underline">{group.label}</Link>
+                <ul className="mt-1 space-y-1">
+                  {getMenuCalculators(group, CALCULATORS, 2).map((c) => <li key={c.slug}><Link href={`/${c.slug}-calculator`} className="text-xs transition-colors hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>{c.shortName}</Link></li>)}
+                </ul>
+              </div>
+            ))}
           </div>
 
           <div>
-            <h3 className="font-bold text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-primary)' }}>More</h3>
-            <ul className="space-y-2 text-sm">
-              {CALCULATORS.slice(4).map((c) => (
-                <li key={c.slug}>
-                  <Link href={`/${c.slug}-calculator`} className="transition-colors flex items-center gap-1.5 hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>
-                    <span className="text-xs">{c.icon}</span>
-                    {c.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <h3 className="font-bold text-xs uppercase tracking-widest mb-4" style={{ color: 'var(--text-primary)' }}>More topics</h3>
+            {REFERENCE_MENU_GROUPS.slice(5).map((group) => (
+              <div key={group.id} className="mb-3">
+                <Link href={`/#menu-${group.id}`} className="text-xs font-bold text-blue-500 hover:underline">{group.label}</Link>
+                <ul className="mt-1 space-y-1">
+                  {getMenuCalculators(group, CALCULATORS, 2).map((c) => <li key={c.slug}><Link href={`/${c.slug}-calculator`} className="text-xs transition-colors hover:text-blue-500" style={{ color: 'var(--text-secondary)' }}>{c.shortName}</Link></li>)}
+                </ul>
+              </div>
+            ))}
           </div>
 
           {/* Company */}

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
-import { CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS } from '@/config/calculators';
+import { CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS, type CalculatorMeta } from '@/config/calculators';
 import { organizationSchema, websiteSchema } from '@/lib/schemas';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 import { KEYWORD_CLUSTERS } from '@/config/keyword-clusters';
+import { getMenuCalculators, REFERENCE_MENU_GROUPS } from '@/config/menu';
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = getSeoSettings((await getDb()).settings.seo);
@@ -58,12 +59,14 @@ export default async function HomePage() {
 
   // Retrieve dynamic calculators and merge
   const db = await getDb();
-  const dynamicCalcs = db.calculators.map((c) => ({
+  const dynamicCalcs: CalculatorMeta[] = db.calculators.map((c) => ({
     slug: c.slug,
     name: c.name,
+    shortName: c.name.replace(/\s*Calculator\s*/i, ''),
     description: c.metadata.description,
+    keywords: c.metadata.keywords,
     icon: '⚡',
-    category: c.category,
+    category: c.category as CalculatorMeta['category'],
   }));
 
   const allCalculators = [...CALCULATORS, ...dynamicCalcs];
@@ -185,6 +188,38 @@ export default async function HomePage() {
             </div>
           );
         })}
+      </section>
+
+      {/* ── Reference-style menu map ── */}
+      <section
+        className="border-t py-14 px-4"
+        style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-page)' }}
+        aria-labelledby="menu-map-heading"
+      >
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-7">
+            <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Calculator menu</p>
+            <h2 id="menu-map-heading" className="text-2xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+              Browse calculators by topic
+            </h2>
+            <p className="text-sm mt-2 max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
+              Use the editorial menu to move from a question to a relevant calculator. Some tools appear in more than one topic when the intent genuinely overlaps.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {REFERENCE_MENU_GROUPS.map((group) => {
+              const entries = getMenuCalculators(group, allCalculators, 4);
+              return <div key={group.id} id={`menu-${group.id}`} className="rounded-2xl border p-4 scroll-mt-20" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{group.label}</h3>
+                <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'var(--text-muted)' }}>{group.description}</p>
+                <ul className="space-y-1.5">
+                  {entries.map((calculator) => <li key={calculator.slug}><Link href={`/${calculator.slug}-calculator`} className="text-xs text-blue-500 hover:underline">{calculator.name}</Link></li>)}
+                </ul>
+                <Link href="/sitemap" className="inline-block mt-3 text-[10px] font-bold text-blue-500 hover:underline">See full directory →</Link>
+              </div>;
+            })}
+          </div>
+        </div>
       </section>
 
       {/* ── Topic clusters ── */}
