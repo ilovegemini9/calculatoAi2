@@ -1,11 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Admin authentication is handled by the admin layout and API route handlers.
- * Keep middleware as a completely transparent pass-through so nested admin
- * navigations preserve the browser's Cookie header exactly as received.
+ * Keep one browser origin for the whole production app.
+ * Admin sessions intentionally use a __Host- cookie, so allowing the apex
+ * and www hosts to serve the app independently can create two separate
+ * sessions. Redirect the apex host to the canonical www host before any
+ * application request is rendered.
  */
-export function middleware() {
+export function middleware(request: NextRequest) {
+  const hostname = request.headers.get('host')?.split(':')[0]?.toLowerCase();
+  if (hostname === 'luckyhoroscope.online') {
+    const url = request.nextUrl.clone();
+    url.hostname = 'www.luckyhoroscope.online';
+    url.protocol = 'https:';
+    return NextResponse.redirect(url, 308);
+  }
+
   return NextResponse.next();
 }
 
