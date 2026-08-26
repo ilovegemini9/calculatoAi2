@@ -12,7 +12,11 @@ function normalizeOrigin(value: string): string {
 }
 
 function normalizeAsset(value: string): string {
-  return value === BROKEN_OG_IMAGE ? '/icon.svg' : value;
+  const normalized = normalizeOrigin(value || '');
+  const pathname = normalized.startsWith(CANONICAL_ORIGIN)
+    ? normalized.slice(CANONICAL_ORIGIN.length)
+    : normalized;
+  return pathname === BROKEN_OG_IMAGE ? '/icon.svg' : normalized;
 }
 
 const defaultJsonLd = {
