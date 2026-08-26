@@ -1,14 +1,11 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
- * Pass-through middleware only.
- *
- * Admin authentication is intentionally handled by the admin layout and API
- * route handlers. Middleware must not rewrite request headers or perform a
- * second auth check: doing either can cause cookies to be lost/duplicated on
- * Vercel when navigating between nested admin routes and /api/admin/*.
+ * Admin authentication is handled by the admin layout and API route handlers.
+ * Keep middleware as a completely transparent pass-through so nested admin
+ * navigations preserve the browser's Cookie header exactly as received.
  */
-export function middleware(_request: NextRequest) {
+export function middleware() {
   return NextResponse.next();
 }
 
