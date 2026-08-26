@@ -21,6 +21,7 @@ import { GolfHandicapCalculator, TireSizeCalculator } from './SportsToolsCalcula
 import { SleepCalculator, RoofingCalculator, TileCalculator, MulchCalculator, GravelCalculator } from './HomeToolsCalculator';
 import { WindChillCalculator, HeatIndexCalculator, DewPointCalculator } from './WeatherToolsCalculator';
 import { BandwidthCalculator, Base64EncodeDecodeCalculator, UrlEncodeDecodeCalculator, TimeDurationCalculator, DayOfTheWeekCalculator } from './WebToolsCalculator';
+import { RandomNumberCalculator, PasswordGeneratorCalculator, DiceRollerCalculator, ShoeSizeCalculator } from './ReferenceUtilityCalculators';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -129,6 +130,10 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'url-encode-decode': return <UrlEncodeDecodeCalculator />;
     case 'time-duration': return <TimeDurationCalculator />;
     case 'day-of-the-week': return <DayOfTheWeekCalculator />;
+    case 'random-number': return <RandomNumberCalculator />;
+    case 'password': return <PasswordGeneratorCalculator />;
+    case 'dice-roller': return <DiceRollerCalculator />;
+    case 'shoe-size': return <ShoeSizeCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;
