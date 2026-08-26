@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { BarChart3, TrendingUp, Gauge, ExternalLink } from 'lucide-react';
 import { getDb } from '@/lib/db';
 import { StatCard, ContentCard } from '@/components/admin/Card';
@@ -26,7 +27,7 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">Admin</p><h1 className="mt-1 text-2xl font-bold text-[var(--text-primary)]">Dashboard</h1><p className="mt-1 text-sm text-[var(--text-muted)]">Simple overview of your platform performance.</p></div>
-        <a href="/admin/analytics" className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium" style={{ borderColor: 'var(--border)' }}><BarChart3 className="h-4 w-4" /> Analytics <ExternalLink className="h-3.5 w-3.5" /></a>
+        <Link href="/admin/analytics" className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium" style={{ borderColor: 'var(--border)' }}><BarChart3 className="h-4 w-4" /> Analytics <ExternalLink className="h-3.5 w-3.5" /></Link>
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard label="Page Views" value={totalViews.toLocaleString()} icon={<TrendingUp className="h-4 w-4" />} />
