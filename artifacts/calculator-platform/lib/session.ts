@@ -1,54 +1,81 @@
 import { cookies } from 'next/headers';
-import { createHash, createHmac, randomUUID, timingSafeEqual } from 'crypto';
+import { createHmac, randomUUID, timingSafeEqual } from 'crypto';
 import type { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
 
 export const SESSION_COOKIE_NAME = 'admin_session';
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60; // 30 days in seconds
-const DB_SESSION_PREFIX = 'v2.';
+const SESSION_PREFIX = 'v3.';
 
-/** Lazily resolved for the legacy local fallback only. */
+/** Shared signing secret. Set SESSION_SECRET in production. */
 function getSessionSecret(): string {
-  const secret = process.env.SESSION_SECRET || 'dev-session-secret-default-key-change-in-prod';
-  return secret;
+  return process.env.SESSION_SECRET || 'dev-session-secret-default-key-change-in-prod';
 }
 
-function hasDurableDatabase(): boolean {
-  return Boolean(
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.POSTGRES_PRISMA_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING,
-  );
+function signPayload(payload: string): string {
+  return createHmac('sha256', getSessionSecret()).update(payload).digest('base64url');
 }
 
-function hashSessionToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
-}
-
-/** Sign a username with HMAC-SHA256 for local/dev fallback sessions. */
-function signUsername(username: string): string {
-  return createHmac('sha256', getSessionSecret()).update(username).digest('hex');
-}
-
-function verifySignature(username: string, signature: string): boolean {
+function safeEqual(a: string, b: string): boolean {
   try {
-    const expected = signUsername(username);
-    if (expected.length !== signature.length) return false;
-    return timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(signature, 'utf8'));
+    const left = Buffer.from(a, 'utf8');
+    const right = Buffer.from(b, 'utf8');
+    return left.length === right.length && timingSafeEqual(left, right);
   } catch {
     return false;
   }
 }
 
-/** Build the legacy signed session token used only when no durable DB is configured. */
-export function buildSessionToken(username: string): string {
-  const signature = signUsername(username);
-  return JSON.stringify({ username, signature });
+/** Stateless signed session token: no DB read/write is needed on navigation. */
+function buildStatelessToken(username: string): string {
+  const expiresAt = Math.floor(Date.now() / 1000) + SESSION_MAX_AGE;
+  const nonce = randomUUID();
+  const payload = JSON.stringify({ username, expiresAt, nonce });
+  const encoded = Buffer.from(payload, 'utf8').toString('base64url');
+  return `${SESSION_PREFIX}${encoded}.${signPayload(encoded)}`;
 }
 
-/** Cookie options shared between login and logout. */
+function verifyStatelessToken(token: string): boolean {
+  if (!token.startsWith(SESSION_PREFIX)) return false;
+  const value = token.slice(SESSION_PREFIX.length);
+  const separator = value.lastIndexOf('.');
+  if (separator <= 0) return false;
+
+  const encoded = value.slice(0, separator);
+  const signature = value.slice(separator + 1);
+  if (!safeEqual(signPayload(encoded), signature)) return false;
+
+  try {
+    const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8')) as {
+      username?: string;
+      expiresAt?: number;
+      nonce?: string;
+    };
+    return Boolean(
+      payload.username &&
+      payload.nonce &&
+      typeof payload.expiresAt === 'number' &&
+      payload.expiresAt > Math.floor(Date.now() / 1000),
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Legacy signed token support for local/dev sessions created before v3. */
+function verifyLegacyToken(token: string): boolean {
+  try {
+    const { username, signature } = JSON.parse(token) as {
+      username?: string;
+      signature?: string;
+    };
+    if (!username || !signature) return false;
+    const expected = createHmac('sha256', getSessionSecret()).update(username).digest('hex');
+    return safeEqual(expected, signature);
+  } catch {
+    return false;
+  }
+}
+
 export function sessionCookieOptions(maxAge = SESSION_MAX_AGE) {
   return {
     httpOnly: true,
@@ -59,92 +86,35 @@ export function sessionCookieOptions(maxAge = SESSION_MAX_AGE) {
   };
 }
 
-/** Set an opaque DB-backed session token on a response. */
 export function setSessionTokenOnResponse(response: NextResponse, token: string) {
   response.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions());
 }
 
-/** Set the legacy signed session token on a response. */
+/** Legacy helper retained for callers that still use it. */
 export function setSessionOnResponse(response: NextResponse, username: string) {
-  setSessionTokenOnResponse(response, buildSessionToken(username));
+  setSessionTokenOnResponse(response, buildStatelessToken(username));
 }
 
-/** Delete the session cookie directly on a NextResponse object. */
 export function deleteSessionOnResponse(response: NextResponse) {
   response.cookies.set(SESSION_COOKIE_NAME, '', { ...sessionCookieOptions(0), maxAge: 0 });
 }
 
-/**
- * Issue a session that is verifiable by every serverless instance through the
- * shared database. Local environments without a DB retain the old HMAC flow.
- */
+/** Issue a portable session that every Vercel/serverless instance can verify. */
 export async function issueSessionToken(username: string): Promise<string> {
-  if (!hasDurableDatabase()) return buildSessionToken(username);
-
-  const token = `${DB_SESSION_PREFIX}${randomUUID()}-${randomUUID()}`;
-  const now = Date.now();
-  const db = await getDb();
-  const activeSessions = (db.sessions || []).filter((session) => session.expiresAt > now);
-  db.sessions = [
-    ...activeSessions,
-    {
-      id: randomUUID(),
-      username,
-      tokenHash: hashSessionToken(token),
-      createdAt: new Date(now).toISOString(),
-      expiresAt: now + SESSION_MAX_AGE * 1000,
-    },
-  ].slice(-100);
-  await saveDb(db);
-  return token;
+  return buildStatelessToken(username);
 }
 
-/** Revoke the current DB-backed session during logout when possible. */
+/** Stateless sessions have nothing to revoke server-side. */
 export async function revokeCurrentSession(): Promise<void> {
-  if (!hasDurableDatabase()) return;
-  const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  if (!token?.startsWith(DB_SESSION_PREFIX)) return;
-
-  const db = await getDb();
-  const tokenHash = hashSessionToken(token);
-  const nextSessions = (db.sessions || []).filter((session) => session.tokenHash !== tokenHash);
-  if (nextSessions.length !== (db.sessions || []).length) {
-    db.sessions = nextSessions;
-    await saveDb(db);
-  }
+  return;
 }
 
-/** Verify either a shared DB-backed token or a legacy HMAC token. */
 export async function verifySession(): Promise<boolean> {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!token) return false;
-
-  if (token.startsWith(DB_SESSION_PREFIX)) {
-    if (!hasDurableDatabase()) return false;
-    try {
-      const db = await getDb();
-      const now = Date.now();
-      const tokenHash = hashSessionToken(token);
-      return (db.sessions || []).some(
-        (session) => session.tokenHash === tokenHash && session.expiresAt > now,
-      );
-    } catch {
-      return false;
-    }
-  }
-
-  try {
-    const { username, signature } = JSON.parse(token) as {
-      username?: string;
-      signature?: string;
-    };
-    if (!username || !signature) return false;
-    return verifySignature(username, signature);
-  } catch {
-    return false;
-  }
+  if (token.startsWith(SESSION_PREFIX)) return verifyStatelessToken(token);
+  return verifyLegacyToken(token);
 }
 
 /** @deprecated Prefer issueSessionToken() + setSessionTokenOnResponse(). */
@@ -155,7 +125,6 @@ export async function createSession(username: string) {
 
 /** @deprecated Prefer deleteSessionOnResponse(). */
 export async function deleteSession() {
-  await revokeCurrentSession();
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE_NAME);
 }
