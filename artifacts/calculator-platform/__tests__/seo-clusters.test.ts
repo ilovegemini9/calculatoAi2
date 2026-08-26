@@ -7,8 +7,8 @@ import { defaultLlmsTxt, ensureLlmsCalculatorCoverage } from '../lib/seo';
 const baseUrl = 'https://example.test';
 const generated = defaultLlmsTxt(baseUrl);
 
-assert.equal(KEYWORD_CLUSTERS.length, 4);
-assert.equal(new Set(KEYWORD_CLUSTERS.map((cluster) => cluster.id)).size, 4);
+assert.equal(KEYWORD_CLUSTERS.length, 5);
+assert.equal(new Set(KEYWORD_CLUSTERS.map((cluster) => cluster.id)).size, 5);
 assert.ok(CALCULATORS.every((calculator) => getKeywordClusterId(calculator.slug)));
 assert.ok(CALCULATORS.every((calculator) => generated.includes(`${baseUrl}/${calculator.slug}-calculator`)));
 

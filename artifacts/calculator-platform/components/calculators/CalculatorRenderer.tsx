@@ -23,7 +23,9 @@ import { WindChillCalculator, HeatIndexCalculator, DewPointCalculator } from './
 import { BandwidthCalculator, Base64EncodeDecodeCalculator, UrlEncodeDecodeCalculator, TimeDurationCalculator, DayOfTheWeekCalculator } from './WebToolsCalculator';
 import { RandomNumberCalculator, PasswordGeneratorCalculator, DiceRollerCalculator, ShoeSizeCalculator } from './ReferenceUtilityCalculators';
 import { DayCounterCalculator } from './DayCounterCalculator';
+import { DaysUntilCalculator } from './DaysUntilCalculator';
 import { EmergencyFundCalculator } from './EmergencyFundCalculator';
+import { CagrCalculator, LoanToValueCalculator, BillSplitCalculator } from './FinanceParityCalculators';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -137,7 +139,11 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'dice-roller': return <DiceRollerCalculator />;
     case 'shoe-size': return <ShoeSizeCalculator />;
     case 'day-counter': return <DayCounterCalculator />;
+    case 'days-until': return <DaysUntilCalculator />;
     case 'emergency-fund': return <EmergencyFundCalculator />;
+    case 'cagr': return <CagrCalculator />;
+    case 'loan-to-value': return <LoanToValueCalculator />;
+    case 'bill-split': return <BillSplitCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;

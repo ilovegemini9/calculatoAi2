@@ -1,4 +1,4 @@
-export type KeywordClusterId = 'debt-credit' | 'mortgage-loan' | 'health-fitness' | 'math-other';
+export type KeywordClusterId = 'debt-credit' | 'mortgage-loan' | 'savings-investing' | 'health-fitness' | 'math-other';
 
 export interface KeywordCluster {
   id: KeywordClusterId;
@@ -58,6 +58,9 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'personal loan payment calculator',
       'auto loan payment calculator',
       'student loan payment calculator',
+      'loan to value calculator',
+      'LTV ratio calculator',
+      'combined loan to value calculator',
     ],
     routes: [
       'mortgage',
@@ -68,7 +71,24 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'mortgage-payoff',
       'personal-loan',
       'student-loan',
+      'loan-to-value',
     ],
+  },
+  {
+    id: 'savings-investing',
+    label: 'Savings & Investing Calculators',
+    description: 'Project compound growth, retirement balances, inflation effects, and annualized investment performance with stated assumptions.',
+    keywords: [
+      'CAGR calculator',
+      'compound annual growth rate calculator',
+      'investment growth calculator',
+      'compound interest calculator',
+      'retirement savings calculator',
+      '401k contribution calculator',
+      'savings growth calculator',
+      'inflation calculator',
+    ],
+    routes: ['cagr', 'compound-interest', 'investment', 'retirement', '401k', 'savings', 'inflation'],
   },
   {
     id: 'health-fitness',
@@ -133,6 +153,12 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'days between dates calculator',
       'business days calculator',
       'working days between dates',
+      'days until calculator',
+      'days since calculator',
+      'countdown to date calculator',
+      'bill split calculator',
+      'split bill with tip',
+      'restaurant bill calculator',
     ],
     routes: [
       'scientific',
@@ -153,6 +179,8 @@ export const KEYWORD_CLUSTERS: KeywordCluster[] = [
       'dice-roller',
       'shoe-size',
       'day-counter',
+      'days-until',
+      'bill-split',
     ],
   },
 ];
@@ -170,6 +198,7 @@ export function getKeywordClusterId(slug: string): KeywordClusterId {
   if (exact) return exact;
   if (/debt|credit|payoff|consolidation|utilization|income/.test(slug)) return 'debt-credit';
   if (/mortgage|loan|rent|refinance|amortization|heloc|equity/.test(slug)) return 'mortgage-loan';
+  if (/cagr|compound-interest|investment|retirement|401k|savings|inflation|dividend|capital-gains/.test(slug)) return 'savings-investing';
   if (/bmi|calorie|bmr|tdee|weight|body|protein|macro|pace|pregnancy|heart|gfr|bac/.test(slug)) return 'health-fitness';
   return 'math-other';
 }
