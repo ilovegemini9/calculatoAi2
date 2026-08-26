@@ -7,12 +7,9 @@ import { ChevronRight, Home } from 'lucide-react';
 const SEGMENT_LABELS: Record<string, string> = {
   admin: 'Admin',
   dashboard: 'Dashboard',
-  articles: 'AI Articles',
-  calculators: 'AI Calculators',
   seo: 'SEO Center',
   analytics: 'Analytics',
   ads: 'Ads Manager',
-  verifications: 'Verification Center',
   users: 'Users',
   logs: 'Logs',
   settings: 'Settings',

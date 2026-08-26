@@ -4,34 +4,25 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
-  FileText,
-  Calculator,
   Search,
   BarChart3,
   Megaphone,
-  ShieldCheck,
   Users,
   ScrollText,
   Settings,
-  Bot,
   X,
   LogOut,
-  ExternalLink,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 
 const NAV_ITEMS = [
   { href: '/admin/dashboard',     label: 'Dashboard',           icon: LayoutDashboard },
-  { href: '/admin/articles',      label: 'AI Articles',         icon: FileText },
-  { href: '/admin/calculators',   label: 'AI Calculators',      icon: Calculator },
   { href: '/admin/seo',           label: 'SEO Center',          icon: Search },
   { href: '/admin/analytics',     label: 'Analytics',           icon: BarChart3 },
   { href: '/admin/ads',           label: 'Ads Manager',         icon: Megaphone },
-  { href: '/admin/verifications', label: 'Verification Center', icon: ShieldCheck },
   { href: '/admin/users',         label: 'Users',               icon: Users },
   { href: '/admin/logs',          label: 'Logs',                icon: ScrollText },
   { href: '/admin/settings',      label: 'Settings',            icon: Settings },
-  { href: '/admin/settings/ai',   label: 'AI Settings',         icon: Bot },
 ] as const;
 
 interface SidebarProps {
@@ -109,15 +100,6 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
         {/* Footer */}
         <div className="px-2 py-3 border-t shrink-0 space-y-0.5" style={{ borderColor: 'var(--border)' }}>
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)] transition w-full"
-          >
-            <ExternalLink className="w-4 h-4 shrink-0" />
-            View External Site
-          </a>
           <Link
             href="/api/admin/logout"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-500/10 transition w-full"

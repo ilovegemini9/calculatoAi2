@@ -74,7 +74,7 @@ function generateInitialLogs(): AppSchema['logs'] {
   return [
     { id: 'log-1', timestamp: new Date(now - 7_200_000).toISOString(), level: 'INFO', message: 'System initialization and database verify complete.', route: '/app' },
     { id: 'log-2', timestamp: new Date(now - 5_400_000).toISOString(), level: 'INFO', message: 'Admin session verified successfully.', route: '/admin' },
-    { id: 'log-3', timestamp: new Date(now - 2_700_000).toISOString(), level: 'INFO', message: 'AI Provider settings synchronized.', route: '/api/admin/settings/ai' },
+    { id: 'log-3', timestamp: new Date(now - 2_700_000).toISOString(), level: 'INFO', message: 'Platform settings synchronized.', route: '/api/admin/settings' },
     { id: 'log-4', timestamp: new Date(now - 600_000).toISOString(), level: 'INFO', message: 'SEO and Sitemap metadata generated.', route: '/api/admin/seo' },
   ];
 }

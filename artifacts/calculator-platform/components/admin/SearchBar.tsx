@@ -6,12 +6,9 @@ import { Search, X } from 'lucide-react';
 
 const QUICK_LINKS = [
   { label: 'Dashboard', href: '/admin/dashboard' },
-  { label: 'AI Articles', href: '/admin/articles' },
-  { label: 'AI Calculators', href: '/admin/calculators' },
   { label: 'SEO Center', href: '/admin/seo' },
   { label: 'Analytics', href: '/admin/analytics' },
   { label: 'Ads Manager', href: '/admin/ads' },
-  { label: 'Verification Center', href: '/admin/verifications' },
   { label: 'Users', href: '/admin/users' },
   { label: 'Logs', href: '/admin/logs' },
   { label: 'Settings', href: '/admin/settings' },
