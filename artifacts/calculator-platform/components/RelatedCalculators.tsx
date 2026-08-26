@@ -1,35 +1,42 @@
 import Link from 'next/link';
 import { CATEGORY_COLORS, CATEGORY_LABELS, type CalculatorMeta } from '@/config/calculators';
+import { getKeywordClusterId } from '@/config/keyword-clusters';
 
-/**
- * Score a candidate calculator's relevance to the current one.
- * Same category = strong signal (10 pts); keyword overlap adds additional points.
- */
-function relevanceScore(current: CalculatorMeta, candidate: CalculatorMeta): number {
-  const currentKeywords = new Set(current.keywords.map((k) => k.toLowerCase()));
-  const overlap = candidate.keywords.filter((k) =>
-    currentKeywords.has(k.toLowerCase()),
-  ).length;
-  const categoryBonus = candidate.category === current.category ? 10 : 0;
-  return categoryBonus + overlap;
+/** Score a candidate using the editorial cluster first, then category and exact intent overlap. */
+export function relevanceScore(current: CalculatorMeta, candidate: CalculatorMeta): number {
+  const currentKeywords = new Set(current.keywords.map((keyword) => keyword.toLowerCase()));
+  const overlap = new Set(
+    candidate.keywords
+      .map((keyword) => keyword.toLowerCase())
+      .filter((keyword) => currentKeywords.has(keyword)),
+  ).size;
+  const sameCluster = getKeywordClusterId(current.slug) === getKeywordClusterId(candidate.slug);
+  const clusterBonus = sameCluster ? 30 : 0;
+  const categoryBonus = candidate.category === current.category ? 8 : 0;
+  return clusterBonus + categoryBonus + overlap * 3;
 }
 
 /**
- * Return up to `maxCount` related calculators for the given calculator.
- * Prioritises same-category matches, then fills remaining slots with
- * cross-category calculators that share the most keywords.
+ * Return up to `maxCount` related calculators without self-links or duplicate slugs.
+ * Same editorial cluster and matching search intent lead; category is a fallback.
  */
 export function getRelatedCalculators(
   current: CalculatorMeta,
   all: CalculatorMeta[],
   maxCount = 6,
 ): CalculatorMeta[] {
-  return all
-    .filter((c) => c.slug !== current.slug)
-    .map((c) => ({ calc: c, score: relevanceScore(current, c) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, maxCount)
-    .map((s) => s.calc);
+  if (maxCount <= 0) return [];
+
+  const ranked = all
+    .filter((candidate, index, source) =>
+      candidate.slug !== current.slug && source.findIndex((item) => item.slug === candidate.slug) === index,
+    )
+    .map((calc, index) => ({ calc, score: relevanceScore(current, calc), index }))
+    .sort((a, b) => b.score - a.score || a.index - b.index);
+
+  const relevant = ranked.filter(({ score }) => score > 0);
+  const fallback = ranked.filter(({ score }) => score === 0);
+  return [...relevant, ...fallback].slice(0, maxCount).map(({ calc }) => calc);
 }
 
 interface RelatedCalculatorsProps {

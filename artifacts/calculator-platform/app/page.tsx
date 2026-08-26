@@ -5,6 +5,7 @@ import { CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS } from '@/config/calculat
 import { organizationSchema, websiteSchema } from '@/lib/schemas';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
+import { KEYWORD_CLUSTERS } from '@/config/keyword-clusters';
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = getSeoSettings((await getDb()).settings.seo);
@@ -46,9 +47,9 @@ const TRUST_ITEMS = [
     desc: 'No sign-up, no paywall, no hidden fees — ever.',
   },
   {
-    icon: '🎯',
-    title: 'Verified Accurate',
-    desc: 'Formulas verified against IRS, WHO, and academic standards.',
+    icon: '📚',
+    title: 'Transparent Methods',
+    desc: 'Formula explanations, worked examples, and source links are shown on calculator pages.',
   },
 ];
 
@@ -186,6 +187,50 @@ export default async function HomePage() {
         })}
       </section>
 
+      {/* ── Topic clusters ── */}
+      <section
+        className="border-t py-14 px-4"
+        style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-page)' }}
+        aria-labelledby="topic-clusters-heading"
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-end justify-between gap-4 mb-7">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Browse by intent</p>
+              <h2 id="topic-clusters-heading" className="text-2xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+                Find the right calculator for your question
+              </h2>
+            </div>
+            <Link href="/sitemap" className="hidden sm:inline text-sm font-semibold text-blue-500 hover:underline">
+              View directory →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {KEYWORD_CLUSTERS.map((cluster) => {
+              const featured = cluster.routes.find((slug) => CALCULATORS.some((calc) => calc.slug === slug));
+              return (
+                <div key={cluster.id} className="rounded-2xl border p-5" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                  <h3 className="font-bold text-base mb-1" style={{ color: 'var(--text-primary)' }}>{cluster.label}</h3>
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>{cluster.description}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {cluster.keywords.slice(0, 4).map((keyword) => (
+                      <span key={keyword} className="rounded-full px-2.5 py-1 text-[11px]" style={{ backgroundColor: 'var(--bg-input)', color: 'var(--text-muted)' }}>
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                  {featured && (
+                    <Link href={`/${featured}-calculator`} className="inline-block mt-4 text-xs font-bold text-blue-500 hover:underline">
+                      Explore {CALCULATORS.find((calc) => calc.slug === featured)?.shortName} →
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* ── Trust strip ── */}
       <section
         className="border-t py-12 px-4"
@@ -194,7 +239,7 @@ export default async function HomePage() {
       >
         <div className="max-w-5xl mx-auto">
           <h2 className="text-center text-xs font-black uppercase tracking-widest mb-8" style={{ color: 'var(--text-muted)' }}>
-            Why millions choose {siteConfig.name}
+            Why use {siteConfig.name}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {TRUST_ITEMS.map((item, i) => (
