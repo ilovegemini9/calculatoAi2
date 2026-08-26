@@ -58,7 +58,11 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           className="h-14 px-4 flex items-center justify-between border-b shrink-0"
           style={{ borderColor: 'var(--border)' }}
         >
-          <Link href="/admin/dashboard" className="flex items-center gap-2.5 font-bold text-sm tracking-tight">
+          <Link
+            href="/admin/dashboard"
+            prefetch={false}
+            className="flex items-center gap-2.5 font-bold text-sm tracking-tight"
+          >
             <span className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xs font-black shadow">
               ƒ
             </span>
@@ -81,6 +85,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               <Link
                 key={href}
                 href={href}
+                prefetch={false}
                 onClick={onClose}
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
