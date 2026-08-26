@@ -98,6 +98,7 @@ function createInitialDb(): AppSchema {
     settings: DEFAULT_SETTINGS,
     logs: generateInitialLogs(),
     backups: [],
+    sessions: [],
   };
 }
 
@@ -123,6 +124,7 @@ function applyDefaults(value: AppSchema): AppSchema {
     },
     logs: Array.isArray(value.logs) && value.logs.length > 0 ? value.logs : generateInitialLogs(),
     backups: value.backups || [],
+    sessions: value.sessions || [],
   };
 }
 

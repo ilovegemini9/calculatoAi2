@@ -3,7 +3,7 @@ export const revalidate = 0;
 
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
-import { setSessionOnResponse } from '@/lib/session';
+import { issueSessionToken, setSessionTokenOnResponse } from '@/lib/session';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: Request) {
@@ -57,7 +57,8 @@ export async function POST(req: Request) {
     // reliable approach on Vercel/serverless (avoids cookies() from next/headers
     // not propagating to the response in some Next.js 15 configurations).
     const loginResponse = NextResponse.json({ success: true });
-    setSessionOnResponse(loginResponse, finalUsername);
+    const sessionToken = await issueSessionToken(finalUsername);
+    setSessionTokenOnResponse(loginResponse, sessionToken);
     try {
       const { logEvent } = await import('@/lib/db');
       await logEvent('INFO', `Admin user '${finalUsername}' logged in successfully.`, '/api/admin/login');

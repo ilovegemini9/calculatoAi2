@@ -5,6 +5,14 @@ export interface AdminUser {
   createdAt: string;
 }
 
+export interface AdminSession {
+  id: string;
+  username: string;
+  tokenHash: string;
+  createdAt: string;
+  expiresAt: number;
+}
+
 export interface TestCase {
   name: string;
   type: 'unit' | 'edge' | 'formula';
@@ -465,4 +473,6 @@ export interface AppSchema {
   settings: SystemSettings;
   logs: LogEntry[];
   backups: BackupEntry[];
+  /** Shared session records used when durable database storage is configured. */
+  sessions?: AdminSession[];
 }
