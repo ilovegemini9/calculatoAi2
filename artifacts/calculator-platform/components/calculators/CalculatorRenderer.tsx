@@ -26,6 +26,7 @@ import { DayCounterCalculator } from './DayCounterCalculator';
 import { DaysUntilCalculator } from './DaysUntilCalculator';
 import { EmergencyFundCalculator } from './EmergencyFundCalculator';
 import { CagrCalculator, LoanToValueCalculator, BillSplitCalculator } from './FinanceParityCalculators';
+import { DcfCalculator, BreakEvenCalculator, CapitalGainsCalculator, DividendCalculator } from './InvestingGapCalculators';
 import { AgeCalculator } from './AgeCalculator';
 import { BMICalculator } from './BMICalculator';
 import { CalorieCalculator } from './CalorieCalculator';
@@ -144,6 +145,10 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'cagr': return <CagrCalculator />;
     case 'loan-to-value': return <LoanToValueCalculator />;
     case 'bill-split': return <BillSplitCalculator />;
+    case 'discounted-cash-flow-dcf': return <DcfCalculator />;
+    case 'break-even': return <BreakEvenCalculator />;
+    case 'capital-gains': return <CapitalGainsCalculator />;
+    case 'dividend': return <DividendCalculator />;
     case 'factor': return <FactorCalculator />;
     case 'matrix': return <MatrixCalculator />;
     case 'basic': return <BasicCalculator />;
