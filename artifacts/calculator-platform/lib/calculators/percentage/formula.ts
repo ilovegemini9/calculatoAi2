@@ -18,11 +18,13 @@ export function calculatePercentage(input: PercentageInput): PercentageResult {
     result = (xNum / 100) * yNum;
     explanation = `${xNum}% of ${yNum} is ${Math.round(result * 10000) / 10000}.`;
   } else if (input.caseType === 'whatPercentOf') {
-    if (xNum === 0) {
+    // X is the amount and Y is the reference/base value.
+    // Example: 25 is what percent of 200? => (25 / 200) * 100 = 12.5%.
+    if (yNum === 0) {
       explanation = 'Cannot divide by zero.';
     } else {
-      result = (yNum / xNum) * 100;
-      explanation = `${yNum} is ${Math.round(result * 10000) / 10000}% of ${xNum}.`;
+      result = (xNum / yNum) * 100;
+      explanation = `${xNum} is ${Math.round(result * 10000) / 10000}% of ${yNum}.`;
     }
   } else {
     if (xNum === 0) {
