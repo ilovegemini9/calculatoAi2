@@ -10,9 +10,7 @@ export function organizationSchema() {
     url: siteConfig.url,
     logo: {
       '@type': 'ImageObject',
-      url: `${siteConfig.url}/icon-512.png`,
-      width: 512,
-      height: 512,
+      url: `${siteConfig.url}/icon.svg`,
     },
     description: siteConfig.description,
     sameAs: [],
@@ -28,21 +26,9 @@ export function websiteSchema() {
     description: siteConfig.description,
     inLanguage: 'en-US',
     copyrightYear: new Date().getFullYear(),
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${siteConfig.url}/{slug}-calculator`,
-      },
-      'query-input': 'required name=slug',
-    },
   };
 }
 
-/**
- * WebApplication + SoftwareApplication dual type — recommended by Google for
- * AI Overviews (SGE) so the tool surfaces in both app and utility searches.
- */
 export function calculatorSchema(calc: CalculatorMeta) {
   return {
     '@context': 'https://schema.org',
@@ -100,12 +86,6 @@ export function faqSchema(items: { question: string; answer: string }[]) {
   };
 }
 
-/**
- * HowTo schema with Google-recommended fields:
- * - Named steps (not just text)
- * - estimatedCost (free tool)
- * - totalTime as ISO 8601 duration (PT{n}M heuristic: ~2 min per step)
- */
 export function howToSchema(calc: CalculatorMeta, steps: string[]) {
   if (!steps || steps.length === 0) return null;
   const estimatedMinutes = Math.max(2, steps.length * 2);
@@ -134,10 +114,6 @@ export function howToSchema(calc: CalculatorMeta, steps: string[]) {
   };
 }
 
-/**
- * ItemList schema for the Related Calculators section — helps Google understand
- * the site structure and distributes PageRank via explicit item declarations.
- */
 export function itemListSchema(
   items: { name: string; slug: string; description: string }[],
   listName = 'Related Calculators',
@@ -190,7 +166,7 @@ export function articleSchema({
       url: siteConfig.url,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteConfig.url}/icon-512.png`,
+        url: `${siteConfig.url}/icon.svg`,
       },
     },
     inLanguage: 'en-US',
@@ -198,7 +174,6 @@ export function articleSchema({
   };
 }
 
-/** Serialize multiple schemas as individual <script> tags (null schemas are filtered out) */
 export function jsonLd(...schemas: (object | null | undefined)[]) {
   return schemas
     .filter((s): s is object => s != null)
