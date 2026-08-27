@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">CalculatorFree — Free Online Calculators</title>
+  <desc id="desc">Free online calculators for finance, math, health, and everyday decisions.</desc>
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <rect x="70" y="70" width="1060" height="490" rx="36" fill="#ffffff" stroke="#dbe3ee" stroke-width="4"/>
+  <rect x="110" y="110" width="88" height="88" rx="20" fill="#0b2545"/>
+  <text x="154" y="171" text-anchor="middle" font-family="Arial, sans-serif" font-size="52" font-weight="700" fill="#ffffff">=</text>
+  <text x="230" y="155" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#0b2545">CalculatorFree</text>
+  <text x="230" y="195" font-family="Arial, sans-serif" font-size="22" fill="#64748b">Free, privacy-first online calculators</text>
+  <text x="110" y="305" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#0f172a">Finance · Math · Health · Everyday Life</text>
+  <text x="110" y="355" font-family="Arial, sans-serif" font-size="25" fill="#475569">Instant results, clear formulas, worked examples, and practical guidance.</text>
+  <rect x="110" y="420" width="310" height="70" rx="18" fill="#0b2545"/>
+  <text x="265" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#ffffff">Free Online Calculators</text>
+</svg>
