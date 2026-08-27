@@ -5,7 +5,7 @@ export const siteConfig = {
   // Keep one canonical production origin so canonical URLs, sitemap, robots,
   // structured data, and social metadata all resolve to the same host.
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.luckyhoroscope.online',
-  ogImage: '/icon.svg',
+  ogImage: '/og-image.svg',
   links: {
     github: '',
   },
