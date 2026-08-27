@@ -8,7 +8,10 @@ export async function GET() {
   const seo = getSeoSettings((await getDb()).settings.seo);
   if (!seo.llmsTxt.enabled) return new Response('llms.txt is disabled', { status: 404 });
 
-  const baseUrl = seo.canonicalUrl?.startsWith('http') ? seo.canonicalUrl : siteConfig.url;
+  // Keep the machine-readable discovery document on the same production
+  // origin as canonical URLs and sitemap/robots. Do not let a stale DB SEO
+  // setting silently reintroduce a bare/www host split.
+  const baseUrl = siteConfig.url.replace(/\/$/, '');
   const content = ensureLlmsCalculatorCoverage(
     seo.llmsTxt.content || defaultLlmsTxt(baseUrl),
     baseUrl,
