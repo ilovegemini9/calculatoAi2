@@ -1,33 +1,15 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {
-  fraction,
-  quadratic,
-  ratio,
-  scientific,
-  standardDeviation,
-} from '@/lib/calculators/mathCore';
-import {
-  Field,
-  inputClass,
-  InputsPanel,
-  ResultCard,
-  ResultsPanel,
-} from './ResultCard';
+import { fraction, quadratic, ratio, scientific, standardDeviation } from '@/lib/calculators/mathCore';
+import { Field, inputClass, InputsPanel, ResultCard, ResultsPanel } from './ResultCard';
 
 type Mode = 'scientific' | 'fraction' | 'standard-deviation' | 'ratio' | 'quadratic';
 
-type NumericField = {
-  key: 'a' | 'b' | 'c' | 'd';
-  label: string;
-  help?: string;
-};
+type NumericField = { key: 'a' | 'b' | 'c' | 'd'; label: string; help?: string };
 
 const modeFields: Record<Mode, NumericField[]> = {
-  scientific: [
-    { key: 'a', label: 'Value x', help: 'Angles for sine and cosine use radians.' },
-  ],
+  scientific: [{ key: 'a', label: 'Value x', help: 'Angles for sine and cosine use radians.' }],
   fraction: [
     { key: 'a', label: 'Numerator a' },
     { key: 'b', label: 'Denominator b' },
@@ -73,16 +55,15 @@ export function MathCoreCalculator({ mode }: { mode: Mode }) {
   const ratioResult = result as ReturnType<typeof ratio>;
   const quadraticResult = result as ReturnType<typeof quadratic>;
 
-  const title =
-    mode === 'scientific'
-      ? 'Scientific Calculator'
-      : mode === 'fraction'
-        ? 'Fraction Calculator'
-        : mode === 'standard-deviation'
-          ? 'Standard Deviation Calculator'
-          : mode === 'ratio'
-            ? 'Ratio Calculator'
-            : 'Quadratic Formula Calculator';
+  const title = mode === 'scientific'
+    ? 'Scientific Calculator'
+    : mode === 'fraction'
+      ? 'Fraction Calculator'
+      : mode === 'standard-deviation'
+        ? 'Standard Deviation Calculator'
+        : mode === 'ratio'
+          ? 'Ratio Calculator'
+          : 'Quadratic Formula Calculator';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -110,7 +91,7 @@ export function MathCoreCalculator({ mode }: { mode: Mode }) {
         ))}
         {mode === 'scientific' && (
           <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Evaluates x², sin(x), cos(x), and ln(x). For x ≤ 0, the guarded natural-log result is 0 because ln is undefined there.
+            Evaluates x², sin(x), cos(x), and ln(x). For x ≤ 0, ln(x) is undefined and is shown as an explicit undefined state.
           </p>
         )}
       </InputsPanel>
@@ -121,7 +102,7 @@ export function MathCoreCalculator({ mode }: { mode: Mode }) {
             <ResultCard highlight label="Square x²" value={scientificResult.square.toFixed(4)} />
             <ResultCard label="Sine sin(x)" value={scientificResult.sin.toFixed(4)} />
             <ResultCard label="Cosine cos(x)" value={scientificResult.cos.toFixed(4)} />
-            <ResultCard label="Natural log ln(x)" value={scientificResult.ln.toFixed(4)} />
+            <ResultCard label="Natural log ln(x)" value={Number.isFinite(scientificResult.ln) ? scientificResult.ln.toFixed(4) : 'Undefined for x ≤ 0'} />
           </>
         ) : mode === 'fraction' ? (
           <>
@@ -136,7 +117,7 @@ export function MathCoreCalculator({ mode }: { mode: Mode }) {
         ) : mode === 'ratio' ? (
           <>
             <ResultCard highlight label="Simplified Ratio" value={`${ratioResult.simplifiedFirst}:${ratioResult.simplifiedSecond}`} />
-            <ResultCard label="Decimal Ratio" value={ratioResult.ratio.toFixed(4)} />
+            <ResultCard label="Decimal Ratio" value={Number.isFinite(ratioResult.ratio) ? ratioResult.ratio.toFixed(4) : 'Undefined when second quantity is 0'} />
           </>
         ) : (
           <>
