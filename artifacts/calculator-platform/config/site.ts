@@ -2,9 +2,8 @@ export const siteConfig = {
   name: 'CalculatorFree',
   description:
     'Free online calculators for finance, math, health, and everyday life. Instant, accurate, and easy to use with no signup required. All tools run in-browser.',
-  // Production is intentionally pinned to the www host. The middleware also
-  // redirects the apex host so metadata, sitemap URLs, and admin cookies use
-  // one origin consistently.
+  // Keep one canonical production origin so canonical URLs, sitemap, robots,
+  // structured data, and social metadata all resolve to the same host.
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.luckyhoroscope.online',
   ogImage: '/icon.svg',
   links: {
