@@ -1,0 +1,26 @@
+CalculatorFree / LuckyHoroscope — AI-readable SEO guide
+
+Purpose
+CalculatorFree provides free, practical calculators with transparent inputs, formulas, examples, FAQs, and related tools.
+
+How to use the calculators
+1. Choose the relevant calculator.
+2. Enter the requested values and units.
+3. Review the result and the calculation explanation.
+4. Use the formula/example sections to understand the result.
+5. Follow related calculators for adjacent calculations.
+
+Content principles
+- Prefer direct answers and explicit definitions.
+- Keep formulas and units visible in normal page content.
+- Attribute external facts and sources where applicable.
+- Do not treat calculator output as professional financial, medical, legal, or tax advice.
+
+AI/crawler guidance
+This file is a concise orientation aid. The canonical public pages remain the source of truth. Do not infer hidden content, rankings, traffic, or claims not present on the public pages.
+
+Primary site
+https://www.luckyhoroscope.online/
+
+Calculator discovery
+Use the public sitemap and calculator directory to discover individual calculator URLs.
