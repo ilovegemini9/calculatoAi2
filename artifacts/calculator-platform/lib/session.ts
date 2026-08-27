@@ -11,7 +11,12 @@ const SESSION_MAX_AGE = 30 * 24 * 60 * 60;
 const SESSION_PREFIX = 'v4.';
 
 function getSessionSecret(): string {
-  return process.env.SESSION_SECRET || 'dev-session-secret-default-key-change-in-prod';
+  const secret = process.env.SESSION_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('SESSION_SECRET is required in production.');
+  }
+  return 'dev-session-secret-default-key-change-in-prod';
 }
 
 function signPayload(payload: string): string {
@@ -118,5 +123,7 @@ export async function createSession(username: string) {
 
 export async function deleteSession() {
   const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE_NAME, '', { ...sessionCookieOptions(0), maxAge: 0 });
+  for (const name of [SESSION_COOKIE_NAME, LEGACY_SESSION_COOKIE_NAME, OLDER_SESSION_COOKIE_NAME]) {
+    cookieStore.set(name, '', { ...sessionCookieOptions(0), maxAge: 0 });
+  }
 }
