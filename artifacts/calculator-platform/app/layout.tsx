@@ -23,10 +23,27 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
+async function getPublicSettings() {
+  try {
+    const db = await getDb();
+    return {
+      seo: getSeoSettings(db.settings.seo),
+      ads: getAdsSettings(db.settings.ads),
+      verification: getVerificationSettings(db.settings.verification),
+    };
+  } catch {
+    // Public SEO must remain renderable when the database is unavailable.
+    // getSeoSettings(undefined) supplies the static, canonical defaults.
+    return {
+      seo: getSeoSettings(),
+      ads: getAdsSettings(),
+      verification: getVerificationSettings(),
+    };
+  }
+}
+
 export async function generateMetadata(): Promise<Metadata> {
-  const db = await getDb();
-  const seo = getSeoSettings(db.settings.seo);
-  const verification = getVerificationSettings(db.settings.verification);
+  const { seo, verification } = await getPublicSettings();
   return {
     metadataBase: new URL(seo.canonicalUrl || siteConfig.url),
     title: {
@@ -79,7 +96,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#0066cc' },
-    { media: '(prefers-color-scheme: dark)',  color: '#0b2545' },
+    { media: '(prefers-color-scheme: dark)', color: '#0b2545' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -89,10 +106,7 @@ export const viewport: Viewport = {
 export const dynamic = 'force-dynamic';
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const db = await getDb();
-  const seo = getSeoSettings(db.settings.seo);
-  const ads = getAdsSettings(db.settings.ads);
-  const verification = getVerificationSettings(db.settings.verification);
+  const { seo, ads, verification } = await getPublicSettings();
   const customMetaTags = parseCustomMetaTags(verification.customMetaTags);
   let jsonLd: unknown = null;
   try {
