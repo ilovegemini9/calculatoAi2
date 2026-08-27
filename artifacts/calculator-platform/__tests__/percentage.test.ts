@@ -27,19 +27,19 @@ describe('calculatePercentage — percentOf (X% of Y)', () => {
   });
 });
 
-describe('calculatePercentage — whatPercentOf (Y is what % of X)', () => {
-  it('50 is 25% of 200', () => {
-    const r = calculatePercentage({ caseType: 'whatPercentOf', x: 200, y: 50 });
-    assert.strictEqual(r.result, 25);
-    assert.strictEqual(r.explanation, '50 is 25% of 200.');
+describe('calculatePercentage — whatPercentOf (X is what % of Y)', () => {
+  it('25 is 12.5% of 200', () => {
+    const r = calculatePercentage({ caseType: 'whatPercentOf', x: 25, y: 200 });
+    assert.strictEqual(r.result, 12.5);
+    assert.strictEqual(r.explanation, '25 is 12.5% of 200.');
   });
 
   it('75 is 30% of 250', () => {
-    assert.strictEqual(calculatePercentage({ caseType: 'whatPercentOf', x: 250, y: 75 }).result, 30);
+    assert.strictEqual(calculatePercentage({ caseType: 'whatPercentOf', x: 75, y: 250 }).result, 30);
   });
 
-  it('divide-by-zero guard: x=0 → result=0 + error explanation', () => {
-    const r = calculatePercentage({ caseType: 'whatPercentOf', x: 0, y: 50 });
+  it('divide-by-zero guard: y=0 → result=0 + error explanation', () => {
+    const r = calculatePercentage({ caseType: 'whatPercentOf', x: 25, y: 0 });
     assert.strictEqual(r.result, 0);
     assert.strictEqual(r.explanation, 'Cannot divide by zero.');
   });
