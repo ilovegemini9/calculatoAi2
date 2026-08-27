@@ -5,7 +5,7 @@ import { KEYWORD_CLUSTERS, getKeywordClusterId } from '../config/keyword-cluster
 
 const CANONICAL_ORIGIN = 'https://www.luckyhoroscope.online';
 const APEX_ORIGIN = 'https://luckyhoroscope.online';
-const BROKEN_OG_IMAGE = '/og-image.png';
+const LEGACY_OG_IMAGE = '/og-image.png';
 
 function normalizeOrigin(value: string): string {
   return value.replace(new RegExp(`^${APEX_ORIGIN}`), CANONICAL_ORIGIN);
@@ -16,7 +16,7 @@ function normalizeAsset(value: string): string {
   const pathname = normalized.startsWith(CANONICAL_ORIGIN)
     ? normalized.slice(CANONICAL_ORIGIN.length)
     : normalized;
-  return pathname === BROKEN_OG_IMAGE ? '/icon.svg' : normalized;
+  return pathname === LEGACY_OG_IMAGE || pathname === '/icon.svg' ? siteConfig.ogImage : normalized;
 }
 
 const defaultJsonLd = {
@@ -41,7 +41,6 @@ export function defaultLlmsTxt(baseUrl = CANONICAL_ORIGIN): string {
   return `# ${siteConfig.name} — llms.txt\n> ${siteConfig.name} provides free, privacy-first calculators for finance, health, math, and everyday decisions. Results run in the browser and each route explains its inputs, formula, assumptions, and related tools.\n\n# https://llmstxt.org\n# AI/LLM access policy for ${siteConfig.name} calculator platform\n\n## Site Overview\n${siteConfig.name} provides free, privacy-first online calculators for finance,\nfitness, math, and lifestyle. All computations run client-side in the browser.\nNo personal data is stored or transmitted.\n\n${sections}\n\n## Formulas & Methodology\nEach calculator page states its route-specific formula, variable definitions,\nworked examples, limitations, and source links where applicable. Do not treat\noutputs as professional financial, medical, legal, or tax advice.\n\n## Licensing & Attribution\nContent is freely usable for informational purposes. Attribution appreciated.\nContact: ${normalizedBase}/contact\n`;
 }
 
-/** Preserve editorial/admin text while guaranteeing every catalog route is listed once. */
 export function ensureLlmsCalculatorCoverage(content: string, baseUrl = CANONICAL_ORIGIN): string {
   const normalizedBase = normalizeOrigin(baseUrl);
   const existing = (content || '').replaceAll(APEX_ORIGIN, CANONICAL_ORIGIN);
@@ -67,14 +66,14 @@ export const DEFAULT_SEO_SETTINGS: SeoSettings = {
   openGraph: {
     title: 'Free Online Calculators for Finance, Math, Health & More',
     description: siteConfig.description,
-    image: '/icon.svg',
+    image: siteConfig.ogImage,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Free Online Calculators for Finance, Math, Health & More',
     description: siteConfig.description,
-    image: '/icon.svg',
+    image: siteConfig.ogImage,
   },
   jsonLd: JSON.stringify(defaultJsonLd, null, 2),
   sitemap: {
@@ -118,8 +117,6 @@ export function getSeoSettings(raw?: Partial<SeoSettings> | null): SeoSettings {
     },
   };
 
-  // Normalize known legacy apex-domain values at read time. This changes no
-  // stored settings; it only prevents mixed-host SEO output at runtime.
   const canonicalUrl = normalizeOrigin(merged.canonicalUrl || CANONICAL_ORIGIN);
   const openGraphImage = normalizeAsset(merged.openGraph.image);
   const twitterImage = normalizeAsset(merged.twitter.image);
