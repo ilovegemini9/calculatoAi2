@@ -11,6 +11,11 @@ const categoryColor: Record<string, string> = {
   'Obese': 'text-red-400',
 };
 
+function roundTo(value: number, digits = 1) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
 export function BMICalculator() {
   const [system, setSystem] = useState<'metric' | 'imperial'>('metric');
   const [weight, setWeight] = useState(70);
@@ -19,6 +24,22 @@ export function BMICalculator() {
   const result = calculateBMI({ system, weight, height });
   const weightLabel = `Weight (${system === 'metric' ? 'kg' : 'lbs'})`;
   const heightLabel = `Height (${system === 'metric' ? 'cm' : 'inches'})`;
+
+  function handleSystemChange(nextSystem: 'metric' | 'imperial') {
+    if (nextSystem === system) return;
+
+    if (nextSystem === 'imperial') {
+      setWeight(roundTo(weight * 2.2046226218));
+      setHeight(roundTo(height / 2.54));
+    } else {
+      setWeight(roundTo(weight / 2.2046226218));
+      setHeight(roundTo(height * 2.54));
+    }
+
+    setSystem(nextSystem);
+  }
+
+  const hasValidInputs = weight > 0 && height > 0 && Number.isFinite(weight) && Number.isFinite(height);
 
   return (
     <div className="space-y-6">
@@ -29,7 +50,7 @@ export function BMICalculator() {
               id="bmi-system"
               value={system}
               aria-label="Unit system for BMI calculation"
-              onChange={e => setSystem(e.target.value as 'metric' | 'imperial')}
+              onChange={e => handleSystemChange(e.target.value as 'metric' | 'imperial')}
               className={selectClass}
             >
               <option value="metric">Metric (kg / cm)</option>
@@ -45,7 +66,7 @@ export function BMICalculator() {
               max={999}
               step={0.1}
               aria-label={weightLabel}
-              onChange={e => setWeight(parseFloat(e.target.value) || 0)}
+              onChange={e => setWeight(e.currentTarget.valueAsNumber || 0)}
               className={inputClass}
             />
           </Field>
@@ -58,29 +79,33 @@ export function BMICalculator() {
               max={999}
               step={0.1}
               aria-label={heightLabel}
-              onChange={e => setHeight(parseFloat(e.target.value) || 0)}
+              onChange={e => setHeight(e.currentTarget.valueAsNumber || 0)}
               className={inputClass}
             />
           </Field>
         </InputsPanel>
 
         <ResultsPanel>
-          <ResultCard highlight label="BMI" value={result.bmi.toString()} />
-          <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Category</p>
-            <p className={`text-xl font-black ${categoryColor[result.category] || 'text-white'}`}>{result.category}</p>
-          </div>
-          <ResultCard label="Healthy Range" value={result.healthyRangeText} />
+          {hasValidInputs ? (
+            <>
+              <ResultCard highlight label="BMI" value={result.bmi.toString()} />
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Category</p>
+                <p className={`text-xl font-black ${categoryColor[result.category] || 'text-white'}`}>{result.category}</p>
+              </div>
+              <ResultCard label="Healthy Range" value={result.healthyRangeText} />
+            </>
+          ) : (
+            <ResultCard highlight label="BMI" value="Enter valid weight and height" />
+          )}
         </ResultsPanel>
       </div>
 
-      {/* Recommendation */}
       <div className="bg-white rounded-2xl border border-slate-200 p-5">
         <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Recommendation</h3>
         <p className="text-sm text-slate-700 leading-relaxed">{result.recommendation}</p>
       </div>
 
-      {/* BMI Scale */}
       <div className="bg-white rounded-2xl border border-slate-200 p-5">
         <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">BMI Scale</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
