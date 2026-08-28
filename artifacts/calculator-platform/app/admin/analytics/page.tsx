@@ -13,19 +13,7 @@ import {
   Users,
   XCircle,
 } from 'lucide-react';
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ContentCard, StatCard } from '@/components/admin/Card';
 import { ChartWrapper } from '@/components/admin/ChartWrapper';
 
@@ -47,20 +35,18 @@ type AnalyticsData = {
     pendingReview: number;
   };
   trends: { date: string; views: number; calculations: number }[];
+  searchConsole?: {
+    configured: boolean;
+    connected: boolean;
+    error?: string;
+    range?: { startDate: string; endDate: string };
+    summary?: { clicks: number; impressions: number; ctr: number; position: number | null };
+    queries?: { query: string; clicks: number; impressions: number; ctr: number; position: number }[];
+    pages?: { page: string; clicks: number; impressions: number; ctr: number; position: number }[];
+    countries?: { country: string; clicks: number; impressions: number }[];
+    devices?: { device: string; clicks: number; impressions: number }[];
+  };
 };
-
-const TRAFFIC_SOURCES = [
-  { name: 'Organic Search', value: 58, color: '#2563eb' },
-  { name: 'Direct Traffic', value: 24, color: '#10b981' },
-  { name: 'Social Media', value: 12, color: '#f59e0b' },
-  { name: 'Referrals', value: 6, color: '#8b5cf6' },
-];
-
-const DEVICE_BREAKDOWN = [
-  { name: 'Mobile', value: 62 },
-  { name: 'Desktop', value: 32 },
-  { name: 'Tablet', value: 6 },
-];
 
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
@@ -110,7 +96,7 @@ export default function AnalyticsPage() {
   }
 
   const totalViews = data.trends.reduce((acc, curr) => acc + curr.views, 0);
-  const estimatedUsers = Math.round(totalViews * 0.72);
+  const gsc = data.searchConsole;
 
   return (
     <div className="space-y-6 pb-10">
@@ -146,10 +132,10 @@ export default function AnalyticsPage() {
           icon={<TrendingUp className="w-4 h-4 text-blue-500" />}
         />
         <StatCard
-          label="Unique Visitors"
-          value={estimatedUsers.toLocaleString()}
-          trend="up"
-          trendLabel="+8.4% vs prev period"
+          label={gsc?.connected ? "Google Search Clicks (28d)" : "Search Console"}
+          value={gsc?.connected ? (gsc.summary?.clicks || 0).toLocaleString() : "Not connected"}
+          trend="neutral"
+          trendLabel={gsc?.connected ? (gsc.summary?.impressions || 0).toLocaleString() + " impressions" : "Connect Google Search Console"}
           icon={<Users className="w-4 h-4 text-emerald-500" />}
         />
         <StatCard
@@ -201,67 +187,37 @@ export default function AnalyticsPage() {
         </ChartWrapper>
 
         <ChartWrapper
-          title="Traffic Sources"
-          description="Inbound visitor origin breakdown"
-          hasData={true}
+          title="Google Search Console"
+          description={gsc?.connected ? "Real Google search performance for the selected Search Console property." : "Connect Google Search Console to load real queries, clicks, impressions, countries and devices."}
+          hasData={Boolean(gsc?.connected)}
           height={280}
         >
-          <div className="flex h-full items-center justify-around">
-            <ResponsiveContainer width="50%" height="100%">
-              <PieChart>
-                <Pie data={TRAFFIC_SOURCES} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4}>
-                  {TRAFFIC_SOURCES.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--bg-card)',
-                    borderColor: 'var(--border)',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    color: 'var(--text-primary)',
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="space-y-2 text-xs">
-              {TRAFFIC_SOURCES.map((src) => (
-                <div key={src.name} className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: src.color }} />
-                  <span className="font-medium text-[var(--text-primary)]">{src.name}</span>
-                  <span className="text-[var(--text-muted)]">({src.value}%)</span>
+          {gsc?.connected ? (
+            <div className="grid h-full grid-cols-2 gap-4 p-2 text-sm">
+              <div><div className="text-xs text-[var(--text-muted)]">Impressions</div><div className="mt-1 text-2xl font-bold">{(gsc.summary?.impressions || 0).toLocaleString()}</div></div>
+              <div><div className="text-xs text-[var(--text-muted)]">CTR</div><div className="mt-1 text-2xl font-bold">{((gsc.summary?.ctr || 0) * 100).toFixed(2)}%</div></div>
+              <div><div className="text-xs text-[var(--text-muted)]">Avg. position</div><div className="mt-1 text-2xl font-bold">{gsc.summary?.position?.toFixed(1) || "—"}</div></div>
+              <div><div className="text-xs text-[var(--text-muted)]">Top query</div><div className="mt-1 truncate font-semibold">{gsc.queries?.[0]?.query || "—"}</div></div>
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+              <p className="max-w-md text-sm text-[var(--text-muted)]">{gsc?.error || "No Google Search Console connection yet."}</p>
+              {gsc?.configured ? <a href="/api/admin/google-search-console/connect" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">Connect Google Search Console</a> : <span className="text-xs text-amber-600">Google OAuth environment variables are not configured.</span>}
+            </div>
+          )}
+        </ChartWrapper>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ContentCard title="Top Search Queries" description="Real queries reported by Google Search Console">
+          {gsc?.connected ? (
+            <div className="max-h-[260px] overflow-auto text-xs">
+              {(gsc.queries || []).slice(0, 10).map((row) => (
+                <div key={row.query} className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b py-2" style={{ borderColor: 'var(--border)' }}>
+                  <span className="truncate font-medium">{row.query}</span><span>{row.clicks} clicks</span><span>{row.impressions} imp.</span><span>#{row.position.toFixed(1)}</span>
                 </div>
               ))}
             </div>
-          </div>
-        </ChartWrapper>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartWrapper
-          title="Device & Screen Distribution"
-          description="Client device share accessing calculators"
-          hasData={true}
-          height={240}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={DEVICE_BREAKDOWN} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-              <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'var(--bg-card)',
-                  borderColor: 'var(--border)',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                }}
-              />
-              <Bar dataKey="value" name="Share %" fill="#10b981" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartWrapper>
-
+          ) : <p className="text-sm text-[var(--text-muted)]">Connect Search Console to view real search queries.</p>}
+        </ContentCard>
         <ContentCard title="Real-Time System Activity" description="Live status of automated features and database logging">
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border)' }}>
@@ -280,7 +236,7 @@ export default function AnalyticsPage() {
                 <Globe className="h-4 w-4 text-blue-500" />
                 <span className="text-xs font-semibold text-[var(--text-primary)]">Google Search Console Sync</span>
               </div>
-              <span className="text-xs text-[var(--text-muted)]">Connected</span>
+              {gsc?.connected ? <span className="text-xs font-semibold text-emerald-600">Connected</span> : <a href="/api/admin/google-search-console/connect" className="text-xs text-blue-500 underline">Connect</a>}
             </div>
 
             <div className="flex items-center justify-between">
@@ -288,7 +244,7 @@ export default function AnalyticsPage() {
                 <BarChart3 className="h-4 w-4 text-purple-500" />
                 <span className="text-xs font-semibold text-[var(--text-primary)]">Durable DB Records</span>
               </div>
-              <span className="text-xs font-semibold text-[var(--text-primary)]">{totalViews} events tracked</span>
+              <span className="text-xs font-semibold text-[var(--text-primary)]">{totalViews.toLocaleString()} recorded views</span>
             </div>
           </div>
         </ContentCard>
