@@ -11,6 +11,7 @@ type AnalyticsData = {
   calcStats: { total: number; staticCount: number; dynamicCount: number; published: number; draft: number };
   articleStats: { total: number; published: number; draft: number; pendingReview: number };
   trends: { date: string; views: number; calculations: number }[];
+  traffic?: { totalTracked: number; sources: { source: string; medium: string; visits: number }[]; referrals: { referrer: string; visits: number }[] };
   searchConsole?: {
     configured: boolean; connected: boolean; error?: string; range?: { startDate: string; endDate: string };
     summary?: { clicks: number; impressions: number; ctr: number; position: number | null };
@@ -92,6 +93,31 @@ export default function AnalyticsPage() {
           {gsc?.connected ? <div className="grid h-full grid-cols-2 gap-4 p-2 text-sm"><div><div className="text-xs text-[var(--text-muted)]">Impressions</div><div className="mt-1 text-2xl font-bold">{(gsc.summary?.impressions || 0).toLocaleString()}</div></div><div><div className="text-xs text-[var(--text-muted)]">CTR</div><div className="mt-1 text-2xl font-bold">{((gsc.summary?.ctr || 0) * 100).toFixed(2)}%</div></div><div><div className="text-xs text-[var(--text-muted)]">Avg. position</div><div className="mt-1 text-2xl font-bold">{gsc.summary?.position?.toFixed(1) || '—'}</div></div><div><div className="text-xs text-[var(--text-muted)]">Top query</div><div className="mt-1 truncate font-semibold">{gsc.queries?.[0]?.query || '—'}</div></div></div> : <div className="flex h-full flex-col items-center justify-center gap-3 text-center"><p className="max-w-md text-sm text-[var(--text-muted)]">{gsc?.error || 'No Google Search Console connection yet.'}</p>{gsc?.configured ? <a href="/api/admin/google-search-console/connect" className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">Connect Google Search Console</a> : <span className="text-xs text-amber-600">Google OAuth environment variables are not configured.</span>}</div>}
         </ChartWrapper>
       </div>
+      {data.traffic && (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <ContentCard title="Real Traffic Sources" description="Actual sources detected from browser referrers">
+            <div className="space-y-2">
+              {data.traffic.sources.length ? data.traffic.sources.map((item) => (
+                <div key={item.source + item.medium} className="flex items-center justify-between rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}>
+                  <div><div className="font-semibold text-[var(--text-primary)]">{item.source}</div><div className="text-xs capitalize text-[var(--text-muted)]">{item.medium}</div></div>
+                  <div className="text-right"><div className="font-bold">{formatNumber(item.visits)}</div><div className="text-[10px] uppercase text-[var(--text-muted)]">visits</div></div>
+                </div>
+              )) : <p className="py-8 text-center text-sm text-[var(--text-muted)]">No real referrer data recorded yet. New visits will appear automatically.</p>}
+            </div>
+          </ContentCard>
+          <ContentCard title="External Referrals" description="Sites that sent visitors to CalculatorFree">
+            <div className="space-y-2">
+              {data.traffic.referrals.length ? data.traffic.referrals.map((item) => (
+                <div key={item.referrer} className="flex items-center justify-between rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}>
+                  <div className="min-w-0"><div className="truncate font-semibold text-[var(--text-primary)]">{item.referrer}</div><div className="text-xs text-[var(--text-muted)]">External referral</div></div>
+                  <div className="font-bold">{formatNumber(item.visits)} visits</div>
+                </div>
+              )) : <p className="py-8 text-center text-sm text-[var(--text-muted)]">No external referral has been recorded yet.</p>}
+            </div>
+          </ContentCard>
+        </div>
+      )}
+
       {gsc?.connected && (
         <>
           <div className="rounded-xl border p-5" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
