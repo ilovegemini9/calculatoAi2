@@ -135,6 +135,21 @@ export async function GET() {
       };
     }
 
+    const trafficEvents = Array.isArray((db as any).trafficEvents) ? (db as any).trafficEvents : [];
+    const sourceMap = new Map<string, { source: string; medium: string; visits: number }>();
+    const referralMap = new Map<string, number>();
+    for (const event of trafficEvents) {
+      const key = `${event.source}|${event.medium}`;
+      const current = sourceMap.get(key) || { source: event.source || 'Direct', medium: event.medium || 'direct', visits: 0 };
+      current.visits += 1;
+      sourceMap.set(key, current);
+      if (event.medium === 'referral' && event.referrerHost) {
+        referralMap.set(event.referrerHost, (referralMap.get(event.referrerHost) || 0) + 1);
+      }
+    }
+    const trafficSources = [...sourceMap.values()].sort((a, b) => b.visits - a.visits).slice(0, 20);
+    const referrals = [...referralMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20).map(([referrer, visits]) => ({ referrer, visits }));
+
     const response = NextResponse.json({
       totalDynamic: dynamicCalcs.length,
       totalArticles: db.articles.length,
@@ -155,6 +170,7 @@ export async function GET() {
         scheduled: 0,
       },
       trends,
+      traffic: { totalTracked: trafficEvents.length, sources: trafficSources, referrals },
       searchConsole,
       settings: {
         adsenseEnabled: db.settings.adsenseEnabled,
