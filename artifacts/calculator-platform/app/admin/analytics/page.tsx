@@ -1,7 +1,7 @@
 'use client';
 import { fetchAdmin } from '@/lib/fetch-admin';
 import { useCallback, useEffect, useState } from 'react';
-import { BarChart3, Calculator, FileText, Globe, Loader2, RefreshCw, TrendingUp, Users, XCircle } from 'lucide-react';
+import { BarChart3, Calculator, FileText, Globe, Loader2, RefreshCw, TrendingUp, Users, XCircle, MousePointerClick, Eye, MapPin, Monitor, Smartphone, Tablet, ExternalLink, Search, Activity } from 'lucide-react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ContentCard, StatCard } from '@/components/admin/Card';
 import { ChartWrapper } from '@/components/admin/ChartWrapper';
@@ -41,6 +41,15 @@ export default function AnalyticsPage() {
   if (error || !data) return <div className="flex min-h-[420px] flex-col items-center justify-center gap-3"><XCircle className="h-8 w-8 text-red-500" /><p className="text-sm font-medium text-red-500">{error || 'Unable to load analytics.'}</p><button type="button" onClick={() => void load()} className="text-xs text-blue-500 underline">Try again</button></div>;
   const totalViews = data.trends.reduce((acc, curr) => acc + curr.views, 0);
   const gsc = data.searchConsole;
+  const gscSummary = gsc?.summary;
+  const formatNumber = (value?: number) => (value || 0).toLocaleString();
+  const formatPercent = (value?: number) => `${((value || 0) * 100).toFixed(2)}%`;
+  const deviceIcon = (device: string) => {
+    const key = device.toLowerCase();
+    if (key.includes('mobile')) return <Smartphone className="h-4 w-4" />;
+    if (key.includes('tablet')) return <Tablet className="h-4 w-4" />;
+    return <Monitor className="h-4 w-4" />;
+  };
   return (
     <div className="space-y-6 pb-10">
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
@@ -69,9 +78,71 @@ export default function AnalyticsPage() {
           {gsc?.connected ? <div className="grid h-full grid-cols-2 gap-4 p-2 text-sm"><div><div className="text-xs text-[var(--text-muted)]">Impressions</div><div className="mt-1 text-2xl font-bold">{(gsc.summary?.impressions || 0).toLocaleString()}</div></div><div><div className="text-xs text-[var(--text-muted)]">CTR</div><div className="mt-1 text-2xl font-bold">{((gsc.summary?.ctr || 0) * 100).toFixed(2)}%</div></div><div><div className="text-xs text-[var(--text-muted)]">Avg. position</div><div className="mt-1 text-2xl font-bold">{gsc.summary?.position?.toFixed(1) || '—'}</div></div><div><div className="text-xs text-[var(--text-muted)]">Top query</div><div className="mt-1 truncate font-semibold">{gsc.queries?.[0]?.query || '—'}</div></div></div> : <div className="flex h-full flex-col items-center justify-center gap-3 text-center"><p className="max-w-md text-sm text-[var(--text-muted)]">{gsc?.error || 'No Google Search Console connection yet.'}</p>{gsc?.configured ? <a href="/api/admin/google-search-console/connect" className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">Connect Google Search Console</a> : <span className="text-xs text-amber-600">Google OAuth environment variables are not configured.</span>}</div>}
         </ChartWrapper>
       </div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ContentCard title="Top Search Queries" description="Real queries reported by Google Search Console">{gsc?.connected ? <div className="max-h-[260px] overflow-auto text-xs">{(gsc.queries || []).slice(0, 10).map(row => <div key={row.query} className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b py-2" style={{ borderColor: 'var(--border)' }}><span className="truncate font-medium">{row.query}</span><span>{row.clicks} clicks</span><span>{row.impressions} imp.</span><span>#{row.position.toFixed(1)}</span></div>)}</div> : <p className="text-sm text-[var(--text-muted)]">Connect Search Console to view real search queries.</p>}</ContentCard>
-        <ContentCard title="Real-Time System Activity" description="Live status of automated features and database logging"><div className="space-y-4"><div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border)' }}><div className="flex items-center gap-2"><span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" /></span><span className="text-xs font-semibold text-[var(--text-primary)]">Live Traffic Tracker</span></div><span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400">Active</span></div><div className="flex items-center justify-between border-b pb-3" style={{ borderColor: 'var(--border)' }}><div className="flex items-center gap-2"><Globe className="h-4 w-4 text-blue-500" /><span className="text-xs font-semibold text-[var(--text-primary)]">Google Search Console Sync</span></div>{gsc?.connected ? <span className="text-xs font-semibold text-emerald-600">Connected</span> : <a href="/api/admin/google-search-console/connect" className="text-xs font-semibold text-blue-500 underline">Connect</a>}</div><div className="flex items-center justify-between"><span className="text-xs font-semibold text-[var(--text-primary)]">Durable DB Records</span><span className="text-xs font-semibold text-[var(--text-primary)]">{totalViews.toLocaleString()} recorded views</span></div></div></ContentCard>
+      {gsc?.connected && (
+        <>
+          <div className="rounded-xl border p-5" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3"><div className="rounded-lg bg-emerald-500/10 p-2"><Activity className="h-5 w-5 text-emerald-600" /></div><div><div className="font-bold text-[var(--text-primary)]">Google Search Console Connected</div><p className="text-xs text-[var(--text-muted)]">Live search performance • {gsc.range?.startDate} → {gsc.range?.endDate}</p></div></div>
+              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-600"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /> Live data</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div className="rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}><div className="flex items-center gap-2 text-xs text-[var(--text-muted)]"><MousePointerClick className="h-3.5 w-3.5 text-blue-500" /> Clicks</div><div className="mt-2 text-xl font-bold">{formatNumber(gscSummary?.clicks)}</div></div>
+              <div className="rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}><div className="flex items-center gap-2 text-xs text-[var(--text-muted)]"><Eye className="h-3.5 w-3.5 text-purple-500" /> Impressions</div><div className="mt-2 text-xl font-bold">{formatNumber(gscSummary?.impressions)}</div></div>
+              <div className="rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}><div className="flex items-center gap-2 text-xs text-[var(--text-muted)]"><TrendingUp className="h-3.5 w-3.5 text-emerald-500" /> CTR</div><div className="mt-2 text-xl font-bold">{formatPercent(gscSummary?.ctr)}</div></div>
+              <div className="rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}><div className="flex items-center gap-2 text-xs text-[var(--text-muted)]"><Search className="h-3.5 w-3.5 text-amber-500" /> Avg. position</div><div className="mt-2 text-xl font-bold">{gscSummary?.position?.toFixed(1) || '—'}</div></div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+            <ContentCard title="Top Landing Pages" description="Pages receiving the most organic search visibility">
+              <div className="max-h-[330px] overflow-auto">
+                {(gsc.pages || []).slice(0, 10).map((row, index) => (
+                  <div key={row.page} className="group flex items-center gap-3 border-b py-3 last:border-0" style={{ borderColor: 'var(--border)' }}>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-xs font-bold text-blue-600">{index + 1}</span>
+                    <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-[var(--text-primary)]">{row.page.replace(/^https?:\/\//, '')}</div><div className="mt-0.5 text-xs text-[var(--text-muted)]">{formatNumber(row.impressions)} impressions • position {row.position.toFixed(1)}</div></div>
+                    <div className="text-right"><div className="text-sm font-bold">{formatNumber(row.clicks)}</div><div className="text-[10px] uppercase text-[var(--text-muted)]">clicks</div></div>
+                    <a href={row.page} target="_blank" rel="noreferrer" className="opacity-0 transition group-hover:opacity-100"><ExternalLink className="h-4 w-4 text-blue-500" /></a>
+                  </div>
+                ))}
+                {!(gsc.pages || []).length && <p className="py-10 text-center text-sm text-[var(--text-muted)]">Google has not reported landing-page data for this range yet.</p>}
+              </div>
+            </ContentCard>
+
+            <ContentCard title="Audience Geography" description="Countries reported by Google Search Console">
+              <div className="max-h-[330px] overflow-auto">
+                {(gsc.countries || []).slice(0, 10).map((row, index) => {
+                  const max = Math.max(...(gsc.countries || []).map((item) => item.clicks || 0), 1);
+                  const width = Math.max(4, ((row.clicks || 0) / max) * 100);
+                  return <div key={row.country} className="border-b py-3 last:border-0" style={{ borderColor: 'var(--border)' }}>
+                    <div className="mb-2 flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2"><MapPin className="h-4 w-4 shrink-0 text-rose-500" /><span className="truncate text-sm font-semibold uppercase">{row.country || 'Unknown'}</span></div><span className="text-sm font-bold">{formatNumber(row.clicks)} clicks</span></div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--bg-secondary)]"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" style={{ width: `${width}%` }} /></div>
+                    <div className="mt-1 text-xs text-[var(--text-muted)]">{formatNumber(row.impressions)} impressions</div>
+                  </div>;
+                })}
+                {!(gsc.countries || []).length && <p className="py-10 text-center text-sm text-[var(--text-muted)]">No country data available yet.</p>}
+              </div>
+            </ContentCard>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <ContentCard title="Device Breakdown" description="Organic search traffic by device">
+              <div className="space-y-3">
+                {(gsc.devices || []).map((row) => <div key={row.device} className="flex items-center justify-between rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}><div className="flex items-center gap-3"><div className="rounded-md bg-slate-500/10 p-2 text-slate-500">{deviceIcon(row.device)}</div><div><div className="text-sm font-bold capitalize">{row.device.toLowerCase()}</div><div className="text-xs text-[var(--text-muted)]">{formatNumber(row.impressions)} impressions</div></div></div><div className="text-right"><div className="font-bold">{formatNumber(row.clicks)}</div><div className="text-[10px] uppercase text-[var(--text-muted)]">clicks</div></div></div>)}
+                {!(gsc.devices || []).length && <p className="text-sm text-[var(--text-muted)]">No device data available yet.</p>}
+              </div>
+            </ContentCard>
+            <ContentCard title="Search Insights" description="Quick signals from your live search data">
+              <div className="space-y-4 text-sm">
+                <div className="rounded-lg bg-blue-500/5 p-3"><div className="text-xs font-bold uppercase tracking-wide text-blue-600">Best query</div><div className="mt-1 truncate font-semibold">{gsc.queries?.[0]?.query || 'No query data yet'}</div><div className="mt-1 text-xs text-[var(--text-muted)]">{formatNumber(gsc.queries?.[0]?.clicks)} clicks • {formatNumber(gsc.queries?.[0]?.impressions)} impressions</div></div>
+                <div className="grid grid-cols-2 gap-3"><div className="rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}><div className="text-xs text-[var(--text-muted)]">Tracked queries</div><div className="mt-1 text-xl font-bold">{formatNumber(gsc.queries?.length)}</div></div><div className="rounded-lg border p-3" style={{ borderColor: 'var(--border)' }}><div className="text-xs text-[var(--text-muted)]">Tracked pages</div><div className="mt-1 text-xl font-bold">{formatNumber(gsc.pages?.length)}</div></div></div>
+              </div>
+            </ContentCard>
+            <ContentCard title="Connection Status" description="Google Search Console integration health">
+              <div className="space-y-3"><div className="flex items-center justify-between"><span className="text-sm">OAuth connection</span><span className="font-semibold text-emerald-600">Connected</span></div><div className="flex items-center justify-between"><span className="text-sm">Search data</span><span className="font-semibold text-emerald-600">Available</span></div><div className="flex items-center justify-between"><span className="text-sm">Refresh window</span><span className="text-xs text-[var(--text-muted)]">On demand</span></div><button type="button" onClick={() => void load(true)} className="mt-2 w-full rounded-lg border px-3 py-2 text-xs font-bold transition hover:border-blue-500 hover:text-blue-500" style={{ borderColor: 'var(--border)' }}>Refresh Search Data</button></div>
+            </ContentCard>
+          </div>
+        </>
+      )}
       </div>
     </div>
   );
