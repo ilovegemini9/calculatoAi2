@@ -81,7 +81,25 @@ export async function exchangeGoogleCode(code: string): Promise<StoredToken> {
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body, cache: 'no-store',
   });
-  if (!res.ok) throw new Error('Google OAuth token exchange failed.');
+  if (!res.ok) {
+    let errorCode = 'token_exchange_failed';
+    let errorDescription = '';
+    try {
+      const errorData = await res.json() as { error?: string; error_description?: string };
+      errorCode = errorData.error || errorCode;
+      errorDescription = errorData.error_description || '';
+    } catch {}
+    console.error('[GSC OAuth] Token exchange rejected by Google:', {
+      status: res.status,
+      error: errorCode,
+      description: errorDescription,
+      redirectUri: googleRedirectUri(),
+      clientIdPresent: Boolean(process.env.GOOGLE_CLIENT_ID),
+      clientSecretPresent: Boolean(process.env.GOOGLE_CLIENT_SECRET),
+      clientSecretLength: process.env.GOOGLE_CLIENT_SECRET?.length || 0,
+    });
+    throw new Error(errorCode);
+  }
   const data = await res.json() as { access_token: string; refresh_token?: string; expires_in?: number };
   return { access_token: data.access_token, refresh_token: data.refresh_token, expires_at: Date.now() + Math.max(60, data.expires_in || 3600) * 1000 };
 }
