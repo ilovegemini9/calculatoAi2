@@ -44,7 +44,21 @@ export default function AnalyticsPage() {
   const gscSummary = gsc?.summary;
   const formatNumber = (value?: number) => (value || 0).toLocaleString();
   const formatPercent = (value?: number) => `${((value || 0) * 100).toFixed(2)}%`;
-  const countryFlag = (country: string) => {\n    const code = (country || '').trim().toUpperCase();\n    if (!/^[A-Z]{2}$/.test(code)) return '🌐';\n    return String.fromCodePoint(...[...code].map((char) => 127397 + char.charCodeAt(0)));\n  };\n  const countryLabel = (country: string) => {\n    const code = (country || '').trim().toUpperCase();\n    if (!code) return 'Unknown';\n    try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code; } catch { return code; }\n  };\n  const deviceIcon = (device: string) => {
+  const countryFlag = (country: string) => {
+    const code = (country || '').trim().toUpperCase();
+    if (!/^[A-Z]{2}$/.test(code)) return '🌐';
+    return String.fromCodePoint(...[...code].map((char) => 127397 + char.charCodeAt(0)));
+  };
+  const countryLabel = (country: string) => {
+    const code = (country || '').trim().toUpperCase();
+    if (!code) return 'Unknown';
+    try {
+      return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code;
+    } catch {
+      return code;
+    }
+  };
+  const deviceIcon = (device: string) => {
     const key = device.toLowerCase();
     if (key.includes('mobile')) return <Smartphone className="h-4 w-4" />;
     if (key.includes('tablet')) return <Tablet className="h-4 w-4" />;
