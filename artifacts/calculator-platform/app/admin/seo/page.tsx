@@ -28,7 +28,9 @@ type IndexingItem = {
   tone: 'healthy' | 'warning' | 'neutral';
 };
 
-type AuditResponse = { baseUrl: string; checkedAt: string; checks: Array<{ label: string; status: 'healthy' | 'warning' | 'error'; detail: string; url?: string }>; summary: { healthy: number; warning: number; error: number }; indexingNote: string; };\n\ntype SeoResponse = {
+type AuditResponse = { baseUrl: string; checkedAt: string; checks: Array<{ label: string; status: 'healthy' | 'warning' | 'error'; detail: string; url?: string }>; summary: { healthy: number; warning: number; error: number }; indexingNote: string; };
+
+type SeoResponse = {
   seo: SeoSettings;
   indexing: IndexingItem[];
   summary: { live: number; total: number; verified: boolean };
