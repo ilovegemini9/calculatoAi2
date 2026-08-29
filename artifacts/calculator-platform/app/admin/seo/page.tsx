@@ -28,7 +28,7 @@ type IndexingItem = {
   tone: 'healthy' | 'warning' | 'neutral';
 };
 
-type SeoResponse = {
+type AuditResponse = { baseUrl: string; checkedAt: string; checks: Array<{ label: string; status: 'healthy' | 'warning' | 'error'; detail: string; url?: string }>; summary: { healthy: number; warning: number; error: number }; indexingNote: string; };\n\ntype SeoResponse = {
   seo: SeoSettings;
   indexing: IndexingItem[];
   summary: { live: number; total: number; verified: boolean };
@@ -158,7 +158,7 @@ export default function SeoPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);\n  const [audit, setAudit] = useState<AuditResponse | null>(null);\n  const [auditing, setAuditing] = useState(false);
 
   const load = useCallback(async (quiet = false) => {
     if (quiet) setRefreshing(true);
@@ -178,6 +178,19 @@ export default function SeoPage() {
   }, []);
 
   useEffect(() => { void load(); }, [load]);
+
+  const runAudit = async () => {
+    setAuditing(true);
+    try {
+      const response = await fetchAdmin('/api/admin/seo/audit', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Unable to run SEO audit.');
+      setAudit(await response.json());
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Unable to run SEO audit.' });
+    } finally {
+      setAuditing(false);
+    }
+  };
 
   const update = <K extends keyof SeoSettings>(key: K, value: SeoSettings[K]) => {
     setForm((current) => current ? { ...current, [key]: value } : current);
@@ -369,6 +382,34 @@ export default function SeoPage() {
           <Field label="Property URL" type="url" value={form.googleSearchConsole.propertyUrl} onChange={(value) => update('googleSearchConsole', { ...form.googleSearchConsole, propertyUrl: value })} placeholder="https://luckyhoroscope.online" hint="The property you manage in Google Search Console." />
           <Field label="Google verification code" value={form.googleSearchConsole.verificationCode} onChange={(value) => update('googleSearchConsole', { ...form.googleSearchConsole, verificationCode: value })} hint="The token from the HTML tag verification method. It is added to the page metadata after saving." />
         </div>
+      </ContentCard>
+
+      <ContentCard
+        title="Technical Crawl & Index Audit"
+        description="Checks the live discovery configuration that helps search engines find public pages."
+        action={<button type="button" onClick={() => void runAudit()} disabled={auditing} className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-bold text-blue-500 disabled:opacity-60" style={{ borderColor: 'var(--border)' }}>{auditing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />} Run audit</button>}
+      >
+        <p className="mb-4 text-xs text-[var(--text-muted)]">Search engines control their own crawl and indexing schedules. These checks verify that your technical setup supports discovery without trying to force crawlers.</p>
+        {!audit ? (
+          <div className="rounded-lg border border-dashed p-6 text-center text-sm text-[var(--text-muted)]" style={{ borderColor: 'var(--border)' }}>Run the audit to check sitemap, robots, canonical, Search Console and indexing directives.</div>
+        ) : (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="rounded-lg bg-emerald-500/10 p-3"><div className="text-[10px] font-bold uppercase text-emerald-600">Healthy</div><div className="mt-1 text-2xl font-bold">{audit.summary.healthy}</div></div>
+              <div className="rounded-lg bg-amber-500/10 p-3"><div className="text-[10px] font-bold uppercase text-amber-600">Warnings</div><div className="mt-1 text-2xl font-bold">{audit.summary.warning}</div></div>
+              <div className="rounded-lg bg-red-500/10 p-3"><div className="text-[10px] font-bold uppercase text-red-600">Errors</div><div className="mt-1 text-2xl font-bold">{audit.summary.error}</div></div>
+            </div>
+            <div className="divide-y rounded-lg border px-4" style={{ borderColor: 'var(--border)' }}>
+              {audit.checks.map((item) => (
+                <div key={item.label} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div><div className="flex items-center gap-2 text-sm font-bold text-[var(--text-primary)]">{item.status === 'healthy' ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : item.status === 'warning' ? <Settings2 className="h-4 w-4 text-amber-500" /> : <XCircle className="h-4 w-4 text-red-500" />}{item.label}</div><p className="mt-1 text-xs text-[var(--text-muted)]">{item.detail}</p></div>
+                  {item.url && <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex w-fit items-center gap-1 text-xs font-semibold text-blue-500">Open <ExternalLink className="h-3 w-3" /></a>}
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-[var(--text-muted)]">{audit.indexingNote}</p>
+          </div>
+        )}
       </ContentCard>
 
       <ContentCard title="Indexing status" description="Current configuration status for the public SEO surfaces." action={<Settings2 className="h-4 w-4 text-blue-500" />}>
