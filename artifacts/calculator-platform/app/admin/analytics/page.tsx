@@ -44,7 +44,7 @@ export default function AnalyticsPage() {
   const gscSummary = gsc?.summary;
   const formatNumber = (value?: number) => (value || 0).toLocaleString();
   const formatPercent = (value?: number) => `${((value || 0) * 100).toFixed(2)}%`;
-  const deviceIcon = (device: string) => {
+  const countryFlag = (country: string) => {\n    const code = (country || '').trim().toUpperCase();\n    if (!/^[A-Z]{2}$/.test(code)) return '🌐';\n    return String.fromCodePoint(...[...code].map((char) => 127397 + char.charCodeAt(0)));\n  };\n  const countryLabel = (country: string) => {\n    const code = (country || '').trim().toUpperCase();\n    if (!code) return 'Unknown';\n    try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code; } catch { return code; }\n  };\n  const deviceIcon = (device: string) => {
     const key = device.toLowerCase();
     if (key.includes('mobile')) return <Smartphone className="h-4 w-4" />;
     if (key.includes('tablet')) return <Tablet className="h-4 w-4" />;
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
                   const max = Math.max(...(gsc.countries || []).map((item) => item.clicks || 0), 1);
                   const width = Math.max(4, ((row.clicks || 0) / max) * 100);
                   return <div key={row.country} className="border-b py-3 last:border-0" style={{ borderColor: 'var(--border)' }}>
-                    <div className="mb-2 flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2"><MapPin className="h-4 w-4 shrink-0 text-rose-500" /><span className="truncate text-sm font-semibold uppercase">{row.country || 'Unknown'}</span></div><span className="text-sm font-bold">{formatNumber(row.clicks)} clicks</span></div>
+                    <div className="mb-2 flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2"><span className="text-lg leading-none" role="img" aria-label={countryLabel(row.country)}>{countryFlag(row.country)}</span><span className="truncate text-sm font-semibold">{countryLabel(row.country)}</span></div><span className="text-sm font-bold">{formatNumber(row.clicks)} clicks</span></div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-[var(--bg-secondary)]"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500" style={{ width: `${width}%` }} /></div>
                     <div className="mt-1 text-xs text-[var(--text-muted)]">{formatNumber(row.impressions)} impressions</div>
                   </div>;
