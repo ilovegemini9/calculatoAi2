@@ -10,6 +10,7 @@ import { getSeoSettings, parseSeoJsonLd } from '@/lib/seo';
 import { getAdsSettings } from '@/lib/ads';
 import { getVerificationSettings, parseCustomMetaTags } from '@/lib/verification';
 import { AdSlot } from '@/components/ads/AdSlot';
+import { TrafficTracker } from '@/components/analytics/TrafficTracker';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -137,6 +138,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="min-h-screen font-sans antialiased flex flex-col" style={{ backgroundColor: 'var(--bg-page)', color: 'var(--text-primary)' }}>
         <ThemeProvider>
+          <TrafficTracker />
           <Header />
           <AdSlot placement="header" ads={ads} />
           <main className="flex-1" id="main-content">
