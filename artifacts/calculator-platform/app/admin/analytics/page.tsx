@@ -206,6 +206,7 @@ export default function AnalyticsPage() {
             </div>
           )}
         </ChartWrapper>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ContentCard title="Top Search Queries" description="Real queries reported by Google Search Console">
           {gsc?.connected ? (
