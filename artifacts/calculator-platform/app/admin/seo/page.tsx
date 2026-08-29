@@ -160,7 +160,9 @@ export default function SeoPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);\n  const [audit, setAudit] = useState<AuditResponse | null>(null);\n  const [auditing, setAuditing] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [audit, setAudit] = useState<AuditResponse | null>(null);
+  const [auditing, setAuditing] = useState(false);
 
   const load = useCallback(async (quiet = false) => {
     if (quiet) setRefreshing(true);
