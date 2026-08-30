@@ -42,6 +42,8 @@ export interface Calculator {
     keywords: string[];
     inputs?: CalculatorInput[];
     outputs?: CalculatorOutput[];
+    /** @deprecated Stored for legacy records only; never execute this value. */
+    calculateBody?: string;
     howToUse?: string[];
     faqItems?: FaqItem[];
     shortDescription?: string;
@@ -96,10 +98,7 @@ export interface CalculatorOutput {
   highlight?: boolean;
 }
 
-export interface FaqItem {
-  question: string;
-  answer: string;
-}
+export interface FaqItem { question: string; answer: string; }
 
 export interface ArticleKeywordData {
   keyword: string;
@@ -115,34 +114,83 @@ export interface SuggestedCalculator {
   calculatorId: string;
   slug: string;
   name: string;
-  reason: string;
+  description: string;
+  category: string;
+}
+export interface RelatedArticle { articleId: string; slug: string; title: string; description: string; }
+export interface InternalLinkSuggestion { anchorText: string; targetSlug: string; targetTitle: string; targetType: 'calculator' | 'article'; }
+
+export interface Article {
+  id: string; calculatorId: string; slug: string; title: string; content: string;
+  status: 'draft' | 'pending_review' | 'published';
+  seoData: { title: string; description: string; keywords: string[]; canonicalUrl: string };
+  version: number; createdAt: string;
+  relatedKeywords?: string[];
+  openGraph?: { title: string; description: string; url: string; type: string };
+  faqItems?: { q: string; a: string }[];
+  howToSteps?: string[]; readingTime?: number; wordCount?: number; tableOfContents?: string;
+  outline?: { heading: string; level: string; subpoints: string[] }[];
+  relatedCalculators?: string[]; schemaFaq?: string; schemaArticle?: string; schemaHowTo?: string;
+  schemaBreadcrumb?: string; keywordData?: ArticleKeywordData; updatedAt?: string;
+  ogImage?: string; twitterCard?: 'summary' | 'summary_large_image';
+  headingHierarchy?: { level: 'h2' | 'h3'; text: string; id: string }[];
+  suggestedCalculator?: SuggestedCalculator | null;
+  relatedArticles?: RelatedArticle[];
+  internalLinkSuggestions?: InternalLinkSuggestion[];
+  aiSeoOptimized?: boolean; aiOverviewTarget?: string; semanticKeywords?: string[];
+  entities?: ArticleEntity[]; eeatSignals?: EeatSignals; seoAudit?: SeoAudit;
 }
 
-export interface AppSchema {
-  adminUsers: AdminUser[];
-  sessions: AdminSession[];
-  calculators: Calculator[];
-  articles: unknown[];
-  articleVersions: unknown[];
-  redirects: unknown[];
-  analytics: { id: string; date: string; views: number; uniqueVisitors: number }[];
-  settings: SystemSettings;
-  logs: { id: string; timestamp: string; level: string; message: string; route?: string }[];
-  backups: unknown[];
-}
+export interface ArticleEntity { name: string; type: 'Person' | 'Organization' | 'Concept' | 'Place' | 'Product' | 'MedicalCondition' | 'FinancialProduct' | 'Other'; description?: string; }
+export interface EeatSignals { expertiseLevel: 'beginner' | 'intermediate' | 'expert'; authoritySignals: string[]; trustSignals: string[]; experienceIndicators: string[]; }
+export type SeoCheckStatus = 'pass' | 'warn' | 'fail';
+export interface SeoCheck { label: string; status: SeoCheckStatus; detail: string; }
+export interface SeoAudit { score: number; checks: SeoCheck[]; optimizedAt: string; }
+export type ValidationCheckStatus = 'pass' | 'warn' | 'fail';
+export interface ValidationCheck { id: string; label: string; status: ValidationCheckStatus; detail: string; recommendations?: string[]; }
+export interface ArticleValidationReport { score: number; checks: ValidationCheck[]; validatedAt: string; hasErrors: boolean; hasWarnings: boolean; }
+export interface ArticleVersion { id: string; articleId: string; content: string; createdAt: string; }
+export interface Redirect { id: string; oldUrl: string; newUrl: string; statusCode: number; createdAt: string; }
+export interface Analytic { id: string; calculatorId?: string; date: string; views: number; uniqueVisitors?: number; }
 
 export interface SystemSettings {
-  openrouterApiKey: string;
-  serpApiKeyEncrypted: string;
-  adsenseEnabled: boolean;
-  adsenseCode: string;
-  analyticsCode: string;
-  seo: unknown;
-  ads: unknown;
-  verification: unknown;
-  ai: unknown;
-  featureFlags: {
-    aiEnabled: boolean;
-    maintenanceMode: boolean;
-  };
+  openrouterApiKey: string; serpApiKeyEncrypted?: string; adsenseEnabled: boolean; adsenseCode: string; analyticsCode: string;
+  seo: SeoSettings; ads: AdsSettings; verification: VerificationSettings; ai: AiSettings;
+  featureFlags: { aiEnabled: boolean; maintenanceMode: boolean };
+}
+export interface TopicSuggestion { topic: string; searchVolumeLabel: string | null; competition: 'Low' | 'Medium' | 'High' | null; trend: 'Rising' | 'Stable' | 'Declining' | null; opportunityScore: number | null; }
+export interface ResearchTitleCard { title: string; searchVolumeLabel: string | null; competition: 'Low' | 'Medium' | 'High' | null; trend: 'Rising' | 'Stable' | 'Declining' | null; opportunityScore: number | null; }
+export interface ResearchKeywordChip { keyword: string; searchVolumeLabel: string | null; competition: 'Low' | 'Medium' | 'High' | null; trend: 'Rising' | 'Stable' | 'Declining' | null; opportunityScore?: number | null; }
+export interface ArticleAutoSeoData { focusKeyword: string; secondaryKeywords: string[]; longTailKeywords: string[]; semanticKeywords: string[]; entityKeywords: string[]; userIntent: string; searchIntent: string; targetAudience: string; contentAngle: string; }
+export interface ArticleOutlineSection { id: string; type: 'h2' | 'h3' | 'faq' | 'howto' | 'examples' | 'comparison' | 'proscons' | 'internal-links' | 'related'; heading: string; subpoints: string[]; }
+export interface ArticleResearchSummary { topic: string; liveData: boolean; serpDataAvailable: boolean; organicCount: number; hasFeaturedSnippet: boolean; paaQuestions: string[]; relatedSearches: string[]; trendDirection: 'rising' | 'stable' | 'declining' | null; trendInterest: number | null; redditCount: number; autocomplete: string[]; organicResults: { title: string; link: string; snippet: string }[]; featuredSnippet: { title: string; snippet: string } | null; trendingQueries: string[]; keywordChips: ResearchKeywordChip[]; }
+export type AiProvider = 'openrouter' | 'openai' | 'gemini' | 'anthropic';
+export interface AiProviderSettings { enabled: boolean; apiKeyEncrypted: string; defaultModel: string; fallbackModel: string; temperature: number; maxTokens: number; dailyBudget: number; monthlyBudget: number; }
+export interface AiUsageCounters { dailyRequests: number; monthlyRequests: number; dailyTokens: number; monthlyTokens: number; lastDay: string; lastMonth: string; cacheVersion: number; }
+export interface AiSettings { activeProvider: AiProvider; providers: Record<AiProvider, AiProviderSettings>; usage: AiUsageCounters; }
+export interface SeoSettings {
+  metaTitle: string; metaDescription: string; canonicalUrl: string;
+  openGraph: { title: string; description: string; image: string; type: 'website' | 'article' };
+  twitter: { card: 'summary' | 'summary_large_image'; title: string; description: string; image: string };
+  jsonLd: string;
+  sitemap: { enabled: boolean; includeStaticPages: boolean; includeCalculators: boolean; customUrls: string[] };
+  robots: { enabled: boolean; content: string };
+  rss: { enabled: boolean; title: string; description: string };
+  llmsTxt: { enabled: boolean; content: string };
+  googleSearchConsole: { propertyUrl: string; verificationCode: string };
+}
+export type AdPlacement = 'header' | 'sidebar' | 'footer' | 'inContent';
+export interface AdSlotSettings { enabled: boolean; slotId: string; desktopHeight: number; mobileHeight: number; }
+export interface AdsSettings { enabled: boolean; provider: 'adsense' | 'custom'; publisherId: string; customNetworkName: string; customNetworkCode: string; slots: Record<AdPlacement, AdSlotSettings>; }
+export interface VerificationSettings {
+  googleSearchConsole: { enabled: boolean; propertyUrl: string; verificationCode: string };
+  googleAdsense: { enabled: boolean; publisherId: string; verificationCode: string };
+  bing: { enabled: boolean; verificationCode: string };
+  yandex: { enabled: boolean; verificationCode: string };
+  customMetaTags: string;
+}
+export interface LogEntry { id: string; timestamp: string; level: 'INFO' | 'WARN' | 'ERROR'; message: string; route: string; }
+export interface BackupEntry { id: string; date: string; size: string; status: 'Completed' | 'Pending'; type: string; }
+export interface AppSchema {
+  adminUsers: AdminUser[]; calculators: Calculator[]; articles: Article[]; articleVersions: ArticleVersion[]; redirects: Redirect[]; analytics: Analytic[]; settings: SystemSettings; logs: LogEntry[]; backups: BackupEntry[]; sessions?: AdminSession[];
 }
