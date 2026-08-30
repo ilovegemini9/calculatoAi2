@@ -3,6 +3,7 @@ import { siteConfig } from '@/config/site';
 import { CALCULATORS } from '@/config/calculators';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
+import { getTrafficPriority } from '@/lib/seo-priority';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
@@ -19,11 +20,14 @@ function staticPages(baseUrl: string): MetadataRoute.Sitemap {
 }
 
 function calculatorPages(baseUrl: string): MetadataRoute.Sitemap {
-  return CALCULATORS.map((calc) => ({
-    url: `${baseUrl}/${calc.slug}-calculator`,
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
+  return CALCULATORS.map((calc) => {
+    const traffic = getTrafficPriority(calc.slug);
+    return {
+      url: `${baseUrl}/${calc.slug}-calculator`,
+      changeFrequency: traffic ? 'daily' as const : 'weekly' as const,
+      priority: traffic?.priority === 'P0' ? 1.0 : traffic?.priority === 'P1' ? 0.9 : 0.8,
+    };
+  });
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -34,7 +38,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const baseUrl = seo.canonicalUrl || siteConfig.url;
     const staticEntries = seo.sitemap.includeStaticPages ? staticPages(baseUrl) : [];
+    const staticCalculatorSlugs = new Set(CALCULATORS.map((c) => c.slug));
     const calculatorEntries = seo.sitemap.includeCalculators ? calculatorPages(baseUrl) : [];
+
+    // Dynamic calculators are included only when explicitly published/active.
+    // This prevents unfinished records from being exposed to search engines.
+    const dynamicEntries: MetadataRoute.Sitemap = seo.sitemap.includeCalculators
+      ? db.calculators
+          .filter((c) => c.status === 'active' && !staticCalculatorSlugs.has(c.slug))
+          .map((c) => ({
+            url: `${baseUrl}/${c.slug}-calculator`,
+            changeFrequency: 'weekly' as const,
+            priority: 0.75,
+          }))
+      : [];
+
     const customPages: MetadataRoute.Sitemap = seo.sitemap.customUrls
       .filter((url) => url.trim())
       .map((url) => ({ url: url.trim(), changeFrequency: 'weekly' as const, priority: 0.5 }));
@@ -50,9 +68,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ? [{ url: `${baseUrl}/blog`, changeFrequency: 'daily' as const, priority: 0.6 }]
       : [];
 
-    return [...staticEntries, ...calculatorEntries, ...blogIndex, ...publishedArticles, ...customPages];
+    return [...staticEntries, ...calculatorEntries, ...dynamicEntries, ...blogIndex, ...publishedArticles, ...customPages];
   } catch {
-    // Keep the public discovery graph complete even if DB is unavailable.
     const baseUrl = siteConfig.url;
     return [...staticPages(baseUrl), ...calculatorPages(baseUrl)];
   }
