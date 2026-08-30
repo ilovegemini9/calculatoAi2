@@ -3,6 +3,18 @@ import { getDb, saveDb } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
+const AI_ENGINES: Array<{ name: string; host: RegExp }> = [
+  { name: 'ChatGPT', host: /(^|\\.)chatgpt\\.com$/i },
+  { name: 'ChatGPT', host: /(^|\\.)openai\\.com$/i },
+  { name: 'Perplexity', host: /(^|\\.)perplexity\\.ai$/i },
+  { name: 'Gemini', host: /(^|\\.)gemini\\.google\\.com$/i },
+  { name: 'Claude', host: /(^|\\.)claude\\.ai$/i },
+  { name: 'Microsoft Copilot', host: /(^|\\.)copilot\\.microsoft\\.com$/i },
+  { name: 'Grok', host: /(^|\\.)grok\\.com$/i },
+  { name: 'DeepSeek', host: /(^|\\.)deepseek\\.com$/i },
+  { name: 'Mistral', host: /(^|\\.)mistral\\.ai$/i },
+];
+
 const SEARCH_ENGINES: Array<{ name: string; host: RegExp }> = [
   { name: 'Google', host: /(^|\.)google\./i },
   { name: 'Bing', host: /(^|\.)bing\.com$/i },
@@ -20,6 +32,8 @@ function classify(referrer: string) {
   if (!referrer) return { source: 'Direct', medium: 'direct', host: '' };
   try {
     const host = new URL(referrer).hostname.toLowerCase().replace(/^www\./, '');
+    const ai = AI_ENGINES.find((item) => item.host.test(host));
+    if (ai) return { source: ai.name, medium: 'ai', host };
     const engine = SEARCH_ENGINES.find((item) => item.host.test(host));
     if (engine) return { source: engine.name, medium: 'organic', host };
     return { source: host, medium: 'referral', host };
