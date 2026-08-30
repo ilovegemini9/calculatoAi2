@@ -1,0 +1,35 @@
+name: Sync Omni research catalog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: artifacts/calculator-platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Discover Omni calculator slugs
+        run: node scripts/import-omni-catalog.mjs
+      - name: Commit catalog changes
+        working-directory: .
+        run: |
+          if git diff --quiet -- artifacts/calculator-platform/config/omni-discovered-catalog.json; then
+            echo 'No catalog changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/calculator-platform/config/omni-discovered-catalog.json
+          git commit -m 'chore: sync Omni research catalog'
+          git push
