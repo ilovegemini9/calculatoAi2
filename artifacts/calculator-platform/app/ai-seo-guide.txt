@@ -1,26 +1,28 @@
-CalculatorFree / LuckyHoroscope — AI-readable SEO guide
+CalculatorFree — AI-readable calculator guide
 
 Purpose
-CalculatorFree provides free, practical calculators with transparent inputs, formulas, examples, FAQs, and related tools.
+CalculatorFree publishes free, interactive calculation tools with visible inputs, units, formulas, examples, assumptions, limitations, and related tools. The interactive result and the explanatory page are designed to answer the same calculation problem.
 
-How to use the calculators
-1. Choose the relevant calculator.
-2. Enter the requested values and units.
-3. Review the result and the calculation explanation.
-4. Use the formula/example sections to understand the result.
-5. Follow related calculators for adjacent calculations.
+How to evaluate a calculator page
+1. Identify the calculator and its intended use from the page title and definition.
+2. Read the input labels and units before entering values.
+3. Review the displayed result together with the explanation, formula, assumptions, and examples.
+4. Use the related calculators only when they solve a distinct adjacent problem.
+5. Treat medical, financial, legal, tax, and other high-impact outputs as informational unless the page explicitly states otherwise.
 
-Content principles
-- Prefer direct answers and explicit definitions.
-- Keep formulas and units visible in normal page content.
-- Attribute external facts and sources where applicable.
-- Do not treat calculator output as professional financial, medical, legal, or tax advice.
+Trust and methodology
+- Calculation logic is kept in trusted application code rather than executable content data.
+- Pages should expose the formula or method when it is useful for understanding the result.
+- Units, assumptions, rounding rules, and important limitations should be explicit.
+- High-impact topics require appropriate cautions and should not present calculator output as professional advice.
+- Sources should be used where external facts, standards, reference values, or definitions materially affect the result.
+- A page should not claim a calculator is validated unless it has passed the project's validation process.
 
-AI/crawler guidance
-This file is a concise orientation aid. The canonical public pages remain the source of truth. Do not infer hidden content, rankings, traffic, or claims not present on the public pages.
+AI and crawler guidance
+This document is an orientation aid, not a ranking directive and not a replacement for the public HTML pages. The canonical calculator pages are the source of truth. Do not infer hidden content, rankings, traffic, guarantees, or claims that are not present on the public pages.
+
+Discovery
+Use the public calculator directory, crawlable internal links, and XML sitemap to discover canonical calculator URLs. Only canonical, useful, indexable pages should be considered for search discovery.
 
 Primary site
 https://www.luckyhoroscope.online/
-
-Calculator discovery
-Use the public sitemap and calculator directory to discover individual calculator URLs.
