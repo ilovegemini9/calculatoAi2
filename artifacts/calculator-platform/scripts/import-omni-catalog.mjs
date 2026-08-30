@@ -1,16 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * One-time catalog discovery tool.
- *
- * Purpose:
- * - Discover calculator URL slugs from Omni's public "all calculators" index.
- * - Normalize and de-duplicate slugs against themselves and our existing catalog.
- * - Import ONLY catalog metadata (slug/source/category), never Omni page copy/content/code.
- *
- * The generated file is intentionally a research/coverage input. Each imported
- * calculator must receive an original implementation and original content before
- * it is indexable on our site.
+ * Research-only catalog discovery from Omni's public index.
+ * Never copies Omni page content, formulas, code, or descriptions.
+ * Imported entries stay unimplemented until we create original implementations/content.
  */
 
 import { readFile, writeFile } from 'node:fs/promises';
@@ -19,6 +12,13 @@ import { existsSync } from 'node:fs';
 const SOURCE_URL = 'https://www.omnicalculator.com/all';
 const OUTPUT = new URL('../config/omni-discovered-catalog.json', import.meta.url);
 const EXISTING = new URL('../config/calculators.ts', import.meta.url);
+
+const NAV_SLUGS = new Set([
+  '', 'all', 'about', 'contact', 'collections', 'press', 'privacy-policy',
+  'terms-of-use', 'editorial-policy', 'search', 'jobs', 'blog', 'resource-library',
+  'biology', 'chemistry', 'construction', 'conversion', 'ecology', 'everyday-life',
+  'finance', 'food', 'health', 'math', 'physics', 'sports', 'statistics', 'other',
+]);
 
 function normalizeSlug(value) {
   return value
@@ -33,12 +33,7 @@ function normalizeSlug(value) {
 function isCandidate(href) {
   if (!href || href.startsWith('#') || href.startsWith('mailto:')) return false;
   const slug = normalizeSlug(href);
-  if (!slug || slug.includes('/')) return false;
-  const blocked = new Set([
-    '', 'all', 'about', 'contact', 'collections', 'press', 'privacy-policy',
-    'terms-of-use', 'editorial-policy', 'search', 'jobs', 'blog', 'resource-library',
-  ]);
-  return !blocked.has(slug);
+  return Boolean(slug) && !slug.includes('/') && !NAV_SLUGS.has(slug);
 }
 
 function extractLinks(html) {
@@ -75,12 +70,12 @@ const result = {
   sourceCount: discovered.length,
   existingCount: existing.size,
   newCount: uniqueNew.length,
-  policy: 'Metadata-only discovery. Implementations and editorial content must be original.',
+  policy: 'Metadata-only discovery. No Omni copy, formulas, code, or descriptions are imported. Implementations and editorial content must be original.',
   calculators: uniqueNew.map((slug) => ({ slug, source: 'omni-research', status: 'unimplemented' })),
 };
 
 await writeFile(OUTPUT, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-console.log(`Discovered: ${discovered.length}`);
+console.log(`Discovered unique Omni candidates: ${discovered.length}`);
 console.log(`Already in our catalog: ${existing.size}`);
 console.log(`New candidates: ${uniqueNew.length}`);
 console.log(`Wrote ${OUTPUT.pathname}`);
