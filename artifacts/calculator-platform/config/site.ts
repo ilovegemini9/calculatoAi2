@@ -2,12 +2,12 @@ export const siteConfig = {
   name: 'CalculatorFree',
   description:
     'Free online calculators for finance, math, health, and everyday life. Instant, accurate, and easy to use with no signup required. All tools run in-browser.',
-  // Keep one canonical production origin so canonical URLs, sitemap, robots,
-  // structured data, and social metadata all resolve to the same host.
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.luckyhoroscope.online',
+  // Set NEXT_PUBLIC_SITE_URL to the real production domain in Vercel.
+  // Keep a neutral fallback so we never publish unrelated-domain canonicals.
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://calculatorfree.vercel.app',
   ogImage: '/og-image.svg',
   links: {
-    github: '',
+    github: 'https://github.com/ilovegemini9/calculatoAi2',
   },
   keywords: [
     'free online calculators',
