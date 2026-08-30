@@ -150,6 +150,23 @@ export async function GET() {
     const trafficSources = [...sourceMap.values()].sort((a, b) => b.visits - a.visits).slice(0, 20);
     const referrals = [...referralMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20).map(([referrer, visits]) => ({ referrer, visits }));
 
+    const aiEvents = trafficEvents.filter((event: any) => event.medium === 'ai');
+    const aiMap = new Map<string, number>();
+    const aiPageMap = new Map<string, number>();
+    const aiDayMap = new Map<string, number>();
+    for (const event of aiEvents) {
+      aiMap.set(event.source || 'Unknown AI', (aiMap.get(event.source || 'Unknown AI') || 0) + 1);
+      aiPageMap.set(event.path || '/', (aiPageMap.get(event.path || '/') || 0) + 1);
+      const day = String(event.timestamp || '').slice(0, 10);
+      if (day) aiDayMap.set(day, (aiDayMap.get(day) || 0) + 1);
+    }
+    const totalAiVisits = aiEvents.length;
+    const aiSources = [...aiMap.entries()].sort((a, b) => b[1] - a[1]).map(([source, visits]) => ({
+      source, visits, share: totalAiVisits ? visits / totalAiVisits : 0,
+    }));
+    const aiPages = [...aiPageMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15).map(([page, visits]) => ({ page, visits }));
+    const aiTrend = [...aiDayMap.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(-30).map(([date, visits]) => ({ date, visits }));
+
     const response = NextResponse.json({
       totalDynamic: dynamicCalcs.length,
       totalArticles: db.articles.length,
@@ -171,6 +188,7 @@ export async function GET() {
       },
       trends,
       traffic: { totalTracked: trafficEvents.length, sources: trafficSources, referrals },
+      aiTraffic: { totalVisits: totalAiVisits, shareOfTracked: trafficEvents.length ? totalAiVisits / trafficEvents.length : 0, sources: aiSources, pages: aiPages, trend: aiTrend },
       searchConsole,
       settings: {
         adsenseEnabled: db.settings.adsenseEnabled,
