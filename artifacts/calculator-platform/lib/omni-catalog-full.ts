@@ -1,6 +1,7 @@
 import type { CalculatorMeta } from '@/config/calculators';
 import { CALCULATORS } from '@/config/calculators';
 import type { CalcContent } from '@/config/calculator-content';
+import omniData from '@/config/omni-full-database.json';
 
 export interface OmniCalculatorEntry {
   slug: string;
@@ -28,10 +29,11 @@ export interface OmniCalculatorEntry {
   examples: Array<{ title: string; scenario: string; steps: string[]; result: string }>;
 }
 
-// The generated Omni inventory was corrupted and could not be parsed by webpack.
-// Keep the catalog API available by deriving a safe fallback from the canonical
-// calculator metadata until the generated inventory is regenerated.
-const omniCalculators: OmniCalculatorEntry[] = CALCULATORS.map((calculator: CalculatorMeta) => ({
+const rawOmniList = (omniData && Array.isArray((omniData as { calculators?: unknown[] }).calculators)
+  ? (omniData as { calculators: OmniCalculatorEntry[] }).calculators
+  : []) as OmniCalculatorEntry[];
+
+const omniCalculators: OmniCalculatorEntry[] = rawOmniList.length > 0 ? rawOmniList : CALCULATORS.map((calculator: CalculatorMeta) => ({
   ...calculator,
   inputs: [],
   outputs: [{ name: 'result', label: 'Result', highlight: true }],
