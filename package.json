@@ -25,5 +25,6 @@
     "prettier": "^3.9.4",
     "prisma": "^7.9.0",
     "typescript": "~5.9.3"
-  }
+  },
+  "packageManager": "pnpm@10.20.0"
 }
