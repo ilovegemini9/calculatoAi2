@@ -21,15 +21,25 @@ const html = await (await fetch(SOURCE, { headers: { 'user-agent': 'calculatoAi2
 
 // The /all page exposes calculator links in normal anchor tags. Keep only
 // first-party calculator paths and deduplicate by normalized pathname.
-const links = [...html.matchAll(/href=["'](\/[^"'#?]+)["'][^>]*>([\s\S]*?)<\/a>/gi)]
-  .map(([, href, label]) => ({ href, label: label.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }))
-  .filter(({ href, label }) => href && label && href.split('/').filter(Boolean).length === 2)
-  .map(({ href, label }) => ({
-    slug: href.split('/').filter(Boolean)[1],
-    category: href.split('/').filter(Boolean)[0],
-    title: label,
-    source: SOURCE,
-  }));
+const links = [...html.matchAll(/href=["']\/([a-z0-9-]+)\/([a-z0-9-]+)["'][^>]*>([^<]+)<\/a>/gi)]
+  .map(([, category, slug, rawLabel]) => {
+    const cleanLabel = rawLabel.replace(/[\x00-\x1F\x7F-\x9F]/g, ' ').replace(/\s+/g, ' ').trim();
+    return {
+      slug: slug.trim().toLowerCase(),
+      category: category.trim().toLowerCase(),
+      title: cleanLabel,
+      source: SOURCE,
+    };
+  })
+  .filter(({ slug, category, title }) => 
+    slug && 
+    category && 
+    title && 
+    category !== 'favicons' && 
+    category !== 'images' && 
+    slug !== 'favicon.png' &&
+    !slug.includes('.')
+  );
 
 const unique = new Map();
 for (const item of links) {

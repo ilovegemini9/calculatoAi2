@@ -12,7 +12,7 @@ import { deleteSessionOnResponse, revokeCurrentSession } from '@/lib/session';
  * admin is simply moving between pages. That was causing successful sessions
  * to disappear and subsequent admin API calls to return 401.
  */
-export async function POST(req: Request) {
+export async function POST() {
   await revokeCurrentSession();
   const response = NextResponse.json({ success: true });
   deleteSessionOnResponse(response);
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
 // Keep GET non-destructive for old links/bookmarks. Never clear the session
 // from a safe/idempotent request.
-export function GET(req: Request) {
+export function GET() {
   return NextResponse.json(
     { error: 'Method not allowed. Use POST to log out.' },
     { status: 405, headers: { Allow: 'POST' } },

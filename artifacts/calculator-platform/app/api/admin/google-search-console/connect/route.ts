@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import { verifySession } from '@/lib/session';
 import { googleClientConfigured, googleRedirectUri, setGoogleOAuthState } from '@/lib/google-search-console';
 
-export async function GET(req: Request) {
+export async function GET() {
   if (!(await verifySession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!googleClientConfigured()) return NextResponse.json({ error: 'Google OAuth is not configured.' }, { status: 503 });
 
