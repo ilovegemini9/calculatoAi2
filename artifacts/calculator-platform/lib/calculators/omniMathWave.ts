@@ -20,6 +20,24 @@ export function combination(nValue: number, rValue: number): number {
   return result;
 }
 
+export function averageRating(counts: number[]): number {
+  const safe = counts.slice(0, 5).map((value) => Math.max(0, finite(value)));
+  const total = safe.reduce((sum, value) => sum + value, 0);
+  if (total === 0) return 0;
+  return safe.reduce((sum, count, index) => sum + count * (index + 1), 0) / total;
+}
+
+export function leastToGreatest(values: number[]): number[] {
+  return values.filter(Number.isFinite).sort((a, b) => a - b);
+}
+
+export function percentileRank(value: number, values: number[]): number {
+  const sorted = leastToGreatest(values);
+  if (!sorted.length) return 0;
+  const rank = sorted.filter((item) => item <= finite(value)).length / sorted.length;
+  return rank * 100;
+}
+
 export function percentile(values: number[], percentileValue: number): number {
   const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
   if (!sorted.length) return 0;

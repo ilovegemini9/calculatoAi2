@@ -5,7 +5,7 @@ import { ScientificCoreCalculator, FractionCoreCalculator, StandardDeviationCalc
 import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculator, RoundingCalculator } from './MathExtendedCalculator';
 import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryCalculator, HexCalculator, HalfLifeCalculator, SlopeCalculator } from './MathGeometryCalculator';
 import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCalculator, StatisticsCalculator, PermutationCombinationCalculator } from './MathStatsCalculator';
-import { FactorialCalculator, CombinationCalculator, PercentileCalculator } from './OmniMathWaveCalculator';
+import { FactorialCalculator, CombinationCalculator, PercentileCalculator, AverageRatingCalculator, LeastToGreatestCalculator, PercentileRankCalculator } from './OmniMathWaveCalculator';
 import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, RightTriangleCalculator, LeastCommonMultipleCalculator, GreatestCommonFactorCalculator, PrimeFactorizationCalculator } from './GeometryAdvancedCalculator';
 import { ZScoreCalculator, ConfidenceIntervalCalculator, MeanMedianModeRangeCalculator } from './StatisticsAdvancedCalculator';
 import { FactorCalculator, MatrixCalculator, BasicCalculator, LongDivisionCalculator, AverageCalculator, PValueCalculator } from './NumberToolsCalculator';
@@ -180,6 +180,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'factorial': return <FactorialCalculator />;
     case 'combination': return <CombinationCalculator />;
     case 'percentile': return <PercentileCalculator />;
+    case 'average-rating': return <AverageRatingCalculator />;
+    case 'least-to-greatest': return <LeastToGreatestCalculator />;
+    case 'percentile-rank': return <PercentileRankCalculator />;
     case 'triangle':             return <TriangleCalculator />;
     case 'volume':               return <VolumeCalculator />;
     case 'number-sequence':      return <NumberSequenceCalculator />;
