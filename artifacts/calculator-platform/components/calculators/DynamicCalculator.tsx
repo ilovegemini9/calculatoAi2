@@ -13,17 +13,39 @@ interface Props {
 type CalculatorFn = (inputs: Record<string, string | number>) => Record<string, unknown>;
 
 const CALCULATORS: Record<string, CalculatorFn> = {
-  bmi: (inputs) => {
-    const weight = Number(inputs.weight || 0);
-    const height = Number(inputs.height || 0);
-    if (weight <= 0 || height <= 0) throw new Error('Invalid inputs');
-    const heightM = height > 3 ? height / 100 : height;
-    return { bmi: weight / (heightM * heightM) };
-  },
   percentage: (inputs) => {
-    const value = Number(inputs.value || 0);
-    const percent = Number(inputs.percent || 0);
-    return { result: (value * percent) / 100 };
+    const part = Number(inputs.part ?? inputs.value ?? 0);
+    const whole = Number(inputs.whole ?? 0);
+    if (!Number.isFinite(part) || !Number.isFinite(whole) || whole === 0) throw new Error('Whole must not be zero');
+    return { percentage: (part / whole) * 100 };
+  },
+  'percentage-increase': (inputs) => {
+    const original = Number(inputs.original);
+    const next = Number(inputs.new);
+    if (!Number.isFinite(original) || original === 0 || !Number.isFinite(next)) throw new Error('Enter valid values; original must not be zero');
+    return { increasePercent: ((next - original) / Math.abs(original)) * 100 };
+  },
+  'percentage-decrease': (inputs) => {
+    const original = Number(inputs.original);
+    const next = Number(inputs.new);
+    if (!Number.isFinite(original) || original === 0 || !Number.isFinite(next)) throw new Error('Enter valid values; original must not be zero');
+    return { decreasePercent: ((original - next) / Math.abs(original)) * 100 };
+  },
+  average: (inputs) => {
+    const raw = String(inputs.values ?? '').split(/[,\s]+/).filter(Boolean).map(Number);
+    if (!raw.length || raw.some((x) => !Number.isFinite(x))) throw new Error('Enter numbers separated by commas or spaces');
+    return { mean: raw.reduce((sum, x) => sum + x, 0) / raw.length };
+  },
+  'square-root': (inputs) => {
+    const value = Number(inputs.value);
+    if (!Number.isFinite(value) || value < 0) throw new Error('Value must be a non-negative number');
+    return { root: Math.sqrt(value) };
+  },
+  exponent: (inputs) => {
+    const base = Number(inputs.base);
+    const exponent = Number(inputs.exponent);
+    if (!Number.isFinite(base) || !Number.isFinite(exponent)) throw new Error('Enter valid numbers');
+    return { power: Math.pow(base, exponent) };
   },
 };
 
@@ -47,20 +69,18 @@ export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
   useEffect(() => {
     if (Object.keys(values).length === 0) return;
     setError('');
-
     try {
       const inputsObj: Record<string, string | number> = {};
       safeInputs.forEach((inp) => {
-        const val = values[inp.name];
+        const val = values[inp.name] ?? '';
         inputsObj[inp.name] = inp.type === 'number' ? Number(val || 0) : val;
       });
-
       const calculator = CALCULATORS[calculatorId];
       if (!calculator) throw new Error(`Unknown calculator: ${calculatorId}`);
       setResults(calculator(inputsObj));
     } catch (err: unknown) {
       console.error(err);
-      setError('Error in mathematical calculations.');
+      setError(err instanceof Error ? err.message : 'Error in mathematical calculations.');
       setResults({});
     }
   }, [values, calculatorId, safeInputs]);
