@@ -29,6 +29,8 @@ const CALCULATORS: Record<string, CalculatorFn> = {
 
 export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
   const uid = useId();
+  const safeInputs = Array.isArray(inputs) ? inputs : [];
+  const safeOutputs = Array.isArray(outputs) ? outputs : [];
   const [values, setValues] = useState<Record<string, string>>({});
   const [results, setResults] = useState<Record<string, unknown>>({});
   const [error, setError] = useState('');
@@ -36,11 +38,11 @@ export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
 
   useEffect(() => {
     const initial: Record<string, string> = {};
-    inputs.forEach((inp) => {
+    safeInputs.forEach((inp) => {
       initial[inp.name] = String(inp.defaultValue ?? '');
     });
     setValues(initial);
-  }, [inputs]);
+  }, [safeInputs]);
 
   useEffect(() => {
     if (Object.keys(values).length === 0) return;
@@ -48,7 +50,7 @@ export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
 
     try {
       const inputsObj: Record<string, string | number> = {};
-      inputs.forEach((inp) => {
+      safeInputs.forEach((inp) => {
         const val = values[inp.name];
         inputsObj[inp.name] = inp.type === 'number' ? Number(val || 0) : val;
       });
@@ -61,7 +63,7 @@ export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
       setError('Error in mathematical calculations.');
       setResults({});
     }
-  }, [values, calculatorId, inputs]);
+  }, [values, calculatorId, safeInputs]);
 
   const handleInputChange = (name: string, val: string) => {
     setValues((prev) => ({ ...prev, [name]: val }));
@@ -72,7 +74,7 @@ export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
       <div className="md:col-span-7 rounded-2xl border p-6 space-y-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
         <h2 className="text-xs font-black uppercase tracking-widest text-blue-500">Variables & Parameters</h2>
         <div className="space-y-4">
-          {inputs.map((inp) => {
+          {safeInputs.map((inp) => {
             const currentVal = values[inp.name] || '';
             const inputId = `${uid}-${inp.name}`;
             const helpId = inp.helpText ? `${uid}-${inp.name}-help` : undefined;
@@ -104,7 +106,7 @@ export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
             <div id={errorId} role="alert" aria-live="assertive" className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold rounded-xl">⚠️ {error}</div>
           ) : (
             <div className="space-y-4" aria-live="polite" aria-label="Calculation results">
-              {outputs.map((out) => {
+              {safeOutputs.map((out) => {
                 const rawVal = results[out.name];
                 const displayVal = typeof rawVal === 'number' ? formatNumber(rawVal, 2) : String(rawVal ?? '0');
                 return (
