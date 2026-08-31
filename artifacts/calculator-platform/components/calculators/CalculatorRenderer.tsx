@@ -5,6 +5,7 @@ import { ScientificCoreCalculator, FractionCoreCalculator, StandardDeviationCalc
 import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculator, RoundingCalculator } from './MathExtendedCalculator';
 import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryCalculator, HexCalculator, HalfLifeCalculator, SlopeCalculator } from './MathGeometryCalculator';
 import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCalculator, StatisticsCalculator, PermutationCombinationCalculator } from './MathStatsCalculator';
+import { FactorialCalculator, CombinationCalculator, PercentileCalculator } from './OmniMathWaveCalculator';
 import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, RightTriangleCalculator, LeastCommonMultipleCalculator, GreatestCommonFactorCalculator, PrimeFactorizationCalculator } from './GeometryAdvancedCalculator';
 import { ZScoreCalculator, ConfidenceIntervalCalculator, MeanMedianModeRangeCalculator } from './StatisticsAdvancedCalculator';
 import { FactorCalculator, MatrixCalculator, BasicCalculator, LongDivisionCalculator, AverageCalculator, PValueCalculator } from './NumberToolsCalculator';
@@ -176,6 +177,9 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'probability':                 return <ProbabilityCalculator />;
     case 'statistics':                  return <StatisticsCalculator />;
     case 'permutation-and-combination': return <PermutationCombinationCalculator />;
+    case 'factorial': return <FactorialCalculator />;
+    case 'combination': return <CombinationCalculator />;
+    case 'percentile': return <PercentileCalculator />;
     case 'triangle':             return <TriangleCalculator />;
     case 'volume':               return <VolumeCalculator />;
     case 'number-sequence':      return <NumberSequenceCalculator />;
