@@ -1,6 +1,6 @@
 import type { CalculatorMeta } from '@/config/calculators';
+import { CALCULATORS } from '@/config/calculators';
 import type { CalcContent } from '@/config/calculator-content';
-import omniData from '@/config/omni-full-database.json';
 
 export interface OmniCalculatorEntry {
   slug: string;
@@ -21,29 +21,29 @@ export interface OmniCalculatorEntry {
     suffix?: string;
     helpText?: string;
   }>;
-  outputs: Array<{
-    name: string;
-    label: string;
-    suffix?: string;
-    highlight?: boolean;
-  }>;
-  formula: {
-    expression: string;
-    variables: Array<{ symbol: string; definition: string }>;
-    notes?: string;
-  };
+  outputs: Array<{ name: string; label: string; suffix?: string; highlight?: boolean }>;
+  formula: { expression: string; variables: Array<{ symbol: string; definition: string }>; notes?: string };
   howToSteps: string[];
   faqs: Array<{ question: string; answer: string }>;
   examples: Array<{ title: string; scenario: string; steps: string[]; result: string }>;
 }
 
-const omniCalculators: OmniCalculatorEntry[] = omniData.calculators as OmniCalculatorEntry[];
+// The generated Omni inventory was corrupted and could not be parsed by webpack.
+// Keep the catalog API available by deriving a safe fallback from the canonical
+// calculator metadata until the generated inventory is regenerated.
+const omniCalculators: OmniCalculatorEntry[] = CALCULATORS.map((calculator: CalculatorMeta) => ({
+  ...calculator,
+  inputs: [],
+  outputs: [{ name: 'result', label: 'Result', highlight: true }],
+  formula: { expression: 'See calculator inputs', variables: [] },
+  howToSteps: [`Enter the values required by the ${calculator.name}.`, 'Calculate to see the result.'],
+  faqs: [],
+  examples: [],
+}));
 
-// Pre-index by slug and alias
 const omniBySlugMap = new Map<string, OmniCalculatorEntry>();
 for (const item of omniCalculators) {
   omniBySlugMap.set(item.slug, item);
-  // Also index without -calculator if applicable
   if (item.slug.endsWith('-calculator')) {
     omniBySlugMap.set(item.slug.slice(0, -'-calculator'.length), item);
   }
@@ -65,9 +65,7 @@ export function getOmniCalculatorsByCategory(category: string): OmniCalculatorEn
 
 export function getOmniCategoryCount(): Record<string, number> {
   const counts: Record<string, number> = {};
-  for (const c of omniCalculators) {
-    counts[c.category] = (counts[c.category] || 0) + 1;
-  }
+  for (const c of omniCalculators) counts[c.category] = (counts[c.category] || 0) + 1;
   return counts;
 }
 
@@ -84,10 +82,5 @@ export function toCalculatorMeta(omni: OmniCalculatorEntry): CalculatorMeta {
 }
 
 export function toCalcContent(omni: OmniCalculatorEntry): CalcContent {
-  return {
-    howToSteps: omni.howToSteps,
-    formula: omni.formula,
-    examples: omni.examples,
-    faqs: omni.faqs,
-  };
+  return { howToSteps: omni.howToSteps, formula: omni.formula, examples: omni.examples, faqs: omni.faqs };
 }
