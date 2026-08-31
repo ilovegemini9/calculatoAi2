@@ -4,6 +4,7 @@ import { CALCULATORS } from '@/config/calculators';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 import { getTrafficPriority } from '@/lib/seo-priority';
+import { checkP0Quality } from '@/lib/p0-quality-gate';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
@@ -20,7 +21,10 @@ function staticPages(baseUrl: string): MetadataRoute.Sitemap {
 }
 
 function calculatorPages(baseUrl: string): MetadataRoute.Sitemap {
-  return CALCULATORS.map((calc) => {
+  return CALCULATORS.filter((calc) => {
+    const traffic = getTrafficPriority(calc.slug);
+    return traffic?.priority !== 'P0' || checkP0Quality(calc.slug, calc).indexable;
+  }).map((calc) => {
     const traffic = getTrafficPriority(calc.slug);
     return {
       url: `${baseUrl}/${calc.slug}-calculator`,
@@ -41,8 +45,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const staticCalculatorSlugs = new Set(CALCULATORS.map((c) => c.slug));
     const calculatorEntries = seo.sitemap.includeCalculators ? calculatorPages(baseUrl) : [];
 
-    // Dynamic calculators are included only when explicitly published/active.
-    // This prevents unfinished records from being exposed to search engines.
     const dynamicEntries: MetadataRoute.Sitemap = seo.sitemap.includeCalculators
       ? db.calculators
           .filter((c) => c.status === 'active' && !staticCalculatorSlugs.has(c.slug))
