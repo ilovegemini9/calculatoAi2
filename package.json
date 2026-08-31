@@ -11,19 +11,15 @@
     "typecheck": "npm run typecheck --workspace=@workspace/calculator-platform",
     "lint": "npm run lint --workspace=@workspace/calculator-platform"
   },
-  "workspaces": [
-    "artifacts/*",
-    "lib/*",
-    "scripts"
-  ],
+  "workspaces": ["artifacts/*", "lib/*", "scripts"],
   "dependencies": {
     "@google/genai": "^2.12.0",
     "@prisma/adapter-pg": "^7.9.0",
-    "@prisma/client": "^7.9.0"
+    "@prisma/client": "^7.9.0",
+    "prisma": "^7.9.0"
   },
   "devDependencies": {
     "prettier": "^3.9.4",
-    "prisma": "^7.9.0",
     "typescript": "~5.9.3"
   },
   "packageManager": "pnpm@10.20.0"
