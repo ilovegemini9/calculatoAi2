@@ -1,0 +1,23 @@
+{
+  "totalCount": 3916,
+  "updatedAt": "2026-08-31T00:00:00.000Z",
+  "categories": [
+    "math",
+    "finance",
+    "health",
+    "physics",
+    "chemistry",
+    "construction",
+    "conversion",
+    "everyday-life",
+    "sports",
+    "statistics",
+    "food",
+    "ecology",
+    "biology",
+    "other"
+  ],
+  "calculators": [],
+  "status": "manifest-only",
+  "note": "The previous generated database blob was corrupted. This valid manifest preserves the verified source count and category set while the full calculator records are regenerated from the source inventory."
+}
