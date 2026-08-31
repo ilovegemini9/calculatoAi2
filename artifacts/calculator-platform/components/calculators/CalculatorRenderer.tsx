@@ -6,6 +6,7 @@ import { ExponentCalculator, RootCalculator, LogCalculator, PercentErrorCalculat
 import { TriangleCalculator, VolumeCalculator, NumberSequenceCalculator, BinaryCalculator, HexCalculator, HalfLifeCalculator, SlopeCalculator } from './MathGeometryCalculator';
 import { AreaCalculator, DistanceCalculator, SampleSizeCalculator, ProbabilityCalculator, StatisticsCalculator, PermutationCombinationCalculator } from './MathStatsCalculator';
 import { FactorialCalculator, CombinationCalculator, PercentileCalculator, AverageRatingCalculator, LeastToGreatestCalculator, PercentileRankCalculator } from './OmniMathWaveCalculator';
+import { PressureUnitConversionCalculator, SalaryToHourlyCalculator, DiscountRateCalculator, LinearCombinationCalculator } from './OmniWaveTwoCalculator';
 import { CircleCalculator, SurfaceAreaCalculator, PythagoreanTheoremCalculator, RightTriangleCalculator, LeastCommonMultipleCalculator, GreatestCommonFactorCalculator, PrimeFactorizationCalculator } from './GeometryAdvancedCalculator';
 import { ZScoreCalculator, ConfidenceIntervalCalculator, MeanMedianModeRangeCalculator } from './StatisticsAdvancedCalculator';
 import { FactorCalculator, MatrixCalculator, BasicCalculator, LongDivisionCalculator, AverageCalculator, PValueCalculator } from './NumberToolsCalculator';
@@ -183,6 +184,10 @@ export function CalculatorRenderer({ slug }: Props) {
     case 'average-rating': return <AverageRatingCalculator />;
     case 'least-to-greatest': return <LeastToGreatestCalculator />;
     case 'percentile-rank': return <PercentileRankCalculator />;
+    case 'pressure-unit-conversion': return <PressureUnitConversionCalculator />;
+    case 'salary-to-hourly': return <SalaryToHourlyCalculator />;
+    case 'discount-rate': return <DiscountRateCalculator />;
+    case 'linear-combination': return <LinearCombinationCalculator />;
     case 'triangle':             return <TriangleCalculator />;
     case 'volume':               return <VolumeCalculator />;
     case 'number-sequence':      return <NumberSequenceCalculator />;
