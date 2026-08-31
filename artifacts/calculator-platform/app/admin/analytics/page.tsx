@@ -1,7 +1,8 @@
 'use client';
 import { fetchAdmin } from '@/lib/fetch-admin';
 import { useCallback, useEffect, useState } from 'react';
-import { BarChart3, Calculator, FileText, Globe, Loader2, RefreshCw, TrendingUp, Users, XCircle, MousePointerClick, Eye, MapPin, Monitor, Smartphone, Tablet, ExternalLink, Search, Activity } from 'lucide-react';
+import Link from 'next/link';
+import { BarChart3, Calculator, FileText, Globe, Loader2, RefreshCw, TrendingUp, Users, XCircle, MousePointerClick, Eye, Monitor, Smartphone, Tablet, ExternalLink, Search, Activity } from 'lucide-react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ContentCard, StatCard } from '@/components/admin/Card';
 import { ChartWrapper } from '@/components/admin/ChartWrapper';
@@ -82,7 +83,7 @@ export default function AnalyticsPage() {
         <div className="rounded-xl border p-5" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div><div className="flex items-center gap-2 text-sm font-bold text-[var(--text-primary)]"><Globe className="h-4 w-4 text-blue-500" /> Google Search Console</div><p className="mt-1 text-sm text-[var(--text-muted)]">Connect your Google account to see real search queries, clicks, impressions, countries, devices and landing pages.</p></div>
-            <a href="/api/admin/google-search-console/connect" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">Connect Google Search Console</a>
+            <Link href="/api/admin/google-search-console/connect" className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">Connect Google Search Console</Link>
           </div>
         </div>
       )}
@@ -91,7 +92,7 @@ export default function AnalyticsPage() {
           <ResponsiveContainer width="100%" height="100%"><AreaChart data={data.trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}><XAxis dataKey="date" stroke="var(--text-muted)" fontSize={11} tickLine={false} /><YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} /><Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', borderRadius: '8px', fontSize: '12px', color: 'var(--text-primary)' }} /><Area type="monotone" dataKey="views" name="Page Views" stroke="#2563eb" strokeWidth={2} fillOpacity={0.12} fill="#2563eb" /></AreaChart></ResponsiveContainer>
         </ChartWrapper>
         <ChartWrapper title="Google Search Console" description={gsc?.connected ? 'Real Google search performance for the configured property.' : 'Real search data will appear here after connecting Search Console.'} hasData={Boolean(gsc?.connected)} height={280}>
-          {gsc?.connected ? <div className="grid h-full grid-cols-2 gap-4 p-2 text-sm"><div><div className="text-xs text-[var(--text-muted)]">Impressions</div><div className="mt-1 text-2xl font-bold">{(gsc.summary?.impressions || 0).toLocaleString()}</div></div><div><div className="text-xs text-[var(--text-muted)]">CTR</div><div className="mt-1 text-2xl font-bold">{((gsc.summary?.ctr || 0) * 100).toFixed(2)}%</div></div><div><div className="text-xs text-[var(--text-muted)]">Avg. position</div><div className="mt-1 text-2xl font-bold">{gsc.summary?.position?.toFixed(1) || '—'}</div></div><div><div className="text-xs text-[var(--text-muted)]">Top query</div><div className="mt-1 truncate font-semibold">{gsc.queries?.[0]?.query || '—'}</div></div></div> : <div className="flex h-full flex-col items-center justify-center gap-3 text-center"><p className="max-w-md text-sm text-[var(--text-muted)]">{gsc?.error || 'No Google Search Console connection yet.'}</p>{gsc?.configured ? <a href="/api/admin/google-search-console/connect" className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">Connect Google Search Console</a> : <span className="text-xs text-amber-600">Google OAuth environment variables are not configured.</span>}</div>}
+          {gsc?.connected ? <div className="grid h-full grid-cols-2 gap-4 p-2 text-sm"><div><div className="text-xs text-[var(--text-muted)]">Impressions</div><div className="mt-1 text-2xl font-bold">{(gsc.summary?.impressions || 0).toLocaleString()}</div></div><div><div className="text-xs text-[var(--text-muted)]">CTR</div><div className="mt-1 text-2xl font-bold">{((gsc.summary?.ctr || 0) * 100).toFixed(2)}%</div></div><div><div className="text-xs text-[var(--text-muted)]">Avg. position</div><div className="mt-1 text-2xl font-bold">{gsc.summary?.position?.toFixed(1) || '—'}</div></div><div><div className="text-xs text-[var(--text-muted)]">Top query</div><div className="mt-1 truncate font-semibold">{gsc.queries?.[0]?.query || '—'}</div></div></div> : <div className="flex h-full flex-col items-center justify-center gap-3 text-center"><p className="max-w-md text-sm text-[var(--text-muted)]">{gsc?.error || 'No Google Search Console connection yet.'}</p>{gsc?.configured ? <Link href="/api/admin/google-search-console/connect" className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">Connect Google Search Console</Link> : <span className="text-xs text-amber-600">Google OAuth environment variables are not configured.</span>}</div>}
         </ChartWrapper>
       </div>
       {data.aiTraffic && (
@@ -183,7 +184,7 @@ export default function AnalyticsPage() {
 
             <ContentCard title="Audience Geography" description="Countries reported by Google Search Console">
               <div className="max-h-[330px] overflow-auto">
-                {(gsc.countries || []).slice(0, 10).map((row, index) => {
+                {(gsc.countries || []).slice(0, 10).map((row) => {
                   const max = Math.max(...(gsc.countries || []).map((item) => item.clicks || 0), 1);
                   const width = Math.max(4, ((row.clicks || 0) / max) * 100);
                   return <div key={row.country} className="border-b py-3 last:border-0" style={{ borderColor: 'var(--border)' }}>

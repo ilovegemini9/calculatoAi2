@@ -124,7 +124,7 @@ export async function GET() {
         calculations: data.calculations,
       }));
 
-    let searchConsole: any;
+    let searchConsole: unknown;
     try {
       searchConsole = await loadSearchConsole();
     } catch (error) {
@@ -135,7 +135,18 @@ export async function GET() {
       };
     }
 
-    const trafficEvents = Array.isArray((db as any).trafficEvents) ? (db as any).trafficEvents : [];
+    type TrafficEvent = {
+      id?: string;
+      timestamp?: string;
+      path?: string;
+      referrer?: string;
+      source?: string;
+      medium?: string;
+      referrerHost?: string;
+      query?: string;
+    };
+    const dbWithTraffic = db as { trafficEvents?: TrafficEvent[] };
+    const trafficEvents: TrafficEvent[] = Array.isArray(dbWithTraffic.trafficEvents) ? dbWithTraffic.trafficEvents : [];
     const sourceMap = new Map<string, { source: string; medium: string; visits: number }>();
     const referralMap = new Map<string, number>();
     for (const event of trafficEvents) {
@@ -150,7 +161,7 @@ export async function GET() {
     const trafficSources = [...sourceMap.values()].sort((a, b) => b.visits - a.visits).slice(0, 20);
     const referrals = [...referralMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 20).map(([referrer, visits]) => ({ referrer, visits }));
 
-    const aiEvents = trafficEvents.filter((event: any) => event.medium === 'ai');
+    const aiEvents = trafficEvents.filter((event) => event.medium === 'ai');
     const aiMap = new Map<string, number>();
     const aiPageMap = new Map<string, number>();
     const aiDayMap = new Map<string, number>();

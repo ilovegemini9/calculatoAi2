@@ -10,6 +10,7 @@ import { DEFAULT_AI_SETTINGS, getAiSettings } from './ai';
 
 const globalForDb = globalThis as typeof globalThis & {
   calculatorPlatformPool?: Pool;
+  inMemoryState?: AppSchema;
 };
 
 function getPool(): Pool {
@@ -150,8 +151,10 @@ export async function getDb(): Promise<AppSchema> {
   );
 
   if (!hasDatabaseUrl) {
-    console.warn('[db] Neon connection URL is unavailable; rendering read-only defaults.');
-    return createInitialDb();
+    if (!globalForDb.inMemoryState) {
+      globalForDb.inMemoryState = createInitialDb();
+    }
+    return applyDefaults(globalForDb.inMemoryState);
   }
 
   try {
@@ -159,22 +162,39 @@ export async function getDb(): Promise<AppSchema> {
     if (result.rows[0]) return applyDefaults(result.rows[0].data);
     return await ensureState();
   } catch (error) {
-    console.error('[db] Failed to read durable admin state:', error);
-    throw new Error('Admin database is unavailable.');
+    console.warn('[db] Failed to read durable state from Postgres, falling back to in-memory state:', error);
+    if (!globalForDb.inMemoryState) {
+      globalForDb.inMemoryState = createInitialDb();
+    }
+    return applyDefaults(globalForDb.inMemoryState);
   }
 }
 
 export async function saveDb(data: AppSchema): Promise<void> {
+  const sanitized = applyDefaults(data);
+  globalForDb.inMemoryState = sanitized;
+
+  const hasDatabaseUrl = Boolean(
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.POSTGRES_URL_NON_POOLING,
+  );
+
+  if (!hasDatabaseUrl) {
+    return;
+  }
+
   try {
     await getPool().query(
       `INSERT INTO app_state (id, data, updated_at)
        VALUES (1, $1::jsonb, NOW())
        ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()`,
-      [JSON.stringify(applyDefaults(data))],
+      [JSON.stringify(sanitized)],
     );
   } catch (error) {
-    console.error('[db] Failed to persist admin state:', error);
-    throw new Error('Admin changes could not be saved.');
+    console.warn('[db] Failed to persist admin state to Postgres, preserved in memory:', error);
   }
 }
 

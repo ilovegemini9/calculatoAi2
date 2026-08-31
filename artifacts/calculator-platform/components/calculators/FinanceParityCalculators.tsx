@@ -21,7 +21,6 @@ export function FinanceParityCalculator({ mode }: { mode: Mode }) {
     if (mode === 'ltv') return loanToValue(a, b, d);
     return splitBill(a, b, c, d);
   }, [mode, cagrMode, a, b, c, d]);
-  const title = mode === 'cagr' ? 'CAGR Calculator' : mode === 'ltv' ? 'Loan-to-Value Calculator' : 'Bill Split Calculator';
   if (mode === 'cagr') {
     const cagrResult = result as ReturnType<typeof calculateCagr>;
     const primaryLabel = cagrMode === 'cagr' ? 'CAGR' : cagrMode === 'future-value' ? 'Future value' : 'Initial value';

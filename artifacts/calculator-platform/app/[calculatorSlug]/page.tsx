@@ -12,6 +12,7 @@ import { getDb } from '@/lib/db';
 import { getAdsSettings } from '@/lib/ads';
 import { AdSlot } from '@/components/ads/AdSlot';
 import { checkP0Quality } from '@/lib/p0-quality-gate';
+import { getOmniCalculator, toCalculatorMeta, toCalcContent } from '@/lib/omni-catalog-full';
 
 interface Props { params: Promise<{ calculatorSlug: string }> }
 
@@ -28,6 +29,29 @@ async function getCalculatorData(calculatorSlug: string) {
     const dynamicCalc = db.calculators.find((c) => c.slug === baseSlug && c.status === 'active');
     if (dynamicCalc) return { calc: { slug: dynamicCalc.slug, name: dynamicCalc.name, shortName: dynamicCalc.name.replace(/\s*Calculator\s*/i, ''), description: dynamicCalc.metadata.description, icon: '⚡', category: dynamicCalc.category, keywords: dynamicCalc.metadata.keywords } as CalculatorMeta, isDynamic: true, dynamicSpec: dynamicCalc, content: { howToSteps: dynamicCalc.metadata.howToUse ?? [], faqs: dynamicCalc.metadata.faqItems ?? [], formula: dynamicCalc.metadata.formula, examples: dynamicCalc.metadata.examples } as CalcContent };
   } catch (err) { console.error('Error fetching dynamic calculator from DB:', err); }
+
+  const omni = getOmniCalculator(baseSlug);
+  if (omni) {
+    return {
+      calc: toCalculatorMeta(omni),
+      isDynamic: true,
+      dynamicSpec: {
+        slug: omni.slug,
+        name: omni.name,
+        category: omni.category,
+        metadata: {
+          inputs: omni.inputs,
+          outputs: omni.outputs,
+          formula: omni.formula,
+          howToUse: omni.howToSteps,
+          faqItems: omni.faqs,
+          examples: omni.examples,
+        },
+      },
+      content: toCalcContent(omni),
+    };
+  }
+
   return null;
 }
 

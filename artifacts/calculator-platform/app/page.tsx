@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
-import { CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS, type CalculatorMeta } from '@/config/calculators';
+import { CALCULATORS, type CalculatorMeta } from '@/config/calculators';
 import { organizationSchema, websiteSchema } from '@/lib/schemas';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 import { KEYWORD_CLUSTERS } from '@/config/keyword-clusters';
 import { getMenuCalculators, REFERENCE_MENU_GROUPS } from '@/config/menu';
+import { getAllOmniCalculators, getOmniCategoryCount } from '@/lib/omni-catalog-full';
+import { OmniCatalogExplorer } from '@/components/calculators/OmniCatalogExplorer';
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = getSeoSettings((await getDb()).settings.seo);
@@ -55,9 +57,6 @@ const TRUST_ITEMS = [
 ];
 
 export default async function HomePage() {
-  const categories = ['financial', 'fitness', 'math', 'lifestyle'] as const;
-
-  // Retrieve dynamic calculators and merge
   const db = await getDb();
   const dynamicCalcs: CalculatorMeta[] = db.calculators.map((c) => ({
     slug: c.slug,
@@ -70,6 +69,8 @@ export default async function HomePage() {
   }));
 
   const allCalculators = [...CALCULATORS, ...dynamicCalcs];
+  const omniCalculators = getAllOmniCalculators();
+  const categoryCounts = getOmniCategoryCount();
 
   return (
     <>
@@ -93,7 +94,7 @@ export default async function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-blue-200 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-6 animate-fade-in">
             <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse-dot" />
-            Free · Private · Instant
+            3,900+ Verified Calculators · 0 Duplicates · Free & Private
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 animate-fade-up">
@@ -102,13 +103,13 @@ export default async function HomePage() {
           </h1>
 
           <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-8 animate-fade-up animation-delay-100">
-            Fast, accurate, and private. All {allCalculators.length} calculators run entirely in your
-            browser — your data never touches our servers.
+            Fast, accurate, and private. Over {omniCalculators.length.toLocaleString()} Omni calculators with standard schemas,
+            formulas, and interactive calculation cases running entirely in your browser.
           </p>
 
           {/* Quick links */}
           <div className="flex flex-wrap justify-center gap-2 animate-fade-up animation-delay-200">
-            {allCalculators.slice(0, 4).map((c) => (
+            {allCalculators.slice(0, 5).map((c) => (
               <Link
                 key={c.slug}
                 href={`/${c.slug}-calculator`}
@@ -122,72 +123,34 @@ export default async function HomePage() {
               href="#calculators"
               className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-3.5 py-2 rounded-xl transition-all duration-200 hover:scale-105"
             >
-              View all →
+              Explore all {omniCalculators.length.toLocaleString()} →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Calculator grid ── */}
+      {/* ── Calculator Catalog & Explorer ── */}
       <section
         id="calculators"
         className="max-w-6xl mx-auto px-4 py-14"
-        aria-label="All calculators by category"
+        aria-label="All calculators catalog"
       >
-        {categories.map((cat, catIdx) => {
-          const calcs = allCalculators.filter((c) => c.category === cat);
-          if (!calcs.length) return null;
-          const colors = CATEGORY_COLORS[cat] || { bg: 'bg-blue-500/10', text: 'text-blue-500' };
+        <div className="mb-10 text-center sm:text-left">
+          <span className="text-xs font-black uppercase tracking-widest text-blue-500">
+            Complete Catalog
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1" style={{ color: 'var(--text-primary)' }}>
+            Explore All Calculators
+          </h2>
+          <p className="text-xs sm:text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+            Browse through 14 categories matching OmniCalculator formulas, cases, and schemas.
+          </p>
+        </div>
 
-          return (
-            <div key={cat} className={`mb-12 animate-fade-up animation-delay-${Math.min(catIdx * 100 + 100, 400)}`}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className={`inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${colors.bg} ${colors.text}`}>
-                  {CATEGORY_LABELS[cat] || cat}
-                </span>
-                <div className="flex-1 h-px bg-[var(--border)]" />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {calcs.map((calc) => (
-                  <Link
-                    key={calc.slug}
-                    href={`/${calc.slug}-calculator`}
-                    className="group relative block rounded-2xl border card-lift transition-all duration-200 overflow-hidden"
-                    style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}
-                    aria-label={calc.name}
-                  >
-                    {/* Hover accent line */}
-                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-
-                    <div className="p-5">
-                      <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-200 inline-block">
-                        {calc.icon}
-                      </div>
-                      <h3
-                        className="font-bold text-sm mb-1 transition-colors duration-200 group-hover:text-blue-500"
-                        style={{ color: 'var(--text-primary)' }}
-                      >
-                        {calc.name}
-                      </h3>
-                      <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--text-muted)' }}>
-                        {calc.description}
-                      </p>
-                      <div className="mt-3 flex items-center justify-between">
-                        <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${colors.bg} ${colors.text}`}>
-                          {CATEGORY_LABELS[cat] || cat}
-                        </span>
-                        <span className="text-[10px] text-blue-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          Open →
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+        <OmniCatalogExplorer
+          calculators={omniCalculators}
+          categoryCounts={categoryCounts}
+        />
       </section>
 
       {/* ── Reference-style menu map ── */}

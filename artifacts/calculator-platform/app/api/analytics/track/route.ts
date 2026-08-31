@@ -53,7 +53,19 @@ export async function POST(request: Request) {
     // are often stripped by search engines; real Google queries come from Search Console.
     const suppliedQuery = typeof body.query === 'string' ? body.query.slice(0, 200) : '';
     const db = await getDb();
-    const state = db as any;
+    type StateWithTraffic = typeof db & {
+      trafficEvents?: Array<{
+        id: string;
+        timestamp: string;
+        path: string;
+        referrer: string;
+        source: string;
+        medium: string;
+        referrerHost: string;
+        query: string;
+      }>;
+    };
+    const state = db as StateWithTraffic;
     state.trafficEvents = Array.isArray(state.trafficEvents) ? state.trafficEvents : [];
     state.trafficEvents.unshift({
       id: `traffic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
