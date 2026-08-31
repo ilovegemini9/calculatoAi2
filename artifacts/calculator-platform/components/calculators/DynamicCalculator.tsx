@@ -47,6 +47,41 @@ const CALCULATORS: Record<string, CalculatorFn> = {
     if (!Number.isFinite(base) || !Number.isFinite(exponent)) throw new Error('Enter valid numbers');
     return { power: Math.pow(base, exponent) };
   },
+  factorial: (inputs) => {
+    const n = Number(inputs.n);
+    if (!Number.isInteger(n) || n < 0 || n > 170) throw new Error('n must be an integer from 0 to 170');
+    let factorial = 1;
+    for (let i = 2; i <= n; i += 1) factorial *= i;
+    return { factorial };
+  },
+  combination: (inputs) => {
+    const n = Number(inputs.n);
+    const r = Number(inputs.r);
+    if (!Number.isInteger(n) || !Number.isInteger(r) || n < 0 || r < 0 || r > n || n > 170) throw new Error('Enter integers with 0 ≤ r ≤ n ≤ 170');
+    const k = Math.min(r, n - r);
+    let value = 1;
+    for (let i = 1; i <= k; i += 1) value = value * (n - k + i) / i;
+    return { combinations: value };
+  },
+  ratio: (inputs) => {
+    const a = Number(inputs.a);
+    const b = Number(inputs.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) throw new Error('Enter valid non-zero ratio values');
+    const gcd = (x: number, y: number): number => y === 0 ? Math.abs(x) : gcd(y, x % y);
+    const divisor = gcd(Math.trunc(a), Math.trunc(b));
+    return { simplifiedRatio: `${a / divisor}:${b / divisor}`, decimal: a / b };
+  },
+  'pythagorean-theorem': (inputs) => {
+    const a = Number(inputs.a);
+    const b = Number(inputs.b);
+    if (!Number.isFinite(a) || !Number.isFinite(b) || a < 0 || b < 0) throw new Error('Side lengths must be non-negative');
+    return { hypotenuse: Math.hypot(a, b) };
+  },
+  circle: (inputs) => {
+    const radius = Number(inputs.radius);
+    if (!Number.isFinite(radius) || radius < 0) throw new Error('Radius must be non-negative');
+    return { area: Math.PI * radius * radius, circumference: 2 * Math.PI * radius };
+  },
 };
 
 export function DynamicCalculator({ inputs, outputs, calculatorId }: Props) {
