@@ -210,7 +210,14 @@ export async function GET() {
       },
     });
 
-    if (searchConsole?.refreshedToken) setGoogleToken(response, searchConsole.refreshedToken);
+    if (
+      searchConsole &&
+      typeof searchConsole === 'object' &&
+      'refreshedToken' in searchConsole &&
+      searchConsole.refreshedToken
+    ) {
+      setGoogleToken(response, (searchConsole as { refreshedToken: Parameters<typeof setGoogleToken>[1] }).refreshedToken);
+    }
     return response;
   } catch (err) {
     console.error('[API ERROR - /api/admin/analytics]:', err);
