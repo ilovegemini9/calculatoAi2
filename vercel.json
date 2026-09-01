@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "installCommand": "rm -rf node_modules && npm install --legacy-peer-deps",
   "buildCommand": "npx prisma generate --schema=artifacts/calculator-platform/prisma/schema.prisma && npm run build",
   "outputDirectory": "artifacts/calculator-platform/.next",
   "headers": [
@@ -14,4 +15,3 @@
     }
   ]
 }
-
