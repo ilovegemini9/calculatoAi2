@@ -45,7 +45,7 @@ const omniCalculators: OmniCalculatorEntry[] = rawOmniList.length > 0 ? rawOmniL
 
 const omniBySlugMap = new Map<string, OmniCalculatorEntry>();
 for (const item of omniCalculators) {
-  const slug = typeof item?.slug === 'string' ? item.slug.trim() : '';
+  const slug = typeof item?.slug === 'string' ? item.slug.trim().toLowerCase() : '';
   if (!slug) continue;
   item.slug = slug;
   omniBySlugMap.set(slug, item);
@@ -74,18 +74,74 @@ export function getOmniCategoryCount(): Record<string, number> {
   return counts;
 }
 
+function cleanText(value: string, fallback: string): string {
+  const cleaned = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
+  return cleaned || fallback;
+}
+
+function buildHelpfulDescription(item: OmniCalculatorEntry): string {
+  const category = cleanText(item.category, 'calculator');
+  const base = cleanText(item.description, `Calculate ${item.name.toLowerCase()} quickly and accurately online.`);
+  const inputLabels = item.inputs
+    .map((input) => input.label || input.name)
+    .filter(Boolean)
+    .slice(0, 4);
+  const inputText = inputLabels.length ? ` Enter ${inputLabels.join(', ')} to get a clear result.` : '';
+  const suffix = ` This free online ${category} calculator shows the result instantly and explains the calculation when formula details are available.`;
+  const result = `${base}${inputText}${suffix}`;
+  return result.length <= 320 ? result : `${base}${inputText}`.slice(0, 320).replace(/\s+\S*$/, '') + '.';
+}
+
+function buildHelpfulKeywords(item: OmniCalculatorEntry): string[] {
+  const base = Array.isArray(item.keywords) ? item.keywords : [];
+  const additions = [
+    item.name,
+    `${item.name} online`,
+    `how to calculate ${item.shortName || item.name.replace(/\s*calculator\s*/i, '')}`,
+    `${item.category} calculator`,
+  ];
+  return [...new Set([...base, ...additions].map((value) => String(value).trim()).filter(Boolean))].slice(0, 20);
+}
+
 export function toCalculatorMeta(omni: OmniCalculatorEntry): CalculatorMeta {
   return {
     slug: omni.slug,
     name: omni.name,
     shortName: omni.shortName,
     category: (omni.category as CalculatorMeta['category']) || 'math',
-    description: omni.description,
-    keywords: omni.keywords,
+    description: buildHelpfulDescription(omni),
+    keywords: buildHelpfulKeywords(omni),
     icon: omni.icon,
   };
 }
 
 export function toCalcContent(omni: OmniCalculatorEntry): CalcContent {
-  return { howToSteps: omni.howToSteps, formula: omni.formula, examples: omni.examples, faqs: omni.faqs };
+  const name = cleanText(omni.name, 'this calculator');
+  const howToSteps = Array.isArray(omni.howToSteps) && omni.howToSteps.length
+    ? omni.howToSteps
+    : [
+        `Enter the values requested by the ${name}.`,
+        'Check the units and input values before calculating.',
+        'Select Calculate to see the result and review the formula when provided.',
+      ];
+  const faqs = Array.isArray(omni.faqs) ? omni.faqs : [];
+  const helpfulFaqs = faqs.length ? faqs : [
+    { question: `What does the ${name} calculate?`, answer: buildHelpfulDescription(omni) },
+    { question: `How do I use the ${name}?`, answer: howToSteps.join(' ') },
+  ];
+  const examples = Array.isArray(omni.examples) ? omni.examples : [];
+  return {
+    howToSteps,
+    formula: omni.formula,
+    examples,
+    faqs: helpfulFaqs,
+    useCases: [
+      `Use the ${name} for quick estimates, planning, checking calculations, and comparing scenarios.`,
+      `Review the inputs and units before relying on the result for real-world decisions.`,
+    ],
+    commonPitfalls: [
+      'Using the wrong unit or mixing incompatible units can produce an incorrect result.',
+      'Round only after the calculation when higher precision matters.',
+    ],
+  } as CalcContent;
 }
