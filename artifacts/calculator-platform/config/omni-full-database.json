@@ -1,0 +1,100 @@
+[
+  {
+    "name": "Chemistry",
+    "slug": "chemistry",
+    "url": "https://www.omnicalculator.com/chemistry",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Construction",
+    "slug": "construction",
+    "url": "https://www.omnicalculator.com/construction",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Conversion",
+    "slug": "conversion",
+    "url": "https://www.omnicalculator.com/conversion",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Ecology",
+    "slug": "ecology",
+    "url": "https://www.omnicalculator.com/ecology",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Everyday Life",
+    "slug": "everyday-life",
+    "url": "https://www.omnicalculator.com/everyday-life",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Finance",
+    "slug": "finance",
+    "url": "https://www.omnicalculator.com/finance",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Food",
+    "slug": "food",
+    "url": "https://www.omnicalculator.com/food",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Health",
+    "slug": "health",
+    "url": "https://www.omnicalculator.com/health",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Math",
+    "slug": "math",
+    "url": "https://www.omnicalculator.com/math",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Physics",
+    "slug": "physics",
+    "url": "https://www.omnicalculator.com/physics",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Sports",
+    "slug": "sports",
+    "url": "https://www.omnicalculator.com/sports",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Statistics",
+    "slug": "statistics",
+    "url": "https://www.omnicalculator.com/statistics",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Other",
+    "slug": "other",
+    "url": "https://www.omnicalculator.com/other",
+    "category": "biology",
+    "source": "omnicalculator.com"
+  },
+  {
+    "name": "Biology",
+    "slug": "biology",
+    "url": "https://www.omnicalculator.com/biology",
+    "category": "chemistry",
+    "source": "omnicalculator.com"
+  }
+]

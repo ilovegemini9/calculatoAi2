@@ -1,12 +1,53 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
-import { CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS, type CalculatorMeta } from '@/config/calculators';
+import { CATEGORY_LABELS, CATEGORY_COLORS, type CalculatorMeta } from '@/config/calculators';
 import { organizationSchema, websiteSchema } from '@/lib/schemas';
-import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 import { KEYWORD_CLUSTERS } from '@/config/keyword-clusters';
 import { getMenuCalculators, REFERENCE_MENU_GROUPS } from '@/config/menu';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// قراءة جميع الحاسبات من ملف JSON مباشرة لضمان وجودها
+function getAllCalculators(): CalculatorMeta[] {
+  try {
+    const dbPath = path.join(process.cwd(), 'config', 'omni-full-database.json');
+    if (!fs.existsSync(dbPath)) {
+      console.warn('Database file not found at:', dbPath);
+      return [];
+    }
+    const rawData = fs.readFileSync(dbPath, 'utf-8');
+    const data = JSON.parse(rawData);
+    
+    // تحويل البيانات إلى الصيغة المطلوبة
+    return data.map((item: any) => ({
+      slug: item.slug || item.id || '',
+      name: item.name || item.title || 'Unknown Calculator',
+      shortName: (item.name || item.title || '').replace(/\s*Calculator\s*/i, ''),
+      description: item.description || item.metadata?.description || 'Online calculator tool',
+      keywords: item.keywords || item.metadata?.keywords || [],
+      icon: item.icon || '🧮',
+      category: mapCategory(item.category || item.metadata?.category || 'other'),
+    })).filter((c: any) => c.slug && c.slug !== 'undefined');
+  } catch (error) {
+    console.error('Error loading calculators:', error);
+    return [];
+  }
+}
+
+// توحيد أسماء التصنيفات
+function mapCategory(cat: string): string {
+  const c = cat.toLowerCase();
+  if (c.includes('financ') || c.includes('money') || c.includes('loan') || c.includes('mortgage') || c.includes('tax')) return 'financial';
+  if (c.includes('health') || c.includes('fitness') || c.includes('medical') || c.includes('body')) return 'fitness';
+  if (c.includes('math') || c.includes('algebra') || c.includes('geometry') || c.includes('stat')) return 'math';
+  if (c.includes('physic') || c.includes('science')) return 'math'; // نضعها في math مؤقتاً
+  if (c.includes('life') || c.includes('time') || c.includes('date') || c.includes('age')) return 'lifestyle';
+  if (c.includes('construct') || c.includes('build')) return 'construction';
+  if (c.includes('food') || c.includes('cook') || c.includes('recipe')) return 'food';
+  return 'other';
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = getSeoSettings((await getDb()).settings.seo);
@@ -55,21 +96,11 @@ const TRUST_ITEMS = [
 ];
 
 export default async function HomePage() {
-  const categories = ['financial', 'fitness', 'math', 'lifestyle'] as const;
-
-  // Retrieve dynamic calculators and merge
-  const db = await getDb();
-  const dynamicCalcs: CalculatorMeta[] = db.calculators.map((c) => ({
-    slug: c.slug,
-    name: c.name,
-    shortName: c.name.replace(/\s*Calculator\s*/i, ''),
-    description: c.metadata.description,
-    keywords: c.metadata.keywords,
-    icon: '⚡',
-    category: c.category as CalculatorMeta['category'],
-  }));
-
-  const allCalculators = [...CALCULATORS, ...dynamicCalcs];
+  // استخدام الدالة الجديدة لجلب جميع الحاسبات من الملف
+  const allCalculators = getAllCalculators();
+  
+  // فلترة التصنيفات الرئيسية اللي عندنا بيانات فيها
+  const categories = ['financial', 'fitness', 'math', 'lifestyle', 'construction', 'food', 'other'] as const;
 
   return (
     <>
