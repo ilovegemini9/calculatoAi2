@@ -1,7 +1,7 @@
 {
   "version": 2,
   "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
-  "buildCommand": "node artifacts/calculator-platform/scripts/sanitize-omni-inventory.mjs && node artifacts/calculator-platform/scripts/generate-omni-database.mjs && pnpm --filter @workspace/calculator-platform build",
+  "buildCommand": "node -e \"const fs=require('fs');const p='artifacts/calculator-platform/config/omni-inventory.json';const s=fs.readFileSync(p,'utf8');let o='',q=false,e=false;for(const c of s){const n=c.charCodeAt(0);if(e){o+=c;e=false;continue}if(c==='\\\\'&&q){o+=c;e=true;continue}if(c==='\\\"'){o+=c;q=!q;continue}if(q&&n<32){if(c==='\\n')o+='\\\\n';else if(c==='\\r')o+='\\\\r';else if(c==='\\t')o+='\\\\t';else o+='\\\\u'+n.toString(16).padStart(4,'0')}else o+=c}JSON.parse(o);fs.writeFileSync(p,o)\" && node artifacts/calculator-platform/scripts/generate-omni-database.mjs && pnpm --filter @workspace/calculator-platform build",
   "outputDirectory": "artifacts/calculator-platform/.next",
   "headers": [
     {
