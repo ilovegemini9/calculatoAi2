@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ─── Auth & Access Control ────────────────────────────────────────────────────
@@ -54,7 +55,7 @@ model Session {
   @@map("sessions")
 }
 
-// ─── Calculators ─────────────────────────────────────────────────────────────
+// ─── Calculators ─────────────────────────────────────────────────────────[...]
 
 model CalculatorCategory {
   id          String       @id @default(cuid())
@@ -122,7 +123,7 @@ model CalculatorRelation {
   @@map("calculator_relations")
 }
 
-// ─── Articles ─────────────────────────────────────────────────────────────────
+// ─── Articles ─────────────────────────────────────────────────────────��[...]
 
 model ArticleCategory {
   id          String    @id @default(cuid())
@@ -207,7 +208,7 @@ model ArticleVersion {
   @@map("article_versions")
 }
 
-// ─── Keywords ─────────────────────────────────────────────────────────────────
+// ─── Keywords ─────────────────────────────────────────────────────────��[...]
 
 model Keyword {
   id           String      @id @default(cuid())
@@ -230,7 +231,7 @@ model Keyword {
   @@map("keywords")
 }
 
-// ─── Media ────────────────────────────────────────────────────────────────────
+// ─── Media ──────────────────────────────────────────────────────────��[...]
 
 model Media {
   id        String    @id @default(cuid())
@@ -247,7 +248,7 @@ model Media {
   @@map("media")
 }
 
-// ─── SEO Settings ────────────────────────────────────────────────────────────
+// ─── SEO Settings ────────────────────────────────────────────────────────�[...]
 
 model SEOSettings {
   id                String   @id @default(cuid())
@@ -267,7 +268,7 @@ model SEOSettings {
   @@map("seo_settings")
 }
 
-// ─── AI Settings ─────────────────────────────────────────────────────────────
+// ─── AI Settings ────────────────────────────────────────────────────────��[...]
 
 model AISettings {
   id                   String   @id @default(cuid())
@@ -305,7 +306,7 @@ model AIGenerationLog {
   @@map("ai_generation_logs")
 }
 
-// ─── Analytics ────────────────────────────────────────────────────────────────
+// ─── Analytics ─────────────────────────────────────────────────────────�[...]
 
 model Analytics {
   id           String      @id @default(cuid())
@@ -323,7 +324,7 @@ model Analytics {
   @@map("analytics")
 }
 
-// ─── Logs ─────────────────────────────────────────────────────────────────────
+// ─── Logs ───────────────────────────────────────────────────────────[...]
 
 model Logs {
   id        String   @id @default(cuid())
@@ -337,7 +338,7 @@ model Logs {
   @@map("logs")
 }
 
-// ─── App Settings ─────────────────────────────────────────────────────────────
+// ─── App Settings ────────────────────────────────────────────────────────�[...]
 
 model AppSettings {
   id               String   @id @default(cuid())
@@ -352,7 +353,7 @@ model AppSettings {
   @@map("app_settings")
 }
 
-// ─── User Interactions ───────────────────────────────────────────────────────
+// ─── User Interactions ──────────────────────────────────────────────────────��[...]
 
 model FavoriteCalculator {
   id           String     @id @default(cuid())
