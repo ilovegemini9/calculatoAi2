@@ -45,9 +45,12 @@ const omniCalculators: OmniCalculatorEntry[] = rawOmniList.length > 0 ? rawOmniL
 
 const omniBySlugMap = new Map<string, OmniCalculatorEntry>();
 for (const item of omniCalculators) {
-  omniBySlugMap.set(item.slug, item);
-  if (item.slug.endsWith('-calculator')) {
-    omniBySlugMap.set(item.slug.slice(0, -'-calculator'.length), item);
+  const slug = typeof item?.slug === 'string' ? item.slug.trim() : '';
+  if (!slug) continue;
+  item.slug = slug;
+  omniBySlugMap.set(slug, item);
+  if (slug.endsWith('-calculator')) {
+    omniBySlugMap.set(slug.slice(0, -'-calculator'.length), item);
   }
 }
 
