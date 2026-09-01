@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npx prisma generate --schema=artifacts/calculator-platform/prisma/schema.prisma && npm run build",
+  "buildCommand": "cd artifacts/calculator-platform && npm ci && npm run build",
   "outputDirectory": "artifacts/calculator-platform/.next",
   "headers": [
     {
@@ -14,4 +14,3 @@
     }
   ]
 }
-
