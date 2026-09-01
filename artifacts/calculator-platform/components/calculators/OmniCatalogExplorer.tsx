@@ -27,6 +27,18 @@ const CATEGORY_TABS = [
   { id: 'other', label: 'Other', icon: '✨' },
 ];
 
+const CATEGORY_ALIASES: Record<string, string> = {
+  'health & fitness': 'health',
+  health_fitness: 'health',
+  'everyday life': 'everyday-life',
+  everyday_life: 'everyday-life',
+};
+
+function normalizeCategory(value: unknown): string {
+  const raw = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return CATEGORY_ALIASES[raw] || raw.replace(/\s+/g, '-');
+}
+
 function normalizeCalculatorSlug(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const slug = value.trim().toLowerCase();
@@ -39,7 +51,7 @@ function calculatorHref(value: unknown): string | null {
   return slug ? `/${slug}-calculator` : null;
 }
 
-export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
+export function OmniCatalogExplorer({ calculators }: Props) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -55,10 +67,19 @@ export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
     });
   }, [calculators]);
 
+  const liveCategoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const calc of validCalculators) {
+      const category = normalizeCategory(calc?.category);
+      if (category) counts[category] = (counts[category] || 0) + 1;
+    }
+    return counts;
+  }, [validCalculators]);
+
   const filteredCalculators = useMemo(() => {
     let list = validCalculators;
     if (selectedCategory !== 'all') {
-      list = list.filter((c) => c.category === selectedCategory);
+      list = list.filter((c) => normalizeCategory(c.category) === selectedCategory);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -89,7 +110,7 @@ export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-96">
-          <input type="text" value={searchQuery} onChange={(e) => handleSearchChange(e.target.value)} placeholder="Search 3,900+ calculators (e.g. mortgage, pace, bmi, area)..." className="w-full px-4 py-3 pl-11 rounded-2xl border text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
+          <input type="text" value={searchQuery} onChange={(e) => handleSearchChange(e.target.value)} placeholder={`Search ${validCalculators.length.toLocaleString()}+ calculators (e.g. mortgage, pace, bmi, area)...`} className="w-full px-4 py-3 pl-11 rounded-2xl border text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
           <span className="absolute left-4 top-3.5 text-gray-400 text-sm">🔍</span>
           {searchQuery && <button type="button" onClick={() => handleSearchChange('')} className="absolute right-3.5 top-3 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">✕</button>}
         </div>
@@ -101,7 +122,7 @@ export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         {CATEGORY_TABS.map((tab) => {
           const isActive = selectedCategory === tab.id;
-          const count = tab.id === 'all' ? validCalculators.length : categoryCounts[tab.id] || 0;
+          const count = tab.id === 'all' ? validCalculators.length : liveCategoryCounts[tab.id] || 0;
           return <button key={tab.id} type="button" onClick={() => handleCategoryChange(tab.id)} className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition shrink-0 border ${isActive ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-600/20' : 'hover:bg-[var(--bg-card-hover)] text-[var(--text-secondary)] border-[var(--border)]'}`} style={!isActive ? { backgroundColor: 'var(--bg-card)' } : undefined}><span>{tab.icon}</span><span>{tab.label}</span><span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-[var(--bg-input)] text-[var(--text-muted)]'}`}>{count}</span></button>;
         })}
       </div>
