@@ -1,0 +1,26 @@
+name: Audit 3728 calculators
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'artifacts/calculator-platform/config/omni-full-database.json'
+      - 'artifacts/calculator-platform/config/calculator-engine.ts'
+      - 'artifacts/calculator-platform/config/calculator-batch-*.ts'
+      - 'artifacts/calculator-platform/scripts/audit-all-3728.mjs'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run full execution audit
+        working-directory: artifacts/calculator-platform
+        run: node --experimental-strip-types scripts/audit-all-3728.mjs
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculator-audit-3728
+          path: artifacts/calculator-platform/audit-3728-report.json
