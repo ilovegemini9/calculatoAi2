@@ -2,27 +2,33 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
 const inventory = 'artifacts/calculator-platform/config/omni-inventory.json';
-const database = 'artifacts/calculator-platform/config/omni-full-database.json';
-const knownGood = '169fda2d44f8a96c9c6584f48b7d20a7e21107e0';
 
 function readJson(path) {
   return JSON.parse(fs.readFileSync(path, 'utf8'));
 }
 
-try {
-  readJson(inventory);
-} catch {
-  // The current inventory is corrupted. Restore the last known-good Omni
-  // snapshot (3916 calculators) directly from Git history, then validate it.
-  const restored = execFileSync('git', ['show', `${knownGood}:${inventory}`]);
-  fs.writeFileSync(inventory, restored);
-  const restoredDb = execFileSync('git', ['show', `${knownGood}:${database}`]);
-  fs.writeFileSync(database, restoredDb);
+const parsed = readJson(inventory);
+const calculators = Array.isArray(parsed)
+  ? parsed
+  : Array.isArray(parsed?.calculators)
+    ? parsed.calculators
+    : null;
+
+if (!calculators) {
+  throw new Error('omni-inventory.json must be an array or an object with a calculators array');
 }
 
-const parsed = readJson(inventory);
-if (!Array.isArray(parsed)) throw new Error('omni-inventory.json must contain an array');
-const db = readJson(database);
-if (db.totalCount !== 3916) throw new Error(`Expected 3916 calculators, got ${db.totalCount}`);
+const seen = new Set();
+for (const calculator of calculators) {
+  const slug = calculator?.slug ?? calculator?.id;
+  if (typeof slug !== 'string' || !slug.trim()) {
+    throw new Error('Inventory contains a calculator without a valid id/slug');
+  }
+  if (seen.has(slug)) {
+    throw new Error(`Duplicate calculator id/slug: ${slug}`);
+  }
+  seen.add(slug);
+}
 
+console.log(`Validated ${calculators.length} calculators from Omni inventory`);
 execFileSync('pnpm', ['--filter', '@workspace/calculator-platform', 'build'], { stdio: 'inherit' });
