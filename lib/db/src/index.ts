@@ -4,12 +4,26 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
+function getPgConfig(connectionString: string) {
+  try {
+    const url = new URL(connectionString);
+    if (url.searchParams.get("sslmode") === "require") {
+      // Keep the current pg behavior explicit and avoid the sslmode warning.
+      url.searchParams.delete("sslmode");
+      return { connectionString: url.toString(), ssl: { rejectUnauthorized: false } };
+    }
+  } catch {
+    // Preserve custom/non-URL connection strings unchanged.
+  }
+  return { connectionString };
+}
+
 let pool: any = null;
 let db: any = null;
 
 if (process.env.DATABASE_URL) {
   try {
-    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    pool = new Pool(getPgConfig(process.env.DATABASE_URL));
     db = drizzle(pool, { schema });
   } catch (err) {
     console.error("[db] Failed to initialize database:", err);
