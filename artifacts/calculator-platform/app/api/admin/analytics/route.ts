@@ -37,8 +37,10 @@ async function loadSearchConsole() {
 
   const token = await refreshGoogleToken(stored);
   const startDate = date(28);
-  const endDate = date(1);
-  const base = { startDate, endDate, rowLimit: 100 };
+  const endDate = date(0);
+  // Include fresh Search Console rows. Recent dates can be incomplete and may change,
+  // but this prevents the dashboard from appearing frozen while finalized data catches up.
+  const base = { startDate, endDate, rowLimit: 100, dataState: 'all' };
 
   const [summary, queries, pages, countries, devices] = await Promise.all([
     gscQuery(token.access_token, base),
