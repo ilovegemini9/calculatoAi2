@@ -11,11 +11,11 @@
     "lib/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=@workspace/calculator-platform",
-    "build": "npm run build --workspace=@workspace/calculator-platform",
-    "start": "npm run start --workspace=@workspace/calculator-platform",
-    "lint": "npm run lint --workspace=@workspace/calculator-platform",
-    "test": "npm run test --workspace=@workspace/calculator-platform",
+    "dev": "pnpm --filter @workspace/calculator-platform dev",
+    "build": "pnpm --filter @workspace/calculator-platform build",
+    "start": "pnpm --filter @workspace/calculator-platform start",
+    "lint": "pnpm --filter @workspace/calculator-platform lint",
+    "test": "pnpm --filter @workspace/calculator-platform test",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
   },
   "devDependencies": {
