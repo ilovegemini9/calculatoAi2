@@ -39,8 +39,11 @@
     "@prisma/client": "^7.9.0"
   },
   "devDependencies": {
+    "@types/node": "^26.4.0",
+    "@types/puppeteer": "^5.4.7",
     "prettier": "^3.9.4",
     "prisma": "^7.9.0",
+    "puppeteer": "^24.43.1",
     "typescript": "~5.9.3"
   }
 }
