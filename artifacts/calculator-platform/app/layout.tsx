@@ -120,6 +120,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var f=window.fetch;var def={get:function(){return f;},set:function(v){f=v;},configurable:true,enumerable:true};try{Object.defineProperty(window,'fetch',def);}catch(_){}var p=window;while(p=Object.getPrototypeOf(p)){try{var d=Object.getOwnPropertyDescriptor(p,'fetch');if(d){Object.defineProperty(p,'fetch',def);}}catch(_){}}if(typeof Window!=='undefined'&&Window.prototype){try{Object.defineProperty(Window.prototype,'fetch',def);}catch(_){}}}catch(e){}})();`,
+          }}
+        />
         {verification.googleAdsense.enabled && verification.googleAdsense.verificationCode && (
           <meta name="google-adsense-account" content={verification.googleAdsense.verificationCode} />
         )}
