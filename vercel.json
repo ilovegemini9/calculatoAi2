@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "rm -rf node_modules && pnpm install --no-frozen-lockfile",
+  "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm exec prisma generate --schema=artifacts/calculator-platform/prisma/schema.prisma && pnpm run build",
   "outputDirectory": "artifacts/calculator-platform/.next",
   "headers": [
