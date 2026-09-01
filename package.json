@@ -2,21 +2,17 @@
   "name": "workspace",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
+  "workspaces": [
+    "artifacts/*",
+    "lib/*"
+  ],
   "scripts": {
     "dev": "npm run dev --workspace=@workspace/calculator-platform",
     "build": "npm run build --workspace=@workspace/calculator-platform",
     "start": "npm run start --workspace=@workspace/calculator-platform",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "npm run typecheck --workspace=@workspace/calculator-platform",
-    "lint": "npm run lint --workspace=@workspace/calculator-platform"
-  },
-  "workspaces": ["artifacts/*", "lib/*", "scripts"],
-  "dependencies": {
-    "@google/genai": "^2.12.0",
-    "@prisma/adapter-pg": "^7.9.0",
-    "@prisma/client": "^7.9.0",
-    "prisma": "^7.9.0"
+    "lint": "npm run lint --workspace=@workspace/calculator-platform",
+    "test": "npm run test --workspace=@workspace/calculator-platform",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
   },
   "devDependencies": {
     "prettier": "^3.9.4",

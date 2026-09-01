@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm prisma generate --schema=prisma/schema.prisma && pnpm --filter @workspace/calculator-platform run build",
-  "outputDirectory": ".next",
+  "buildCommand": "npx prisma generate --schema=artifacts/calculator-platform/prisma/schema.prisma && npm run build",
+  "outputDirectory": "artifacts/calculator-platform/.next",
   "headers": [
     {
       "source": "/(.*)",
@@ -15,3 +14,4 @@
     }
   ]
 }
+

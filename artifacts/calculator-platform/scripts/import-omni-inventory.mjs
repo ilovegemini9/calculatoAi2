@@ -17,7 +17,13 @@ const SOURCE = 'https://www.omnicalculator.com/all';
 const ROOT = resolve(new URL('..', import.meta.url).pathname);
 const OUT = resolve(ROOT, 'config/omni-inventory.json');
 
-const html = await (await fetch(SOURCE, { headers: { 'user-agent': 'calculatoAi2-inventory/1.0' } })).text();
+const res = await fetch(SOURCE, {
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+  }
+});
+const html = await res.text();
 
 // The /all page exposes calculator links in normal anchor tags. Keep only
 // first-party calculator paths and deduplicate by normalized pathname.
