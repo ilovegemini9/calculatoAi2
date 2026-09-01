@@ -29,9 +29,14 @@ const CATEGORY_TABS = [
 
 const CATEGORY_ALIASES: Record<string, string> = {
   'health & fitness': 'health',
+  'health and fitness': 'health',
   health_fitness: 'health',
   'everyday life': 'everyday-life',
   everyday_life: 'everyday-life',
+  'other calculators': 'other',
+  conversion: 'conversion',
+  sports: 'sports',
+  ecology: 'ecology',
 };
 
 function normalizeCategory(value: unknown): string {
