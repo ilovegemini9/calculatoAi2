@@ -1,0 +1,13 @@
+{
+  "total_raw": 14,
+  "verified_count": 0,
+  "rejection_reasons": {
+    "duplicate": 0,
+    "invalid_slug": 0,
+    "list_page": 0,
+    "no_logic": 14,
+    "other": 0
+  },
+  "timestamp": "2026-09-02T02:56:50.252Z",
+  "status": "STRICT_AUDIT_PASSED"
+}
