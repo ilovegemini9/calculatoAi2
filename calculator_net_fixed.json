@@ -1,0 +1,2572 @@
+[
+  {
+    "name": "financial",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/financial-calculator.html",
+    "category": "Finance",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Mortgage Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/mortgage-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Amortization Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/amortization-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Mortgage Payoff Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/mortgage-payoff-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "House Affordability Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/house-affordability-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Rent Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/rent-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Debt-to-Income Ratio Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/debt-ratio-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Real Estate Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/real-estate-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Refinance Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/refinance-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Rental Property Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/rental-property-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "APR Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/apr-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "FHA Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/fha-loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "VA Mortgage Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/va-mortgage-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Home Equity Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/home-equity-loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "HELOC Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/heloc-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Down Payment Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/down-payment-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Rent vs. Buy Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/rent-vs-buy-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Auto Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/auto-loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Cash Back or Low Interest Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/cash-back-or-low-interest-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Auto Lease Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/auto-lease-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Interest Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/interest-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Investment Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/investment-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Finance Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/finance-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Compound Interest Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/compound-interest-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Interest Rate Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/interest-rate-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Savings Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/savings-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Simple Interest Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/simple-interest-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "CD Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/cd-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Bond Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/bond-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Mutual Fund Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/mutual-fund-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Average Return Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/average-return-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "IRR Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/irr-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "ROI Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/roi-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Payback Period Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/payback-period-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Present Value Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/present-value-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Future Value Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/future-value-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Retirement Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/retirement-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "401K Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/401k-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Pension Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/pension-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Social Security Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/social-security-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Annuity Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/annuity-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Annuity Payout Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/annuity-payout-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Roth IRA Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/roth-ira-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "IRA Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/ira-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "RMD Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/rmd-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Income Tax Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/tax-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Salary Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/salary-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Marriage Tax Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/marriage-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "Estate Tax Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/estate-tax-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Take-Home-Paycheck Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/take-home-pay-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Payment Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/payment-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Currency Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/currency-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Inflation Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/inflation-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Sales Tax Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/sales-tax-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Credit Card Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/credit-card-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Credit Cards Payoff Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/credit-card-payoff-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Debt Payoff Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/debt-payoff-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Debt Consolidation Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/debt-consolidation-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Repayment Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/repayment-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Student Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/student-loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "College Cost Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/college-cost-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "VAT Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/vat-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Depreciation Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/depreciation-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Margin Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/margin-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Discount Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/discount-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Business Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/business-loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Personal Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/personal-loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Boat Loan Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/boat-loan-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "principal",
+        "rate",
+        "term",
+        "start_date"
+      ],
+      "outputs": [
+        "monthly_payment",
+        "total_interest",
+        "payoff_date"
+      ]
+    }
+  },
+  {
+    "name": "Lease Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/lease-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Budget Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/budget-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Commission Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/commission-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Financial Calculators",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/financial-calculator.html",
+    "category": "Finance",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "More Financial Calculators",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/financial-calculator.html",
+    "category": "Finance",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Fitness and Health",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/fitness-and-health-calculator.html",
+    "category": "Health",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Math",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/math-calculator.html",
+    "category": "Math",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Other",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/other-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Fitness & Health",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/fitness-and-health-calculator.html",
+    "category": "Health",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Scientific Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/scientific-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Fraction Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/fraction-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Percentage Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/percent-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "Percent Error Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/percent-error-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Exponent Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/exponent-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Binary Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/binary-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Hex Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/hex-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Half-Life Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/half-life-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Quadratic Formula Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/quadratic-formula-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Log Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/log-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Ratio Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/ratio-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Root Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/root-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Least Common Multiple Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/lcm-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Greatest Common Factor Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/gcf-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Factor Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/factor-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Rounding Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/rounding-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Matrix Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/matrix-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Scientific Notation Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/scientific-notation-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Big Number Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/big-number-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Standard Deviation Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/standard-deviation-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Number Sequence Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/number-sequence-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Sample Size Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/sample-size-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Probability Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/probability-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Statistics Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/statistics-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Mean, Median, Mode, Range Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/mean-median-mode-range-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Permutation and Combination Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/permutation-and-combination-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Z-score Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/z-score-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Confidence Interval Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/confidence-interval-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Triangle Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/triangle-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Volume Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/volume-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Slope Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/slope-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Area Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/area-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Distance Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/distance-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Circle Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/circle-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Surface Area Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/surface-area-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Pythagorean Theorem Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/pythagorean-theorem-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Right Triangle Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/right-triangle-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Math Calculators",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/math-calculator.html",
+    "category": "Math",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "More Math Calculators",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/math-calculator.html",
+    "category": "Math",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Age Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/age-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "Date Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/date-calculator.html",
+    "category": "Date/Time",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Time Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/time-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Hours Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/hours-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Time Card Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/time-card-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Time Zone Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/time-zone-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Time Duration Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/time-duration-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Day of the Week Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/day-of-the-week-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Concrete Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/concrete-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "BTU Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/btu-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Square Footage Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/square-footage-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "Stair Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/stair-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Roofing Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/roofing-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Tile Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/tile-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Mulch Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/mulch-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Gravel Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/gravel-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Height Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/height-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Conversion Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/conversion-calculator.html",
+    "category": "Conversion",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "GDP Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/gdp-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Density Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/density-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Mass Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/mass-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Weight Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/weight-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Speed Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/speed-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Molarity Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/molarity-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Molecular Weight Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/molecular-weight-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Voltage Drop Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/voltage-drop-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "Resistor Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/resistor-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Ohms Law Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/ohms-law-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Electricity Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/electricity-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "IP Subnet Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/ip-subnet-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Bandwidth Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/bandwidth-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "GPA Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/gpa-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Grade Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/grade-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Bra Size Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/bra-size-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Tip Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/tip-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Golf Handicap Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/golf-handicap-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Sleep Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/sleep-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Wind Chill Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/wind-chill-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Heat Index Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/heat-index-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Dew Point Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/dew-point-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Fuel Cost Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/fuel-cost-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Gas Mileage Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/gas-mileage-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "Horsepower Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/horsepower-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Engine Horsepower Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/engine-horsepower-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Mileage Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/mileage-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "birth_date",
+        "current_date"
+      ],
+      "outputs": [
+        "years",
+        "months",
+        "days"
+      ]
+    }
+  },
+  {
+    "name": "Tire Size Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/tire-size-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Love Calculator",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/love-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "Other Calculators",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/other-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  },
+  {
+    "name": "More Other Calculators",
+    "source": "calculator.net",
+    "url": "https://www.calculator.net/other-calculator.html",
+    "category": "General",
+    "logic_hints": {
+      "inputs": [
+        "input_1",
+        "input_2"
+      ],
+      "outputs": [
+        "result"
+      ]
+    }
+  }
+]

@@ -8,9 +8,23 @@ import { CalculatorRenderer } from '@/components/calculators/CalculatorRenderer'
 import { DynamicCalculator } from '@/components/calculators/DynamicCalculator';
 import { calculatorSchema, breadcrumbSchema, faqSchema, howToSchema, itemListSchema } from '@/lib/schemas';
 import { RelatedCalculators, getRelatedCalculators } from '@/components/RelatedCalculators';
-import { getDb } from '@/lib/db';
 import { getAdsSettings } from '@/lib/ads';
 import { AdSlot } from '@/components/ads/AdSlot';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// جلب الحاسبات الديناميكية من ملف JSON
+function getDynamicCalculators(): any[] {
+  try {
+    const dbPath = path.join(process.cwd(), 'config', 'omni-full-database.json');
+    if (!fs.existsSync(dbPath)) return [];
+    const rawData = fs.readFileSync(dbPath, 'utf-8');
+    return JSON.parse(rawData);
+  } catch (error) {
+    console.error('Error loading dynamic calculators:', error);
+    return [];
+  }
+}
 
 interface Props { params: Promise<{ calculatorSlug: string }> }
 
@@ -23,34 +37,63 @@ async function getCalculatorData(calculatorSlug: string) {
   const staticCalc = CALCULATOR_BY_SLUG[baseSlug];
   if (staticCalc) return { calc: staticCalc, isDynamic: false, content: CALCULATOR_CONTENT[baseSlug] };
 
-  try {
-    const db = await getDb();
-    const dynamicCalc = db.calculators.find((c) => c.slug === baseSlug && c.status === 'active');
-    if (dynamicCalc) {
-      return {
-        calc: {
-          slug: dynamicCalc.slug,
-          name: dynamicCalc.name,
-          shortName: dynamicCalc.name.replace(/\s*Calculator\s*/i, ''),
-          description: dynamicCalc.metadata.description,
-          icon: '⚡',
-          category: dynamicCalc.category,
-          keywords: dynamicCalc.metadata.keywords,
-        } as CalculatorMeta,
-        isDynamic: true,
-        dynamicSpec: dynamicCalc,
-        content: {
-          howToSteps: dynamicCalc.metadata.howToUse ?? [],
-          faqs: dynamicCalc.metadata.faqItems ?? [],
-          formula: dynamicCalc.metadata.formula,
-          examples: dynamicCalc.metadata.examples,
-        } as CalcContent,
-      };
-    }
-  } catch (err) {
-    console.error('Error fetching dynamic calculator from DB:', err);
+  // البحث في الحاسبات الديناميكية من الملف
+  const dynamicCalcs = getDynamicCalculators();
+  const dynamicCalc = dynamicCalcs.find((c: any) => c.slug === baseSlug);
+  
+  if (dynamicCalc) {
+    return {
+      calc: {
+        slug: dynamicCalc.slug,
+        name: dynamicCalc.name || dynamicCalc.title || 'Calculator',
+        shortName: (dynamicCalc.name || dynamicCalc.title || '').replace(/\s*Calculator\s*/i, ''),
+        description: dynamicCalc.description || dynamicCalc.metadata?.description || 'Online calculator tool',
+        icon: dynamicCalc.icon || '⚡',
+        category: mapCategory(dynamicCalc.category || dynamicCalc.metadata?.category || 'other') as any,
+        keywords: dynamicCalc.keywords || dynamicCalc.metadata?.keywords || [],
+      } as CalculatorMeta,
+      isDynamic: true,
+      dynamicSpec: {
+        slug: dynamicCalc.slug,
+        name: dynamicCalc.name || dynamicCalc.title,
+        metadata: {
+          inputs: dynamicCalc.inputs || [],
+          outputs: dynamicCalc.outputs || [],
+          description: dynamicCalc.description || '',
+          keywords: dynamicCalc.keywords || [],
+          howToUse: dynamicCalc.howToUse || [],
+          faqItems: dynamicCalc.faqItems || [],
+          formula: dynamicCalc.formula ? { expression: dynamicCalc.formula.expression || '', variables: dynamicCalc.formula.variables || [] } : undefined,
+          examples: dynamicCalc.examples || [],
+        },
+        category: mapCategory(dynamicCalc.category || 'other'),
+        status: 'active',
+      },
+      content: {
+        howToSteps: dynamicCalc.howToUse || dynamicCalc.metadata?.howToUse || [],
+        faqs: dynamicCalc.faqItems || dynamicCalc.metadata?.faqItems || [],
+        formula: dynamicCalc.formula ? { expression: dynamicCalc.formula.expression || '', variables: dynamicCalc.formula.variables || [] } : undefined,
+        examples: dynamicCalc.examples || dynamicCalc.metadata?.examples || [],
+        useCases: dynamicCalc.useCases || [],
+        commonPitfalls: dynamicCalc.commonPitfalls || [],
+      } as CalcContent,
+    };
   }
+  
   return null;
+}
+
+// توحيد أسماء التصنيفات
+function mapCategory(cat: string): string {
+  const c = cat.toLowerCase();
+  if (c.includes('financ') || c.includes('money') || c.includes('loan') || c.includes('mortgage') || c.includes('tax')) return 'financial';
+  if (c.includes('health') || c.includes('fitness') || c.includes('medical') || c.includes('body')) return 'fitness';
+  if (c.includes('math') || c.includes('algebra') || c.includes('geometry') || c.includes('stat')) return 'math';
+  if (c.includes('physic') || c.includes('science')) return 'math';
+  if (c.includes('life') || c.includes('time') || c.includes('date') || c.includes('age')) return 'lifestyle';
+  if (c.includes('construct') || c.includes('build')) return 'construction';
+  if (c.includes('food') || c.includes('cook') || c.includes('recipe')) return 'food';
+  return 'other';
 }
 
 export async function generateStaticParams() {

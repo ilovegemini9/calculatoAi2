@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "npm run dev --workspace=@workspace/calculator-platform",
+    "prebuild": "tsx scripts/sanitize_data.ts",
     "build": "npm run build --workspaces --if-present",
     "build:calculator-platform": "prisma generate && npm run build --workspace=@workspace/calculator-platform",
     "typecheck:libs": "tsc --build",
@@ -39,8 +40,11 @@
     "@prisma/client": "^7.9.0"
   },
   "devDependencies": {
+    "@types/node": "^26.4.0",
+    "@types/puppeteer": "^5.4.7",
     "prettier": "^3.9.4",
     "prisma": "^7.9.0",
+    "puppeteer": "^24.43.1",
     "typescript": "~5.9.3"
   }
 }
