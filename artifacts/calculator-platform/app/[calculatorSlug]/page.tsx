@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { CALCULATOR_BY_SLUG, CALCULATORS, CATEGORY_LABELS, CATEGORY_COLORS, type CalculatorMeta } from '@/config/calculators';
 import { CALCULATOR_CONTENT, type CalcContent } from '@/config/calculator-content';
 import { getCalculatorSpec } from '@/config/calculator-engine';
+import { buildNumericWorkedExample } from '@/config/calculator-examples';
 import { siteConfig } from '@/config/site';
 import { CalculatorRenderer } from '@/components/calculators/CalculatorRenderer';
 import { DynamicCalculator } from '@/components/calculators/DynamicCalculator';
@@ -28,6 +29,7 @@ function buildSpecContent(slug: string, name: string): CalcContent {
       symbol: input,
       definition: `${input.replace(/[-_]/g, ' ')} used by the calculator formula.`,
     }));
+    const numericExample = buildNumericWorkedExample(slug);
     return {
       howToSteps: [
         `Enter the required ${spec.inputs.length} input${spec.inputs.length === 1 ? '' : 's'} for ${name}.`,
@@ -45,7 +47,12 @@ function buildSpecContent(slug: string, name: string): CalcContent {
         variables,
         notes: 'Formula supplied by the verified calculator specification used by this site.',
       },
-      examples: [{
+      examples: numericExample ? [{
+        title: 'Real numeric example',
+        scenario: numericExample.scenario,
+        steps: numericExample.steps,
+        result: numericExample.result,
+      }] : [{
         title: 'Worked example',
         scenario: `Enter valid values for ${spec.inputs.join(', ')} and compare the result with the formula shown above.`,
         steps: spec.inputs.map((input, index) => `${index + 1}. Enter a valid value for ${input.replace(/[-_]/g, ' ')}.`).concat([`${spec.inputs.length + 1}. Review the calculated ${spec.outputs.join(', ')}.`]),
