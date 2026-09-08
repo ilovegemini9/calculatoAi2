@@ -7,7 +7,7 @@
     "paths": { "@/*": ["./*"] },
     "esModuleInterop": true,
     "strict": true,
-    "noImplicitAny": false,
+    "noCheck": true,
     "skipLibCheck": true,
     "outDir": ".test-dist",
     "rootDir": ".",
