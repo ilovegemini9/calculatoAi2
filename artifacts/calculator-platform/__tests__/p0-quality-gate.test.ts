@@ -16,15 +16,22 @@ test('P0 quality gate rejects an unknown calculator', () => {
 });
 
 test('P0 quality gate requires core content sections', () => {
-  const result = checkP0Quality('age', {
-    slug: 'age',
-    name: 'Age Calculator',
-    shortName: 'Age',
-    description: 'Calculate age.',
-    icon: '🎂',
-    category: 'lifestyle',
-    keywords: ['age calculator'],
-  });
+  const result = checkP0Quality(
+    'age',
+    {
+      slug: 'age',
+      name: 'Age Calculator',
+      shortName: 'Age',
+      description: 'Calculate age.',
+      icon: '🎂',
+      category: 'lifestyle',
+      keywords: ['age calculator'],
+    },
+    {},
+  );
   assert.equal(result.indexable, false);
-  assert.ok(result.reasons.includes('missing-content'));
+  assert.ok(result.reasons.includes('missing-how-to'));
+  assert.ok(result.reasons.includes('missing-formula'));
+  assert.ok(result.reasons.includes('missing-examples'));
+  assert.ok(result.reasons.includes('missing-faqs'));
 });
