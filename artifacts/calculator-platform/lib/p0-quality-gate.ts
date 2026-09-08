@@ -17,10 +17,16 @@ const P0 = new Set([
   'basic',
 ]);
 
-export function checkP0Quality(slug: string, calc?: CalculatorMeta): P0QualityResult {
+type CalculatorContentEntry = (typeof CALCULATOR_CONTENT)[string];
+
+export function checkP0Quality(
+  slug: string,
+  calc?: CalculatorMeta,
+  contentOverride?: CalculatorContentEntry,
+): P0QualityResult {
   const base = slug.endsWith('-calculator') ? slug.slice(0, -11) : slug;
   const meta = calc ?? CALCULATOR_BY_SLUG[base];
-  const content = CALCULATOR_CONTENT[base];
+  const content = contentOverride ?? CALCULATOR_CONTENT[base];
   const reasons: string[] = [];
 
   if (!P0.has(base)) reasons.push('not-p0');
