@@ -16,10 +16,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const TRUST_ITEMS = [
-  { icon: '🔒', title: 'Private by design', desc: 'Calculations run in your browser for the supported client-side tools.' },
-  { icon: '⚡', title: 'Instant results', desc: 'Interactive inputs update results without a signup or a page reload.' },
-  { icon: '✅', title: 'Free to use', desc: 'The published calculator tools are available without a paid account.' },
-  { icon: '📚', title: 'Transparent methods', desc: 'Calculator pages explain inputs, formulas, examples, and assumptions where available.' },
+  { icon: '🔒', title: 'Privacy-first', desc: 'Supported client-side calculators process inputs in your browser instead of requiring an account.' },
+  { icon: '⚡', title: 'Instant results', desc: 'Change an input and see the calculation update without a signup or page reload.' },
+  { icon: '🧮', title: 'Real calculation logic', desc: 'Published tools are connected to calculation logic, not just calculator names or empty metadata pages.' },
+  { icon: '📚', title: 'Clear methods', desc: 'Calculator pages explain inputs, formulas, examples, assumptions, and related tools where available.' },
 ];
 const CATEGORY_ORDER = ['financial', 'math', 'fitness', 'lifestyle'] as const;
 
@@ -38,9 +38,9 @@ export default async function HomePage() {
       <section className="hero-gradient text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px)', backgroundSize: '40px 40px' }} aria-hidden="true" />
         <div className="relative max-w-5xl mx-auto px-4 pt-16 pb-20 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-blue-200 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-6"><span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />{publishedCount.toLocaleString()} published calculators · free & private</div>
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-blue-200 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-6"><span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />{publishedCount.toLocaleString()} free calculators · instant results</div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5">Free Online <span className="text-blue-400">Calculators</span></h1>
-          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-8">Fast, practical calculators for math, finance, health, and everyday decisions. Each published tool is backed by calculation logic rather than a metadata-only placeholder.</p>
+          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-8">Free calculators for math, finance, health, and everyday decisions — with instant results, clear formulas, worked examples, and practical explanations.</p>
           <div className="flex flex-wrap justify-center gap-2">{allCalculators.slice(0, 5).map((c) => <Link key={c.slug} href={`/${c.slug}-calculator`} className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium px-3.5 py-2 rounded-xl transition-all"><span className="text-base">{c.icon}</span>{c.name}</Link>)}<Link href="#calculators" className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-3.5 py-2 rounded-xl transition-all">Explore calculators →</Link></div>
         </div>
       </section>
@@ -60,7 +60,19 @@ export default async function HomePage() {
       </section>
 
       <section className="border-t py-14 px-4" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-page)' }} aria-labelledby="topic-clusters-heading">
-        <div className="max-w-5xl mx-auto"><div className="mb-7"><p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Browse by intent</p><h2 id="topic-clusters-heading" className="text-2xl font-extrabold" style={{ color: 'var(--text-primary)' }}>Find the right calculator for your question</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{KEYWORD_CLUSTERS.map((cluster) => { const featured = cluster.routes.find((slug) => CALCULATORS.some((calc) => calc.slug === slug)); return <div key={cluster.id} className="rounded-2xl border p-5" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}><h3 className="font-bold text-base mb-1" style={{ color: 'var(--text-primary)' }}>{cluster.label}</h3><p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>{cluster.description}</p><div className="flex flex-wrap gap-2">{cluster.keywords.slice(0, 4).map((keyword) => <span key={keyword} className="rounded-full px-2.5 py-1 text-[11px]" style={{ backgroundColor: 'var(--bg-input)', color: 'var(--text-muted)' }}>{keyword}</span>)}</div>{featured && <Link href={`/${featured}-calculator`} className="inline-block mt-4 text-xs font-bold text-blue-500 hover:underline">Explore {CALCULATORS.find((calc) => calc.slug === featured)?.shortName} →</Link>}</div>; })}</div></div>
+        <div className="max-w-5xl mx-auto"><div className="mb-7"><p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Browse by intent</p><h2 id="topic-clusters-heading" className="text-2xl font-extrabold tracking-tight" style={{ color: 'var(--text-primary)' }}>Find the right calculator for your question</h2></div><div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{KEYWORD_CLUSTERS.map((cluster) => { const featured = cluster.routes.find((slug) => CALCULATORS.some((calc) => calc.slug === slug)); return <div key={cluster.id} className="rounded-2xl border p-5" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}><h3 className="font-bold text-base mb-1" style={{ color: 'var(--text-primary)' }}>{cluster.label}</h3><p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-secondary)' }}>{cluster.description}</p><div className="flex flex-wrap gap-2">{cluster.keywords.slice(0, 4).map((keyword) => <span key={keyword} className="rounded-full px-2.5 py-1 text-[11px]" style={{ backgroundColor: 'var(--bg-input)', color: 'var(--text-muted)' }}>{keyword}</span>)}</div>{featured && <Link href={`/${featured}-calculator`} className="inline-block mt-4 text-xs font-bold text-blue-500 hover:underline">Explore {CALCULATORS.find((calc) => calc.slug === featured)?.shortName} →</Link>}</div>; })}</div></div>
+      </section>
+
+      <section className="border-t py-14 px-4" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }} aria-labelledby="methodology-heading">
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Built for useful answers</p>
+          <h2 id="methodology-heading" className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: 'var(--text-primary)' }}>More than a number</h2>
+          <p className="max-w-3xl mx-auto mt-3 text-sm sm:text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>A useful calculator should do more than return a result. Where supported, our calculator pages explain what the inputs mean, show the formula or method, include a worked example, and link to related tools so you can understand and act on the result.</p>
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
+            <Link href="/methodology" className="rounded-xl border px-4 py-2.5 text-sm font-bold hover:border-blue-500/50" style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}>How our calculators are built →</Link>
+            <Link href="/about" className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-500">About CalculatorFree →</Link>
+          </div>
+        </div>
       </section>
 
       <section className="border-t py-12 px-4" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--bg-card)' }} aria-label={`Why use ${siteConfig.name}`}><div className="max-w-5xl mx-auto"><h2 className="text-center text-xs font-black uppercase tracking-widest mb-8" style={{ color: 'var(--text-muted)' }}>Why use {siteConfig.name}</h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">{TRUST_ITEMS.map((item) => <div key={item.title} className="flex flex-col items-center text-center gap-2 p-5 rounded-2xl border" style={{ borderColor: 'var(--border)' }}><span className="text-3xl mb-1" aria-hidden="true">{item.icon}</span><h3 className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{item.title}</h3><p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{item.desc}</p></div>)}</div></div></section>
