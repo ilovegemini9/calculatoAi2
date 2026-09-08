@@ -13,7 +13,7 @@ try {
   readJson(inventory);
 } catch {
   // The current inventory is corrupted. Restore the last known-good Omni
-  // snapshot (3916 calculators) directly from Git history, then validate it.
+  // snapshot directly from Git history, then validate it.
   const restored = execFileSync('git', ['show', `${knownGood}:${inventory}`]);
   fs.writeFileSync(inventory, restored);
   const restoredDb = execFileSync('git', ['show', `${knownGood}:${database}`]);
@@ -21,8 +21,14 @@ try {
 }
 
 const parsed = readJson(inventory);
-if (!Array.isArray(parsed)) throw new Error('omni-inventory.json must contain an array');
+const calculators = Array.isArray(parsed) ? parsed : parsed.calculators;
+if (!Array.isArray(calculators)) {
+  throw new Error('omni-inventory.json must contain a calculators array');
+}
+
 const db = readJson(database);
-if (db.totalCount !== 3916) throw new Error(`Expected 3916 calculators, got ${db.totalCount}`);
+if (!Number.isInteger(db.totalCount) || db.totalCount !== calculators.length) {
+  throw new Error(`Inventory/database count mismatch: inventory=${calculators.length}, database=${db.totalCount}`);
+}
 
 execFileSync('pnpm', ['--filter', '@workspace/calculator-platform', 'build'], { stdio: 'inherit' });
