@@ -4,8 +4,8 @@ import { CALCULATOR_BATCH_02 } from './calculator-batch-02';
 import { CALCULATOR_BATCH_03 } from './calculator-batch-03';
 import { CALCULATOR_BATCH_04 } from './calculator-batch-04';
 
-export type CalculatorInputs = Record<string, number | string | number[]>;
-export type CalculatorResult = Record<string, number | string | boolean | number[]>;
+export type CalculatorInputs = Record<string, number | string | boolean | number[]>;
+export type CalculatorResult = Record<string, number | string | boolean | number[] | undefined>;
 export type CalculatorHandler = (inputs: CalculatorInputs) => CalculatorResult;
 
 const n = (inputs: CalculatorInputs, key: string): number => {
@@ -27,7 +27,7 @@ const gcd = (a: number, b: number): number => { a = Math.abs(a); b = Math.abs(b)
 const factorial = (x: number): number => { if (!Number.isInteger(x) || x < 0 || x > 170) throw new Error('n must be an integer from 0 to 170'); let r=1; for(let i=2;i<=x;i++) r*=i; return r; };
 const roundSig = (x: number, sig: number): number => { if (x === 0) return 0; const p = sig - Math.floor(Math.log10(Math.abs(x))) - 1; const f = 10 ** p; return Math.round(x*f)/f; };
 
-const handlers: Record<string, CalculatorHandler> = {
+const handlers: Record<string, CalculatorHandler> = Object.assign({}, {
   percentage: i => ({ percentage: n(i,'whole') === 0 ? (()=>{throw new Error('whole cannot be zero')})() : n(i,'part')/n(i,'whole')*100 }),
   'percentage-increase': i => ({ increasePercent: (n(i,'new')-n(i,'original'))/positive(i,'original')*100 }),
   'percentage-decrease': i => ({ decreasePercent: (n(i,'original')-n(i,'new'))/positive(i,'original')*100 }),
@@ -173,6 +173,7 @@ const handlers: Record<string, CalculatorHandler> = {
   'energy-conversion': i => { const f:{[k:string]:number}={j:1,kj:1000,wh:3600,kwh:3600000,cal:4.184,kcal:4184}; const a=f[String(i.fromUnit)],b=f[String(i.toUnit)]; if(!a||!b)throw new Error('Unsupported energy unit'); return {converted:n(i,'value')*a/b}; },
   'power-conversion': i => { const f:{[k:string]:number}={w:1,kw:1000,hp:745.699872}; const a=f[String(i.fromUnit)],b=f[String(i.toUnit)]; if(!a||!b)throw new Error('Unsupported power unit'); return {converted:n(i,'value')*a/b}; },
   'temperature-conversion': i => { const v=n(i,'value'),from=String(i.fromUnit),to=String(i.toUnit); const c0=from==='c'?v:from==='f'?(v-32)*5/9:from==='k'?v-273.15:NaN; if(!Number.isFinite(c0))throw new Error('Unsupported temperature unit'); return {converted:to==='c'?c0:to==='f'?c0*9/5+32:to==='k'?c0+273.15:(()=>{throw new Error('Unsupported temperature unit')})()}; },
+}, {
   'mean': i => { const v=values(i); return {mean:v.reduce((s,x)=>s+x,0)/v.length}; },
   'calorie-deficit': i => ({ deficit:n(i,'maintenanceCalories')-n(i,'targetCalories') }),
   factorial: i => { const x=n(i,'n'); if(!Number.isInteger(x)||x<0||x>170)throw new Error('n must be an integer from 0 to 170'); let r=1; for(let k=2;k<=x;k++)r*=k; return {factorial:r}; },
@@ -221,7 +222,7 @@ const handlers: Record<string, CalculatorHandler> = {
   volume: i => ({ volume:positive(i,'length')*positive(i,'width')*positive(i,'height') }),
   'cylinder-volume': i => ({ volume:Math.PI*positive(i,'radius')**2*positive(i,'height') }),
   'sphere-volume': i => ({ volume:4*Math.PI*positive(i,'radius')**3/3 }),
-};
+});
 
 export const CALCULATOR_SPECS: CalculatorSpec[] = [...CALCULATOR_BATCH_01,...CALCULATOR_BATCH_02,...CALCULATOR_BATCH_03,...CALCULATOR_BATCH_04];
 
