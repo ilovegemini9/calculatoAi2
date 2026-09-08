@@ -26,12 +26,32 @@ const CATEGORY_TABS = [
   { id: 'other', label: 'Other', icon: '✨' },
 ];
 
+function normalizeText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[-_/]+/g, ' ')
+    .replace(/[^\p{L}\p{N}\s]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function normalizeCategory(category: string): string {
   const normalized = category.trim().toLowerCase();
   if (normalized === 'financial') return 'finance';
   if (normalized === 'fitness' || normalized === 'health & fitness') return 'health';
   if (normalized === 'lifestyle' || normalized === 'everyday') return 'everyday-life';
   return normalized;
+}
+
+function searchableText(calculator: OmniCalculatorEntry): string {
+  return normalizeText([
+    calculator.name,
+    calculator.slug,
+    calculator.description,
+    ...calculator.keywords,
+  ].join(' '));
 }
 
 export function OmniCatalogExplorer({ calculators }: Props) {
@@ -54,22 +74,23 @@ export function OmniCatalogExplorer({ calculators }: Props) {
     if (selectedCategory !== 'all') {
       list = list.filter((c) => normalizeCategory(c.category) === selectedCategory);
     }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      list = list.filter(
-        (c) =>
-          c.name.toLowerCase().includes(q) ||
-          c.slug.toLowerCase().includes(q) ||
-          c.description.toLowerCase().includes(q) ||
-          c.keywords.some((k) => k.toLowerCase().includes(q))
-      );
+
+    const query = normalizeText(searchQuery);
+    if (query) {
+      // Match every meaningful word, regardless of order. This makes searches such as
+      // "mortgage payment", "body mass", or "square feet" work across name/slug/keywords.
+      const terms = query.split(' ').filter((term) => term.length >= 2);
+      list = list.filter((calculator) => {
+        const haystack = searchableText(calculator);
+        return terms.every((term) => haystack.includes(term));
+      });
     }
     return list;
   }, [calculators, selectedCategory, searchQuery]);
 
   const paginatedList = useMemo(() => {
     return filteredCalculators.slice(0, page * pageSize);
-  }, [filteredCalculators, page, pageSize]);
+  }, [filteredCalculators, page]);
 
   const handleCategoryChange = (catId: string) => {
     setSelectedCategory(catId);
@@ -83,14 +104,15 @@ export function OmniCatalogExplorer({ calculators }: Props) {
 
   return (
     <div className="space-y-8">
-      {/* Search & Filter Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-96">
           <input
-            type="text"
+            type="search"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search calculators (e.g. mortgage, pace, bmi, area)..."
+            aria-label="Search calculators"
+            autoComplete="off"
             className="w-full px-4 py-3 pl-11 rounded-2xl border text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 shadow-sm"
             style={{
               backgroundColor: 'var(--bg-card)',
@@ -98,11 +120,12 @@ export function OmniCatalogExplorer({ calculators }: Props) {
               color: 'var(--text-primary)',
             }}
           />
-          <span className="absolute left-4 top-3.5 text-gray-400 text-sm">🔍</span>
+          <span className="absolute left-4 top-3.5 text-gray-400 text-sm" aria-hidden="true">🔍</span>
           {searchQuery && (
             <button
               type="button"
               onClick={() => handleSearchChange('')}
+              aria-label="Clear calculator search"
               className="absolute right-3.5 top-3 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
             >
               ✕
@@ -115,7 +138,6 @@ export function OmniCatalogExplorer({ calculators }: Props) {
         </div>
       </div>
 
-      {/* Category Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         {CATEGORY_TABS.map((tab) => {
           const isActive = selectedCategory === tab.id;
@@ -134,11 +156,7 @@ export function OmniCatalogExplorer({ calculators }: Props) {
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-[var(--bg-input)] text-[var(--text-muted)]'
-                }`}
-              >
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-[var(--bg-input)] text-[var(--text-muted)]'}`}>
                 {count}
               </span>
             </button>
@@ -146,18 +164,12 @@ export function OmniCatalogExplorer({ calculators }: Props) {
         })}
       </div>
 
-      {/* Grid of calculators */}
       {filteredCalculators.length === 0 ? (
-        <div
-          className="rounded-2xl border p-12 text-center space-y-3"
-          style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}
-        >
+        <div className="rounded-2xl border p-12 text-center space-y-3" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }}>
           <div className="text-3xl">🔍</div>
-          <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>
-            No calculators found
-          </h3>
+          <h3 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>No calculators found</h3>
           <p className="text-xs max-w-sm mx-auto" style={{ color: 'var(--text-muted)' }}>
-            We could not find any calculator matching &quot;{searchQuery}&quot;. Try checking for spelling errors or searching another keyword.
+            We could not find any calculator matching &quot;{searchQuery}&quot;. Try another keyword or clear the search.
           </p>
         </div>
       ) : (
@@ -171,27 +183,16 @@ export function OmniCatalogExplorer({ calculators }: Props) {
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">
-                    {calc.icon}
-                  </span>
+                  <span className="text-2xl group-hover:scale-110 transition-transform">{calc.icon}</span>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
                     {normalizeCategory(calc.category)}
                   </span>
                 </div>
-                <h3
-                  className="font-bold text-sm leading-snug mb-1.5 group-hover:text-blue-500 transition-colors"
-                  style={{ color: 'var(--text-primary)' }}
-                >
+                <h3 className="font-bold text-sm leading-snug mb-1.5 group-hover:text-blue-500 transition-colors" style={{ color: 'var(--text-primary)' }}>
                   {calc.name}
                 </h3>
-                <p
-                  className="text-xs leading-relaxed line-clamp-2"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  {calc.description}
-                </p>
+                <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--text-muted)' }}>{calc.description}</p>
               </div>
-
               <div className="mt-4 pt-3 border-t flex items-center justify-between text-[11px] font-semibold text-blue-500" style={{ borderColor: 'var(--border)' }}>
                 <span>Calculate & Solve</span>
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -201,14 +202,9 @@ export function OmniCatalogExplorer({ calculators }: Props) {
         </div>
       )}
 
-      {/* Load More Button */}
       {paginatedList.length < filteredCalculators.length && (
         <div className="text-center pt-4">
-          <button
-            type="button"
-            onClick={() => setPage((prev) => prev + 1)}
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-xl shadow-sm transition"
-          >
+          <button type="button" onClick={() => setPage((prev) => prev + 1)} className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-xl shadow-sm transition">
             Load More Calculators ({paginatedList.length} of {filteredCalculators.length})
           </button>
         </div>
