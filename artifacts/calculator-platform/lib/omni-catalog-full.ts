@@ -33,7 +33,16 @@ const rawOmniList = (omniData && Array.isArray((omniData as { calculators?: unkn
   ? (omniData as { calculators: OmniCalculatorEntry[] }).calculators
   : []) as OmniCalculatorEntry[];
 
-const omniCalculators: OmniCalculatorEntry[] = rawOmniList.length > 0 ? rawOmniList : CALCULATORS.map((calculator: CalculatorMeta) => ({
+const validOmniList = rawOmniList.filter(
+  (item): item is OmniCalculatorEntry =>
+    Boolean(item) &&
+    typeof item.slug === 'string' &&
+    item.slug.trim().length > 0 &&
+    typeof item.name === 'string' &&
+    item.name.trim().length > 0
+);
+
+const omniCalculators: OmniCalculatorEntry[] = validOmniList.length > 0 ? validOmniList : CALCULATORS.map((calculator: CalculatorMeta) => ({
   ...calculator,
   inputs: [],
   outputs: [{ name: 'result', label: 'Result', highlight: true }],
