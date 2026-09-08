@@ -22,7 +22,7 @@ test('P0 quality gate requires core content sections', () => {
     shortName: 'Age',
     description: 'Calculate age.',
     icon: '🎂',
-    category: 'health-lifestyle',
+    category: 'lifestyle',
     keywords: ['age calculator'],
   });
   assert.equal(result.indexable, false);
