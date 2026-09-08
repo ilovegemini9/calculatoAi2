@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { siteConfig } from '@/config/site';
-import { CALCULATORS } from '@/config/calculators';
+import { CALCULATORS, CATEGORY_LABELS } from '@/config/calculators';
 import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 import { getTrafficPriority } from '@/lib/seo-priority';
@@ -18,6 +18,14 @@ function staticPages(baseUrl: string): MetadataRoute.Sitemap {
     { url: `${baseUrl}/terms`, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${baseUrl}/contact`, changeFrequency: 'monthly', priority: 0.4 },
   ];
+}
+
+function categoryPages(baseUrl: string): MetadataRoute.Sitemap {
+  return Object.keys(CATEGORY_LABELS).map((category) => ({
+    url: `${baseUrl}/category/${category}`,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
 }
 
 function calculatorPages(baseUrl: string): MetadataRoute.Sitemap {
@@ -40,8 +48,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const seo = getSeoSettings(db.settings.seo);
     if (!seo.sitemap.enabled) return [];
 
-    const baseUrl = seo.canonicalUrl || siteConfig.url;
+    const baseUrl = (seo.canonicalUrl || siteConfig.url).replace(/\/$/, '');
     const staticEntries = seo.sitemap.includeStaticPages ? staticPages(baseUrl) : [];
+    const categoryEntries = seo.sitemap.includeCalculators ? categoryPages(baseUrl) : [];
     const staticCalculatorSlugs = new Set(CALCULATORS.map((c) => c.slug));
     const calculatorEntries = seo.sitemap.includeCalculators ? calculatorPages(baseUrl) : [];
 
@@ -70,9 +79,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ? [{ url: `${baseUrl}/blog`, changeFrequency: 'daily' as const, priority: 0.6 }]
       : [];
 
-    return [...staticEntries, ...calculatorEntries, ...dynamicEntries, ...blogIndex, ...publishedArticles, ...customPages];
+    return [...staticEntries, ...categoryEntries, ...calculatorEntries, ...dynamicEntries, ...blogIndex, ...publishedArticles, ...customPages];
   } catch {
-    const baseUrl = siteConfig.url;
-    return [...staticPages(baseUrl), ...calculatorPages(baseUrl)];
+    const baseUrl = siteConfig.url.replace(/\/$/, '');
+    return [...staticPages(baseUrl), ...categoryPages(baseUrl), ...calculatorPages(baseUrl)];
   }
 }
