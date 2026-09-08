@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { OmniCalculatorEntry } from '@/lib/omni-catalog-full';
-import { CALCULATORS } from '@/config/calculators';
 
 interface Props {
   calculators: OmniCalculatorEntry[];
@@ -88,40 +87,12 @@ export function OmniCatalogExplorer({ calculators }: Props) {
     return list;
   }, [calculators, selectedCategory, searchQuery]);
 
-  const searchCandidates = useMemo(() => {
-    const candidates = [...calculators];
-    const knownSlugs = new Set(candidates.map((calculator) => calculator.slug));
-
-    // Dedicated calculators are real, published calculators but are not always engine-backed.
-    // Include their canonical registry metadata so search/autocomplete can still find them.
-    for (const calculator of CALCULATORS) {
-      if (knownSlugs.has(calculator.slug)) continue;
-      candidates.push({
-        slug: calculator.slug,
-        name: calculator.name,
-        shortName: calculator.shortName,
-        category: calculator.category,
-        icon: calculator.icon,
-        description: calculator.description,
-        keywords: calculator.keywords,
-        inputs: [],
-        outputs: [],
-        formula: { expression: '', variables: [] },
-        howToSteps: [],
-        faqs: [],
-        examples: [],
-      });
-    }
-
-    return candidates;
-  }, [calculators]);
-
   const suggestions = useMemo(() => {
     const query = normalizeText(searchQuery);
     if (!query || query.length < 2) return [];
 
     const terms = query.split(' ').filter(Boolean);
-    return searchCandidates
+    return calculators
       .map((calculator) => {
         const name = normalizeText(calculator.name);
         const slug = normalizeText(calculator.slug);
@@ -135,7 +106,7 @@ export function OmniCatalogExplorer({ calculators }: Props) {
       .sort((a, b) => b.score - a.score || a.calculator.name.localeCompare(b.calculator.name))
       .slice(0, 8)
       .map((item) => item.calculator);
-  }, [searchCandidates, searchQuery]);
+  }, [calculators, searchQuery]);
 
   const paginatedList = useMemo(() => {
     return filteredCalculators.slice(0, page * pageSize);
@@ -200,7 +171,7 @@ export function OmniCatalogExplorer({ calculators }: Props) {
         </div>
 
         <div className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
-          Showing <span className="font-bold text-blue-500">{filteredCalculators.length}</span> verified calculators
+          Showing <span className="font-bold text-blue-500">{filteredCalculators.length}</span> verified working calculators
         </div>
       </div>
 
