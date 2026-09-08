@@ -1,5 +1,5 @@
-import { CALCULATOR_BY_SLUG, type CalculatorMeta } from '@/config/calculators';
-import { CALCULATOR_CONTENT } from '@/config/calculator-content';
+import { CALCULATOR_BY_SLUG, type CalculatorMeta } from '../config/calculators';
+import { CALCULATOR_CONTENT } from '../config/calculator-content';
 
 export type P0QualityResult = {
   slug: string;
