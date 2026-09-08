@@ -10,8 +10,6 @@ const rendererPath = path.resolve(process.cwd(), 'components/calculators/Calcula
 const rendererSource = fs.readFileSync(rendererPath, 'utf8');
 
 function hasDedicatedRenderer(slug: string): boolean {
-  // CalculatorRenderer uses explicit slug branches. Keep this deliberately strict:
-  // a mention in a comment/import is not enough to count as a renderer.
   const escaped = slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`case\\s+[\\\'\\\"]${escaped}[\\\'\\\"]\\s*:`).test(rendererSource);
 }
@@ -63,10 +61,10 @@ test('every engine-backed calculator has real input/output specifications', () =
     if (!spec.inputs.length) failures.push(`${slug}: no inputs`);
     if (!spec.outputs.length) failures.push(`${slug}: no outputs`);
     for (const input of spec.inputs) {
-      if (!input.key?.trim() || !input.label?.trim()) failures.push(`${slug}: invalid input metadata`);
+      if (!input?.trim()) failures.push(`${slug}: invalid input metadata`);
     }
     for (const output of spec.outputs) {
-      if (!output.key?.trim() || !output.label?.trim()) failures.push(`${slug}: invalid output metadata`);
+      if (!output?.trim()) failures.push(`${slug}: invalid output metadata`);
     }
   }
 
@@ -83,7 +81,7 @@ test('every listed calculator has rich content or a verified spec fallback', () 
       }
       try {
         const spec = getCalculatorSpec(slug);
-        return !spec.inputs.length || !spec.outputs.length || !spec.formula?.expression?.trim();
+        return !spec.inputs.length || !spec.outputs.length || !spec.formula?.trim();
       } catch {
         return true;
       }
