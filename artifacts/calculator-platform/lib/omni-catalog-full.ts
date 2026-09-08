@@ -2,7 +2,6 @@ import type { CalculatorMeta } from '@/config/calculators';
 import { CALCULATORS } from '@/config/calculators';
 import type { CalcContent } from '@/config/calculator-content';
 import { getCalculatorSpec, listFunctionalCalculators } from '@/config/calculator-engine';
-import omniData from '@/config/omni-full-database.json';
 
 export interface OmniCalculatorEntry {
   slug: string;
@@ -30,13 +29,8 @@ export interface OmniCalculatorEntry {
   examples: Array<{ title: string; scenario: string; steps: string[]; result: string }>;
 }
 
-// The large Omni JSON is retained as source data for the generator, but it is never used
-// to decide which calculators are public. Public visibility is derived only from executable
-// handlers plus the small set of registered dedicated renderers.
-const rawOmniList = (omniData && Array.isArray((omniData as { calculators?: unknown[] }).calculators)
-  ? (omniData as { calculators: OmniCalculatorEntry[] }).calculators
-  : []) as OmniCalculatorEntry[];
-
+// Public visibility is derived only from executable handlers plus the small set of
+// registered dedicated renderers. No metadata-only calculator database is published.
 const functionalSlugs = new Set(listFunctionalCalculators());
 const staticBySlug = new Map(CALCULATORS.map((calculator) => [calculator.slug, calculator]));
 
@@ -86,8 +80,7 @@ const functionalCatalog: OmniCalculatorEntry[] = listFunctionalCalculators().map
   };
 });
 
-// Dedicated calculators are real page implementations even though they do not use the
-// generic engine. Detect them from the canonical registry by excluding engine-backed slugs.
+// Dedicated calculators are real page implementations even though they do not use the generic engine.
 const dedicatedCatalog: OmniCalculatorEntry[] = CALCULATORS
   .filter((calculator) => !functionalSlugs.has(calculator.slug))
   .map((calculator) => ({
@@ -106,16 +99,11 @@ const dedicatedCatalog: OmniCalculatorEntry[] = CALCULATORS
     examples: [],
   }));
 
-// IMPORTANT: Do not publish arbitrary records from the 3,728-entry Omni database.
-// The public catalog is exactly the executable engine + registered dedicated renderers.
+// The public catalog is exactly executable engine calculators + registered dedicated renderers.
 const publishedBySlug = new Map<string, OmniCalculatorEntry>();
 for (const item of functionalCatalog) publishedBySlug.set(item.slug, item);
 for (const item of dedicatedCatalog) publishedBySlug.set(item.slug, item);
 const publishedCalculators = Array.from(publishedBySlug.values());
-
-// Keep this reference intentionally used so builds do not accidentally treat the imported
-// Omni dataset as the public source of truth. The dataset itself is not user-visible here.
-void rawOmniList;
 
 const omniBySlugMap = new Map<string, OmniCalculatorEntry>();
 for (const item of publishedCalculators) {
