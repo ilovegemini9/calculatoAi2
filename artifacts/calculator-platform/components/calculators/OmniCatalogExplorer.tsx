@@ -6,7 +6,6 @@ import type { OmniCalculatorEntry } from '@/lib/omni-catalog-full';
 
 interface Props {
   calculators: OmniCalculatorEntry[];
-  categoryCounts: Record<string, number>;
 }
 
 const CATEGORY_TABS = [
@@ -27,16 +26,33 @@ const CATEGORY_TABS = [
   { id: 'other', label: 'Other', icon: '✨' },
 ];
 
-export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
+function normalizeCategory(category: string): string {
+  const normalized = category.trim().toLowerCase();
+  if (normalized === 'financial') return 'finance';
+  if (normalized === 'fitness' || normalized === 'health & fitness') return 'health';
+  if (normalized === 'lifestyle' || normalized === 'everyday') return 'everyday-life';
+  return normalized;
+}
+
+export function OmniCatalogExplorer({ calculators }: Props) {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 24;
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const calculator of calculators) {
+      const category = normalizeCategory(calculator.category);
+      counts[category] = (counts[category] || 0) + 1;
+    }
+    return counts;
+  }, [calculators]);
+
   const filteredCalculators = useMemo(() => {
     let list = calculators;
     if (selectedCategory !== 'all') {
-      list = list.filter((c) => c.category === selectedCategory);
+      list = list.filter((c) => normalizeCategory(c.category) === selectedCategory);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -74,7 +90,7 @@ export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Search 3,900+ calculators (e.g. mortgage, pace, bmi, area)..."
+            placeholder="Search calculators (e.g. mortgage, pace, bmi, area)..."
             className="w-full px-4 py-3 pl-11 rounded-2xl border text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-blue-500 shadow-sm"
             style={{
               backgroundColor: 'var(--bg-card)',
@@ -95,7 +111,7 @@ export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
         </div>
 
         <div className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>
-          Showing <span className="font-bold text-blue-500">{filteredCalculators.length}</span> verified calculators (0 duplicates)
+          Showing <span className="font-bold text-blue-500">{filteredCalculators.length}</span> verified calculators
         </div>
       </div>
 
@@ -159,7 +175,7 @@ export function OmniCatalogExplorer({ calculators, categoryCounts }: Props) {
                     {calc.icon}
                   </span>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
-                    {calc.category}
+                    {normalizeCategory(calc.category)}
                   </span>
                 </div>
                 <h3
