@@ -7,7 +7,7 @@ import { getDb } from '@/lib/db';
 import { getSeoSettings } from '@/lib/seo';
 import { KEYWORD_CLUSTERS } from '@/config/keyword-clusters';
 import { getMenuCalculators, REFERENCE_MENU_GROUPS } from '@/config/menu';
-import { getAllOmniCalculators, getOmniCategoryCount } from '@/lib/omni-catalog-full';
+import { getAllOmniCalculators } from '@/lib/omni-catalog-full';
 import { OmniCatalogExplorer } from '@/components/calculators/OmniCatalogExplorer';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -70,7 +70,6 @@ export default async function HomePage() {
 
   const allCalculators = [...CALCULATORS, ...dynamicCalcs];
   const omniCalculators = getAllOmniCalculators();
-  const categoryCounts = getOmniCategoryCount();
 
   return (
     <>
@@ -147,10 +146,7 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <OmniCatalogExplorer
-          calculators={omniCalculators}
-          categoryCounts={categoryCounts}
-        />
+        <OmniCatalogExplorer calculators={omniCalculators} />
       </section>
 
       {/* ── Reference-style menu map ── */}
