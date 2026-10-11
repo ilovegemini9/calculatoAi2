@@ -83,12 +83,25 @@ const CODE_GEN_MODELS = [
 // Primary: google/gemma-4-31b per spec (strong prose quality).
 // Secondary: google/gemma-4-26b-a4b per spec.
 // Tertiary: nemotron-3-ultra — proven reliable in prior testing.
-const ARTICLE_GEN_MODELS = [
+const DEFAULT_ARTICLE_GEN_MODELS = [
   'google/gemma-4-31b-it:free',             // Primary: article writing & SEO content
   'google/gemma-4-26b-a4b:free',            // Secondary fallback
   'nvidia/nemotron-3-ultra-550b-a55b:free', // Reliable tertiary fallback
   'nvidia/nemotron-3-nano-30b-a3b:free',
 ];
+
+// Auto-generation runs in the API server and cannot read the platform's encrypted
+// AI-provider settings directly. Allow its model cascade to be configured explicitly
+// so operators can use paid models or mirror the manual generator's model choices.
+function getConfiguredModels(envName: string, defaults: string[]): string[] {
+  const configured = process.env[envName]
+    ?.split(',')
+    .map((model) => model.trim())
+    .filter(Boolean);
+  return configured?.length ? configured : defaults;
+}
+
+const ARTICLE_GEN_MODELS = getConfiguredModels('OPENROUTER_ARTICLE_MODELS', DEFAULT_ARTICLE_GEN_MODELS);
 
 // Legacy generic fallback, kept only for call sites not yet split by task type.
 const OPENROUTER_MODELS = CODE_GEN_MODELS;
@@ -1146,7 +1159,7 @@ async function generateArticleInBackground(
 
   try {
     const currentDB = getDB();
-    const openrouterApiKey = currentDB.settings.openrouterApiKey;
+    const openrouterApiKey = currentDB.settings.openrouterApiKey || process.env.OPENROUTER_API_KEY || '';
     const geminiClient = getGeminiClient();
 
     if (!geminiClient && !openrouterApiKey) {
