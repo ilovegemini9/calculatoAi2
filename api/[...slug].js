@@ -30,6 +30,12 @@ function normalizePath(req) {
 export default async function handler(req, res) {
   const pathname = normalizePath(req);
   const automation = await getAutomation();
+
+  // Keep the worker route ahead of the generic /tasks/:id status route.
+  if ((req.method === 'GET' || req.method === 'POST') && pathname === '/tasks/worker') {
+    return automation.worker(req, res);
+  }
+
   const handled = await automation.handle(req, res, pathname);
   if (handled !== false) return;
 
