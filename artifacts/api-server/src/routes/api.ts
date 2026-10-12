@@ -14,15 +14,8 @@ import {
 import type { Article } from '../db/types.js';
 import { validateGeneratedCode } from '../security.js';
 
-// Calculator test runners
-import { runTests as runMortgageTests } from '../calculators/mortgage/tests.js';
-import { runTests as runBmiTests } from '../calculators/bmi/tests.js';
-import { runTests as runPercentageTests } from '../calculators/percentage/tests.js';
-import { runTests as runLoanTests } from '../calculators/loan/tests.js';
-import { runTests as runAgeTests } from '../calculators/age/tests.js';
-import { runTests as runTipTests } from '../calculators/tip/tests.js';
-import { runTests as runCalorieTests } from '../calculators/calorie/tests.js';
-import { runTests as runGpaTests } from '../calculators/gpa/tests.js';
+// Dedicated calculator test modules are not included in this API-server package.
+// Activation of built-in calculators fails closed until their test modules are restored.
 
 const router = Router();
 
@@ -421,14 +414,19 @@ router.post(
     if (targetStatus === 'active') {
       let testResult = { success: false, logs: ['No test runner found'] };
       switch (id) {
-        case 'mortgage': testResult = runMortgageTests(); break;
-        case 'bmi':      testResult = runBmiTests();      break;
-        case 'percentage': testResult = runPercentageTests(); break;
-        case 'loan':     testResult = runLoanTests();     break;
-        case 'age':      testResult = runAgeTests();      break;
-        case 'tip':      testResult = runTipTests();      break;
-        case 'calorie':  testResult = runCalorieTests();  break;
-        case 'gpa':      testResult = runGpaTests();      break;
+        case 'mortgage':
+        case 'bmi':
+        case 'percentage':
+        case 'loan':
+        case 'age':
+        case 'tip':
+        case 'calorie':
+        case 'gpa':
+          testResult = {
+            success: false,
+            logs: ['Dedicated test runner is missing from this deployment. Restore the calculator test module before reactivating this calculator.'],
+          };
+          break;
         default:
           testResult = { success: true, logs: ['Dynamically accepted custom tool'] };
       }
