@@ -1,0 +1,22 @@
+name: Article Automation Worker
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  process-article:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process one queued article
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$APP_URL"
+          test -n "$CRON_SECRET"
+          curl --fail-with-body --silent --show-error \
+            --max-time 330 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$APP_URL/api/tasks/worker"
