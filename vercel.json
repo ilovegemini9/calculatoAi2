@@ -3,12 +3,6 @@
   "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm run vercel:build",
   "outputDirectory": "artifacts/calculator-platform/.next",
-  "crons": [
-    {
-      "path": "/api/tasks/worker",
-      "schedule": "*/5 * * * *"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
