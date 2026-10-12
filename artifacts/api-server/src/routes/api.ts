@@ -412,34 +412,62 @@ router.post(
     const targetStatus = currentStatus === 'active' ? 'inactive' : 'active';
 
     if (targetStatus === 'active') {
-      let testResult = { success: false, logs: ['No test runner found'] };
-      switch (id) {
-        case 'mortgage':
-        case 'bmi':
-        case 'percentage':
-        case 'loan':
-        case 'age':
-        case 'tip':
-        case 'calorie':
-        case 'gpa':
-          testResult = {
-            success: false,
-            logs: ['Dedicated test runner is missing from this deployment. Restore the calculator test module before reactivating this calculator.'],
-          };
-          break;
-        default:
-          testResult = { success: true, logs: ['Dynamically accepted custom tool'] };
-      }
-      if (!testResult.success) {
-        logEvent(
-          'test_hook_failed',
-          `Blocked activation of ${calculator.name} because tests failed.`,
-        );
-        res.status(400).json({
-          error: `Cannot activate calculator: tests failed.`,
-          logs: testResult.logs,
-        });
-        return;
+      // The dedicated per-calculator test modules are not part of this package.
+      // Use the available static safety validator as a fail-closed recovery check,
+      // and require a calculation body before allowing a built-in calculator to activate.
+      const builtInCalculatorIds = new Set([
+        'mortgage',
+        'bmi',
+        'percentage',
+        'loan',
+        'age',
+        'tip',
+        'calorie',
+        'gpa',
+      ]);
+
+      if (builtInCalculatorIds.has(id)) {
+        const calculateBody = calculator.metadata?.calculateBody;
+        if (!calculateBody || !calculateBody.trim()) {
+          const logs = ['Calculator has no calculation body; activation is blocked.'];
+          logEvent(
+            'test_hook_failed',
+            `Blocked activation of ${calculator.name} because its calculation body is missing.`,
+          );
+          res.status(400).json({
+            error: 'Cannot activate calculator: validation failed.',
+            logs,
+          });
+          return;
+        }
+
+        const violations = validateGeneratedCode({ meta: calculator.metadata });
+        if (violations.length > 0) {
+          const logs = [`Unsafe calculator code detected: ${violations.join(', ')}`];
+          logEvent(
+            'test_hook_failed',
+            `Blocked activation of ${calculator.name} because static safety validation failed.`,
+          );
+          res.status(400).json({
+            error: 'Cannot activate calculator: validation failed.',
+            logs,
+          });
+          return;
+        }
+      } else {
+        const violations = validateGeneratedCode({ meta: calculator.metadata });
+        if (violations.length > 0) {
+          const logs = [`Unsafe calculator code detected: ${violations.join(', ')}`];
+          logEvent(
+            'test_hook_failed',
+            `Blocked activation of ${calculator.name} because static safety validation failed.`,
+          );
+          res.status(400).json({
+            error: 'Cannot activate calculator: validation failed.',
+            logs,
+          });
+          return;
+        }
       }
     }
 
