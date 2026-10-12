@@ -14,15 +14,8 @@ import {
 import type { Article } from '../db/types.js';
 import { validateGeneratedCode } from '../security.js';
 
-// Calculator test runners
-import { runTests as runMortgageTests } from '../calculators/mortgage/tests.js';
-import { runTests as runBmiTests } from '../calculators/bmi/tests.js';
-import { runTests as runPercentageTests } from '../calculators/percentage/tests.js';
-import { runTests as runLoanTests } from '../calculators/loan/tests.js';
-import { runTests as runAgeTests } from '../calculators/age/tests.js';
-import { runTests as runTipTests } from '../calculators/tip/tests.js';
-import { runTests as runCalorieTests } from '../calculators/calorie/tests.js';
-import { runTests as runGpaTests } from '../calculators/gpa/tests.js';
+// Dedicated calculator test modules are not included in this API-server package.
+// Activation of built-in calculators fails closed until their test modules are restored.
 
 const router = Router();
 
@@ -419,29 +412,62 @@ router.post(
     const targetStatus = currentStatus === 'active' ? 'inactive' : 'active';
 
     if (targetStatus === 'active') {
-      let testResult = { success: false, logs: ['No test runner found'] };
-      switch (id) {
-        case 'mortgage': testResult = runMortgageTests(); break;
-        case 'bmi':      testResult = runBmiTests();      break;
-        case 'percentage': testResult = runPercentageTests(); break;
-        case 'loan':     testResult = runLoanTests();     break;
-        case 'age':      testResult = runAgeTests();      break;
-        case 'tip':      testResult = runTipTests();      break;
-        case 'calorie':  testResult = runCalorieTests();  break;
-        case 'gpa':      testResult = runGpaTests();      break;
-        default:
-          testResult = { success: true, logs: ['Dynamically accepted custom tool'] };
-      }
-      if (!testResult.success) {
-        logEvent(
-          'test_hook_failed',
-          `Blocked activation of ${calculator.name} because tests failed.`,
-        );
-        res.status(400).json({
-          error: `Cannot activate calculator: tests failed.`,
-          logs: testResult.logs,
-        });
-        return;
+      // The dedicated per-calculator test modules are not part of this package.
+      // Use the available static safety validator as a fail-closed recovery check,
+      // and require a calculation body before allowing a built-in calculator to activate.
+      const builtInCalculatorIds = new Set([
+        'mortgage',
+        'bmi',
+        'percentage',
+        'loan',
+        'age',
+        'tip',
+        'calorie',
+        'gpa',
+      ]);
+
+      if (builtInCalculatorIds.has(id)) {
+        const calculateBody = calculator.metadata?.calculateBody;
+        if (!calculateBody || !calculateBody.trim()) {
+          const logs = ['Calculator has no calculation body; activation is blocked.'];
+          logEvent(
+            'test_hook_failed',
+            `Blocked activation of ${calculator.name} because its calculation body is missing.`,
+          );
+          res.status(400).json({
+            error: 'Cannot activate calculator: validation failed.',
+            logs,
+          });
+          return;
+        }
+
+        const violations = validateGeneratedCode({ meta: calculator.metadata });
+        if (violations.length > 0) {
+          const logs = [`Unsafe calculator code detected: ${violations.join(', ')}`];
+          logEvent(
+            'test_hook_failed',
+            `Blocked activation of ${calculator.name} because static safety validation failed.`,
+          );
+          res.status(400).json({
+            error: 'Cannot activate calculator: validation failed.',
+            logs,
+          });
+          return;
+        }
+      } else {
+        const violations = validateGeneratedCode({ meta: calculator.metadata });
+        if (violations.length > 0) {
+          const logs = [`Unsafe calculator code detected: ${violations.join(', ')}`];
+          logEvent(
+            'test_hook_failed',
+            `Blocked activation of ${calculator.name} because static safety validation failed.`,
+          );
+          res.status(400).json({
+            error: 'Cannot activate calculator: validation failed.',
+            logs,
+          });
+          return;
+        }
       }
     }
 
